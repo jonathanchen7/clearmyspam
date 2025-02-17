@@ -1,0 +1,62 @@
+# Files in the config/locales directory are used for internationalization and
+# are automatically loaded by Rails. If you want to use locales other than
+# English, add the necessary files in this directory.
+#
+# To use the locales, use `I18n.t`:
+#
+#     I18n.t "hello"
+#
+# In views, this is aliased to just `t`:
+#
+#     <%= t("hello") %>
+#
+# To use a different locale, set it with `I18n.locale`:
+#
+#     I18n.locale = :es
+#
+# This would use the information in config/locales/es.yml.
+#
+# To learn more about the API, please read the Rails Internationalization guide
+# at https://guides.rubyonrails.org/i18n.html.
+#
+# Be aware that YAML interprets the following case-insensitive strings as
+# booleans: `true`, `false`, `on`, `off`, `yes`, `no`. Therefore, these strings
+# must be quoted to be interpreted as strings. For example:
+#
+#     en:
+#       "yes": yup
+#       enabled: "ON"
+
+en:
+  toasts:
+    protect:
+      success:
+        title: "%{count} %{email} protected"
+    unprotect:
+      success:
+        title: "%{count} %{email} unprotected"
+    dispose:
+      no_emails:
+        title: "No emails to %{dispose}"
+      success:
+        title: "%{count} %{email} %{disposed}"
+      async:
+        title: "%{count} %{email} %{disposing} in the background..."
+      free_trial_limit:
+        title: "Free trial limit reached"
+        text: "You have reached the free trial %{disposing} limit. Upgrade your account to unlock unlimited access!"
+        cta: "Upgrade"
+      delete_all_from_sender:
+        text: "We found %{remaining_count} remaining%{unread} emails in your inbox from %{senders}. Would you like to %{dispose} them? Protected emails will not be %{disposed}."
+        cta: "%{dispose} All"
+    dispose_all:
+      async:
+        title: "%{disposing}..."
+        text: "%{disposing}%{unread} emails from %{senders} in the background."
+  buttons:
+    load_more: "Load more"
+    all_emails_loaded: "All emails loaded"
+    protect_all: "Protect all"
+    unprotect_all: "Unprotect all"
+    archive_all: "Archive all"
+    delete_all: "Delete all"

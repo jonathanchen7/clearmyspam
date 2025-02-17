@@ -1,0 +1,24 @@
+<%= turbo_frame_tag "load_more" do %>
+  <div class="flex flex-row items-center gap-x-2">
+    <p class="text-xs text-gray-500">
+      <%= @inbox&.size || 0 %> emails
+    </p>
+    <%= button_to dashboard_load_more_path,
+                  title: "Load More Emails",
+                  data: Views::StimulusData.new(
+                    controllers: "inbox",
+                    targets: { "inbox" => "loadMoreButton" },
+                    actions: { "click" => %w[inbox#showLoadingState toast#notify] },
+                    params: {
+                      "toast" => {
+                        "title" => "Loading more emails...",
+                        "text" => "This will take a few seconds."
+                      }
+                    }
+                  ).erb_attributes,
+                  disabled: @inbox.nil? || no_more_emails?(@inbox),
+                  class: "flex items-center justify-center gap-x-2 rounded-full bg-primary px-3 py-1 text-xs text-white hover:brightness-90 duration-200 disabled:cursor-default disabled:opacity-50" do %>
+      <%= @inbox.nil? || no_more_emails?(@inbox) ? I18n.t("buttons.all_emails_loaded") : I18n.t("buttons.load_more") %>
+    <% end %>
+  </div>
+<% end %>

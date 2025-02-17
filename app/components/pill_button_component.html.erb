@@ -1,0 +1,15 @@
+<% base_styles = "text-xs rounded-full px-2 py-1 disabled:opacity-50 hover:enabled:brightness-90" %>
+<% if @path.present? %>
+  <%= button_to @path,
+                data: @stimulus_data&.erb_attributes,
+                class: class_names(base_styles, button_styles),
+                disabled: @disabled do %>
+    <%= content %>
+  <% end %>
+<% else %>
+  <button <%= "disabled" if @disabled %>
+          <%= @stimulus_data&.html_attributes %>
+          class="<%= class_names(base_styles, button_styles) %>">
+    <%= content %>
+  </button>
+<% end %>

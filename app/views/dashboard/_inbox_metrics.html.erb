@@ -1,0 +1,14 @@
+<%= turbo_frame_tag "inbox_metrics", class: "w-full sm:w-auto flex flex-col sm:flex-row items-center gap-x-1 gap-y-1" do %>
+  <div class='w-full sm:w-auto flex flex-row items-center gap-x-1'>
+    <%= render Dashboard::InboxMetricsPillComponent.new(@inbox&.metrics&.total, icon: "inbox", suffix: "emails") %>
+    <%= render Dashboard::InboxMetricsPillComponent.new(@inbox&.metrics&.unread, icon: "envelope-circle-check", suffix: "unread") %>
+  </div>
+  <div class="w-full sm:w-auto flex flex-row items-center gap-x-1">
+    <% if Current.options.archive_email_threads? %>
+      <%= render Dashboard::InboxMetricsPillComponent.new(@inbox&.metrics&.archived, icon: "box-archive", suffix: "archived") %>
+    <% else %>
+      <%= render Dashboard::InboxMetricsPillComponent.new(@inbox&.metrics&.trashed, icon: "trash-can", suffix: "deleted") %>
+    <% end %>
+    <%= render Dashboard::InboxMetricsPillComponent.new(@inbox&.metrics&.protected, icon: "lock", suffix: "protected") %>
+  </div>
+<% end %>

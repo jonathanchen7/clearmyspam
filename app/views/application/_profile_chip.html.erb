@@ -1,0 +1,23 @@
+<%# locals: (user:) %>
+<div class="relative" data-controller="profile">
+  <div data-profile-target="profileChip"
+       data-action="click->profile#toggleDropdown"
+       class="flex flex-row items-center justify-end gap-x-2 cursor-pointer">
+    <div class="hidden lg:block text-right">
+      <p class="text-sm"><%= user.name %></p>
+      <p class="text-xs text-gray-400"><%= user.email %></p>
+    </div>
+    <%= image_tag user.image,
+                  alt: "profile picture",
+                  class: "h-7 w-7 sm:h-9 sm:w-9 rounded-full outline outline-1 outline-gray-300" %>
+  </div>
+  <div data-profile-target="dropdownContainer" class="hidden absolute right-0 flex flex-col divide-y w-36 sm:w-56 text-xs text-gray-500 rounded bg-white mt-2 outline outline-1 outline-gray-300 shadow z-10">
+    <% if user.active_pro? %>
+      <div data-action="click->profile#openBilling" class="p-3 hover:bg-gray-200 duration-200 cursor-pointer">Billing</div>
+    <% end %>
+    <%= button_to "Sign Out",
+                  dashboard_logout_path,
+                  data: { turbo_method: :delete },
+                  class: "w-full text-left p-3 hover:bg-gray-200 duration-200 cursor-pointer" %>
+  </div>
+</div>

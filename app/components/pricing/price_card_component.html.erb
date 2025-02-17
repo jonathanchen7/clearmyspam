@@ -1,0 +1,43 @@
+<div class="<%= class_names(@featured ? "ring-primary" : "ring-gray-200", "rounded-3xl p-8 ring-2 xl:p-10") %>">
+  <div class="flex items-center justify-between gap-x-4">
+    <h3 id="tier-startup" class="text-lg/8 font-semibold text-primary"><%= @name %></h3>
+    <% if @tag %>
+      <p class="rounded-full bg-primary/10 px-2.5 py-1 text-xs/5 font-semibold text-primary"><%= @tag %></p>
+    <% end %>
+  </div>
+  <p class="mt-4 text-sm/6 text-gray-600"><%= @subtitle %></p>
+  <p class="mt-6 flex items-baseline gap-x-1">
+    <span class="text-4xl font-semibold tracking-tight text-gray-900">$<%= @price %></span>
+    <span class="text-sm/6 font-semibold text-gray-600">/ <%= @term %></span>
+  </p>
+  <% featured_styling = "bg-primary text-white shadow-sm hover:bg-primary-hover" %>
+  <% regular_styling = "text-primary ring-1 ring-inset ring-primary hover:ring-primary-hover" %>
+  <% default_styling = "mt-6 block w-full rounded-md px-3 py-2 text-center text-sm/6 font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary duration-200" %>
+  <% button_styling = class_names(default_styling, @featured ? featured_styling : regular_styling) %>
+  <% if helpers.current_user.present? %>
+    <% if helpers.current_user.active_pro? %>
+      <%= link_to "Dashboard →", app_path, class: button_styling, data: { "turbo-prefetch": false } %>
+    <% elsif @plan_type == "free" %>
+      <%= link_to "Get Started", app_path, class: button_styling, data: { "turbo-prefetch": false } %>
+    <% else %>
+      <button data-controller="pricing"
+              data-action="click->pricing#checkout"
+              data-pricing-plan-type-value="<%= @plan_type %>"
+              class="<%= button_styling %>">
+        <%= @cta %>
+      </button>
+    <% end %>
+  <% else %>
+    <%= button_to "Login to get started", user_google_oauth2_omniauth_authorize_path,
+                  data: { turbo: false }, form_class: "contents", class: button_styling %>
+  <% end %>
+
+  <ul role="list" class="mt-8 space-y-3 text-sm/6 text-gray-600 xl:mt-10">
+    <% @features.each do |feature| %>
+      <li class="flex gap-x-3">
+        <%= icon("fa-solid", "check", class: "text-primary text-lg") %>
+        <%= feature %>
+      </li>
+    <% end %>
+  </ul>
+</div>

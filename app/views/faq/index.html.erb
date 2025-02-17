@@ -1,0 +1,47 @@
+<div class="w-full">
+  <div class="bg-white">
+    <div class="mx-auto max-w-7xl px-6 py-4 sm:pt-32 lg:px-8 lg:py-40">
+      <div class="lg:grid lg:grid-cols-12 lg:gap-8">
+        <div class="lg:col-span-5">
+          <h2 class="text-pretty text-2xl sm:text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl">
+            Frequently asked questions
+          </h2>
+          <p class="mt-4 text-sm text-base/7 text-gray-600">
+            Can’t find the answer you’re looking for? Ask me directly at
+            <a href="mailto:jonathanchen.dev@gmail.com" class="font-medium text-primary hover:text-primary">
+              jonathanchen.dev@gmail.com
+            </a>.
+          </p>
+        </div>
+        <div class="mt-4 lg:col-span-7 lg:mt-0">
+          <dl class="divide-y">
+            <%= render FAQ::FAQComponent.new(
+              question: "What is Clear My Spam?",
+              answer: "Clear My Spam is a web app designed to declutter your Gmail inbox, with an emphasis on simplicity, usability, and security."
+            ) %>
+            <%= render FAQ::FAQComponent.new(
+              question: "What happens to my email data?",
+              answer: "Clear My Spam does not store any email data and will never sell anyone's personal information. Emails are temporarily cached during your browsing session and are never sent to or processed by third parties."
+            ) %>
+            <%= render FAQ::FAQComponent.new(
+              question: "Will you open source this project?",
+              answer: "Yes! Clear My Spam is in the process of being open sourced. Stay tuned for updates!"
+            ) %>
+            <%= render FAQ::FAQComponent.new(
+              question: "What email providers do you support?",
+              answer: "At this time, Clear My Spam only supports Gmail and Google Workspace accounts. If you have a request, send it our way!"
+            ) %>
+            <%= render FAQ::FAQComponent.new(
+              question: "How does this work?",
+              answer: "Clear My Spam's uses Google's public Gmail API under the hood to fetch, organize, and delete emails."
+            ) %>
+            <%= render FAQ::FAQComponent.new(
+              question: "Who is behind Clear My Spam?",
+              answer: "Hey, nice to meet you! Clear My Spam is solely maintained and developed by me (Jonathan Chen), a software engineer with self-diagnosed \"digital OCD\". This website has been incredibly fun to develop and I hope you'll find it useful!"
+            ) %>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

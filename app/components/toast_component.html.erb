@@ -1,0 +1,38 @@
+<div class="<%= class_names("toast-container", "pointer-events-none fixed inset-0 flex items-end px-4 py-6 sm:items-end sm:p-6 z-50") %>">
+  <div class="flex w-full flex-col items-center space-y-4 sm:items-end">
+    <%
+      original_position = "translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+      styling = "pointer-events-auto w-full max-w-sm overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-black/5"
+    %>
+    <div <%= @placeholder ? "id=toast-placeholder" : nil %>
+         class="<%= class_names("toast", original_position, styling, @placeholder && "hidden") %>"
+         data-toast-target="toast">
+      <div class="grid grid-cols-12 gap-x-2 gap-y-1.5 p-4">
+        <div class="flex items-center justify-center">
+          <%= icon("fa-solid", icon_name, class: class_names(icon_color, "text-lg")) %>
+        </div>
+        <div class="col-span-10 flex items-center">
+          <p class="toast-title text-sm font-medium text-gray-900"><%= @title %></p>
+        </div>
+        <div class="flex items-center justify-center">
+          <button class="inline-flex rounded-md bg-white text-gray-400 hover:text-gray-500"
+                  data-action="click->toast#dismiss">
+            <span class="sr-only">Close</span>
+            <%= icon("fa-solid", "xmark") %>
+          </button>
+        </div>
+        <div class="toast-text-row hidden col-start-2 col-span-10">
+          <p class="toast-text text-sm text-gray-500"><%= @text %></p>
+        </div>
+        <% if @cta_stimulus_data.present? %>
+          <div class="col-start-2 col-span-10">
+            <button <%= @cta_stimulus_data.html_attributes %>
+                    class="rounded-md bg-white text-sm font-medium text-primary hover:text-primary/75 duration-200">
+              <%= @cta_text %>
+            </button>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

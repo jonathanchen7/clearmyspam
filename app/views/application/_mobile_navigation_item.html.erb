@@ -1,0 +1,10 @@
+<%# locals: (text:, path:, icon: nil, highlight: false) %>
+<%= link_to path,
+            class: class_names(
+              "text-sm flex items-center justify-center gap-x-1.5 p-3",
+              highlight ? "bg-primary text-white" : "text-gray-800",
+              current_page?(path) ? "bg-gray-200 font-semibold" : "font-normal",
+            ) do %>
+  <%= text %>
+  <%= icon('fa-solid', icon, class: "text-xs") if icon.present? %>
+<% end %>

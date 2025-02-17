@@ -1,0 +1,130 @@
+<%# locals: (sender:) %>
+<% sender_email_threads = @inbox.sender_emails(sender.id, sorted: true) %>
+<%= turbo_frame_tag "sender_drawer",
+                    data: Views::StimulusData.new(
+                      include_controller: true,
+                      controllers: "sender-drawer",
+                      targets: { "sender-drawer" => "drawerContainer" },
+                      values: { "sender-drawer" => { "sender-id" => sender.id.to_s, "sender-email" => sender.email } }
+                    ).erb_attributes do %>
+  <div class="relative" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 z-20 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
+    <div class="fixed inset-0 z-20">
+      <div class="absolute inset-0">
+        <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full">
+          <div class="pointer-events-auto w-screen max-w-sm sm:max-w-3xl" data-sender-drawer-target="drawer">
+            <div class="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
+              <div class="px-2 sm:px-4">
+                <div class="sticky top-0 bg-white z-30">
+                  <div class="flex justify-between pt-4 sm:pt-5 mb-2">
+                    <div class="flex flex-col sm:flex-row gap-y-2 gap-x-4">
+                      <div class="flex flex-row gap-x-2 items-center">
+                        <%= render Dashboard::SenderPictureComponent.new(sender) %>
+                        <%= render Dashboard::SenderDetailsComponent.new(
+                          sender,
+                          actionable_thread_count: actionable_thread_count(sender_email_threads),
+                          protected_thread_count: protected_thread_count(sender_email_threads)
+                        ) %>
+                      </div>
+                    </div>
+                    <div class="ml-3 flex h-7 items-center">
+                      <button
+                        type="button"
+                        class="relative rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                        data-sender-drawer-target="closeButton"
+                      >
+                        <span class="absolute -inset-2.5"></span>
+                        <span class="sr-only">Close panel</span>
+                        <%= icon("fa-solid", "xmark") %>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-between py-1 sm:py-2 px-2 sm:px-4">
+                    <div class="flex items-center gap-x-2">
+                      <div class="flex items-center gap-x-2">
+                        <%= check_box_tag(false,
+                                          class: "h-3.5 w-3.5 rounded",
+                                          data: {
+                                            action: "change->sender-drawer#toggleSelectAll",
+                                            "sender-drawer-target": "selectAllCheckbox"
+                                          }) %>
+                      </div>
+                      <div class="flex items-center">
+                        <%= render IconButtonComponent.new(
+                          icon: Current.options.archive_email_threads? ? "box-archive" : "trash-can",
+                          color: "text-danger",
+                          disabled: true,
+                          tooltip: "#{Current.options.archive_email_threads? ? "Archive" : "Delete"} Selected",
+                          stimulus_data: Views::StimulusData.new(
+                            actions: { "click" => "sender-drawer#disposeSelected" },
+                            targets: { "sender-drawer" => "disposeIconButton" }
+                          )
+                        ) %>
+                        <%= render IconButtonComponent.new(
+                          icon: "lock",
+                          color: "text-success",
+                          tooltip: "Protect Selected",
+                          disabled: true,
+                          stimulus_data: Views::StimulusData.new(
+                            actions: { "click" => "sender-drawer#protectSelected" },
+                            targets: { "sender-drawer" => "protectIconButton" }
+                          )
+                        ) %>
+                        <%= render IconButtonComponent.new(
+                          icon: "lock-open",
+                          color: "text-warning",
+                          tooltip: "Unprotect Selected",
+                          disabled: true,
+                          stimulus_data: Views::StimulusData.new(
+                            actions: { "click" => "sender-drawer#unprotectSelected" },
+                            targets: { "sender-drawer" => "unprotectIconButton" }
+                          )
+                        ) %>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-x-2">
+                      <%= render PillButtonComponent.new(
+                        type: DashboardHelper::ButtonTypes::TEXT,
+                        stimulus_data: Views::StimulusData.new(
+                          controllers: "sender-drawer",
+                          actions: { "click" => "sender-drawer#unsubscribe" },
+                          targets: { "sender-drawer" => "unsubscribeButton" }
+                        )
+                      ) do %>
+                        Unsubscribe
+                      <% end %>
+                      <% final_page_fetched = @inbox.final_page_fetched?(sender_id: sender.id) %>
+                      <%= render PillButtonComponent.new(
+                        path: dashboard_load_more_path(sender_id: sender.id, drawer: true),
+                        disabled: final_page_fetched,
+                        stimulus_data: Views::StimulusData.new(
+                          actions: { "click" => "toast#notify" },
+                          params: {
+                            "toast" => {
+                              "title" => "Loading more emails from #{sender.name}...",
+                              "text" => "This may take up to 30 seconds."
+                            }
+                          }
+                        )) do %>
+                        <%= final_page_fetched ? I18n.t("buttons.all_emails_loaded") : I18n.t("buttons.load_more") %>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+                <% if sender_email_threads.any? %>
+                  <div class="relative flex-1 divide-y mb-2">
+                    <%= render Dashboard::EmailThreadComponent.with_collection(sender_email_threads) %>
+                  </div>
+                <% else %>
+                  <div class="flex flex-col items-center justify-center text-gray-500 text-sm mt-4">
+                    No emails!
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

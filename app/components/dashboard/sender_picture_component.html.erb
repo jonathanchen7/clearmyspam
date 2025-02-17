@@ -1,0 +1,11 @@
+<% picture_style = "flex flex-row items-center justify-center outline outline-1 outline-gray-400 bg-white rounded-full h-8 w-8 sm:h-10 sm:w-10 font-medium" %>
+<% if @sender.personal? %>
+  <div class="<%= picture_style %>">
+    <%= initials %>
+  </div>
+<% else %>
+  <img src="<%= logo_url %>" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';" class="<%= picture_style %>"/>
+  <div class="hidden flex-row items-center justify-center outline outline-1 outline-gray-400 bg-white rounded-full h-8 w-8 sm:h-10 sm:w-10">
+    <%= initials %>
+  </div>
+<% end %>

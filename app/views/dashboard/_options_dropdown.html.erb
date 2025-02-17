@@ -1,0 +1,64 @@
+<%= turbo_frame_tag "options_dropdown" do %>
+  <div class="flex flex-col gap-y-2">
+    <div class="flex flex-row justify-between items-center">
+      Hide Personal Emails
+      <%= render partial: "application/toggle",
+                 locals: {
+                   path: options_update_path,
+                   params: { options: { hide_personal_emails: !Current.options.hide_personal_emails } },
+                   enabled: Current.options.hide_personal_emails,
+                   data: Views::StimulusData.new(
+                     targets: { "options" => "hidePersonalEmailsToggle" },
+                     actions: { "click" => "options#disableOptions" }
+                   ).erb_attributes
+                 } %>
+    </div>
+    <div class="flex flex-row justify-between items-center">
+      Show Unread Only
+      <%= render partial: "application/toggle",
+                 locals: {
+                   path: options_update_path,
+                   params: { options: { unread_only: !Current.options.unread_only } },
+                   enabled: Current.options.unread_only,
+                   data: Views::StimulusData.new(
+                     targets: { "options" => "unreadOnlyToggle" },
+                     actions: { "click" => %w[inbox#showLoadingState toast#notify] },
+                     params: {
+                       "inbox" => { "enable" => "options" },
+                       "toast" => { "title" => "Refreshing...", "text" => "This will take a few seconds." }
+                     }
+                   ).erb_attributes
+                 } %>
+    </div>
+    <div aria-hidden="true" class="inset-0 flex items-center">
+      <div class="w-full border-t border-gray-300"></div>
+    </div>
+    <div class="flex flex-col gap-y-2">
+      Default Email Action
+      <%
+        selected_button_styling = "bg-primary outline-primary text-white"
+        unselected_button_styling = "bg-white outline-primary"
+      %>
+      <div class="flex flex-row gap-x-2">
+        <%= button_to "Delete", options_update_path,
+                      params: { options: { archive_email_threads: false } },
+                      class: class_names(
+                        "rounded-sm outline outline-1 px-2 py-1",
+                        Current.options.archive_email_threads ? unselected_button_styling : selected_button_styling),
+                      data: Views::StimulusData.new(
+                        targets: { "options" => "trashOption" },
+                        actions: { "click" => "options#disableOptions" },
+                      ).erb_attributes %>
+        <%= button_to "Archive", options_update_path,
+                      params: { options: { archive_email_threads: true } },
+                      class: class_names(
+                        "rounded-sm outline outline-1 px-2 py-1",
+                        Current.options.archive_email_threads ? selected_button_styling : unselected_button_styling),
+                      data: Views::StimulusData.new(
+                        targets: { "options" => "archiveOption" },
+                        actions: { "click" => "options#disableOptions" },
+                      ).erb_attributes %>
+      </div>
+    </div>
+  </div>
+<% end %>

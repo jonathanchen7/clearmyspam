@@ -1,0 +1,45 @@
+<div id="inbox_actions" class="flex flex-row items-center">
+  <%= render IconButtonComponent.new(
+    icon: "rotate",
+    color: "text-primary",
+    disabled: @inbox.nil?,
+    path: helpers.dashboard_resync_path,
+    tooltip: "Refresh Inbox",
+    stimulus_data: Views::StimulusData.new(
+      targets: { "inbox" => "resyncIconButton" },
+      actions: { "click" => %w[inbox#showLoadingState toast#notify] },
+      params: { "toast" => { "title" => "Refreshing...", "text" => "This will take a few seconds." } }
+    )
+  ) %>
+  <%= render IconButtonComponent.new(
+    icon: Current.options.archive_email_threads? ? "box-archive" : "trash-can",
+    color: "text-danger",
+    disabled: true,
+    tooltip: "#{Current.options.archive_email_threads? ? "Archive" : "Delete"} Selected",
+    stimulus_data: Views::StimulusData.new(
+      targets: { "inbox" => "disposeIconButton" },
+      actions: { "click" => "inbox#disposeSelected" }
+    )
+  ) %>
+  <%= render IconButtonComponent.new(
+    icon: "lock",
+    color: "text-success",
+    disabled: true,
+    tooltip: "Protect Selected",
+    stimulus_data: Views::StimulusData.new(
+      targets: { "inbox" => "protectIconButton" },
+      actions: { "click" => "inbox#protectSelected" }
+    )
+  ) %>
+  <%= render IconButtonComponent.new(
+    icon: "lock-open",
+    color: "text-warning",
+    disabled: true,
+    tooltip: "Unprotect Selected",
+    stimulus_data: Views::StimulusData.new(
+      targets: { "inbox" => "unprotectIconButton" },
+      actions: { "click" => "inbox#unprotectSelected" }
+    )
+  ) %>
+</div>
+

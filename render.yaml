@@ -1,0 +1,40 @@
+databases:
+  - name: clearmyspam-db
+    databaseName: clearmyspam
+    user: clearmyspam
+    plan: basic-256mb
+    diskSizeGB: 1
+    region: oregon
+
+services:
+  - type: web
+    name: clearmyspam
+    runtime: ruby
+    plan: starter
+    region: oregon
+    buildCommand: "./bin/render-build.sh"
+    preDeployCommand: "bundle exec rails db:migrate"
+    startCommand: "bundle exec rails server"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: clearmyspam-db
+          property: connectionString
+      - key: RAILS_MASTER_KEY
+        sync: false
+      - key: WEB_CONCURRENCY
+        value: 2 # sensible default
+  - type: worker
+    name: clearmyspam-worker
+    plan: starter
+    runtime: ruby
+    region: oregon
+    buildCommand: "./bin/render-build.sh"
+    startCommand: "bundle exec good_job start"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: clearmyspam-db
+          property: connectionString
+      - key: RAILS_MASTER_KEY
+        sync: false

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= content_for(:title) || "Clear My Spam" %></title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="mobile-web-app-capable" content="yes">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <%= yield :head %>
+
+  <% favicon_link_tag asset_path("/icon.png") %>
+  <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+
+<body>
+<main class="flex flex-col min-h-screen" data-controller="toast">
+  <%= turbo_frame_tag "notifications" do %>
+    <%= render ToastComponent.new(placeholder: true) %>
+  <% end %>
+  <%= render partial: "header" %>
+  <div class="flex flex-col grow">
+    <%= yield %>
+  </div>
+  <%= render partial: "footer" %>
+</main>
+</body>
+</html>

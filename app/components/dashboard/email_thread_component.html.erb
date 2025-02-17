@@ -1,0 +1,52 @@
+<div
+  class="email-thread group relative w-full flex flex-row items-center gap-x-3 sm:gap-x-4 overflow-hidden p-2 sm:px-4 hover:bg-gray-200 duration-200 "
+  data-sender-drawer-email-thread-id-param="<%= email_thread.id %>"
+  data-email-thread-id-value="<%= email_thread.id %>"
+  data-protected-value="<%= email_thread.protected? %>"
+  data-action="click->sender-drawer#selectEmailThread"
+>
+  <div class="min-h-4 min-w-4 sm:min-h-3.5 sm:min-w-3.5 rounded text-primary-400 flex flex-row items-center gap-x-3">
+    <%= check_box_tag(email_thread.id,
+                      false,
+                      class: "h-3.5 w-3.5 rounded",
+                      data: {
+                        action: "click->sender-drawer#checkboxClicked",
+                        "sender-drawer-target": "emailThreadCheckbox"
+                      }) %>
+    <div class="flex flex-col overflow-hidden">
+      <div class="sm:flex items-start gap-x-3">
+        <div class="flex items-center gap-x-2">
+          <p class="text-sm text-gray-900 truncate font-medium"><%= email_subject %></p>
+          <%= helpers.icon("fa-solid", "lock", class: "text-success text-xs") if email_thread.protected? %>
+        </div>
+      </div>
+      <div class="mt-0.5 flex items-center gap-x-1 text-xs text-gray-500">
+        <p class="shrink-0">
+          <%= relative_date %>
+        </p>
+        <% if email_thread.snippet.present? %>
+          <p class="truncate">• <%= email_thread.snippet %></p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <div class="hidden sm:flex flex-row absolute right-2 invisible group-hover:visible p-1 rounded-md group-hover:bg-gray-200 group-hover:duration-300">
+    <button
+      class="flex items-center justify-center h-8 w-8 rounded-full hover:enabled:bg-gray-100 hover:duration-200 disabled:opacity-50"
+      data-action="click->sender-drawer#toggleProtection"
+      data-sender-drawer-email-thread-id-param="<%= email_thread.id %>"
+      data-sender-drawer-protected-param="<%= email_thread.protected? %>"
+    >
+      <%= toggle_protection_button_icon %>
+    </button>
+    <% if email_thread.actionable? %>
+      <button
+        class="flex items-center justify-center h-8 w-8 rounded-full hover:enabled:bg-gray-100 hover:duration-200 disabled:opacity-50"
+        data-action="click->sender-drawer#dispose"
+        data-sender-drawer-email-thread-id-param="<%= email_thread.id %>"
+      >
+        <%= dispose_button_icon %>
+      </button>
+    <% end %>
+  </div>
+</div>

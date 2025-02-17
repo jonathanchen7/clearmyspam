@@ -1,0 +1,55 @@
+<%= turbo_frame_tag "senders_table" do %>
+  <div class="mx-3 sm:mx-4 mb-3 sm:mb-4">
+    <%= render Dashboard::LoadingSendersTableComponent.new(@inbox) %>
+    <div id="notifications" class="absolute"></div>
+    <% if flash.alert %>
+      <%= render ToastComponent.new(
+        title: "Error",
+        text: flash.alert,
+        type: ToastComponent::TYPE::ERROR
+      ) %>
+      <% flash.discard %>
+    <% end %>
+    <% if @inbox.present? %>
+      <div class="flex flex-col divide-y border-b" data-turbo-prefetch="false" data-inbox-target="sendersTable">
+        <% @inbox.emails_by_sender(hide_personal_emails: Current.options.hide_personal_emails).each do |sender, sender_email_threads| %>
+          <%= render Dashboard::SenderRowComponent.new(
+            sender,
+            sender_emails: sender_email_threads,
+            final_page_fetched: @inbox.final_page_fetched?(sender_id: sender.id),
+          ) %>
+        <% end %>
+      </div>
+    <% end %>
+    <% unless current_user.active_pro? %>
+      <%= render FloatingBannerComponent.new(
+        cta_text: "Go Pro",
+        cta_stimulus_data: Views::StimulusData.new(
+          controllers: "pricing",
+          actions: { "click" => "pricing#checkout" },
+          values: { "pricing" => { "plan-type" => "monthly" } },
+          include_controller: true
+        )
+      ) do %>
+        <% if current_user.unpaid? %>
+          <% if current_user.remaining_disposal_count.zero? %>
+            You have reached your free trial limit of
+            <b class="text-primary"><%= current_user.active_account_plan.thread_disposal_limit %></b>
+            deleted emails.
+          <% else %>
+            You can delete
+            <b class="text-primary">
+              <%= current_user.remaining_disposal_count %>
+            </b>
+            more emails on the free plan.
+          <% end %>
+          Upgrade to pro to unlock all features!
+        <% elsif current_user.inactive_pro? %>
+          Your Clear My Spam Pro subscription has expired. Please renew to regain access to all features.
+        <% else %>
+          Upgrade to Clear My Spam Pro to unlock all features!
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

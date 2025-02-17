@@ -1,0 +1,35 @@
+<div class="my-8 sm:my-12 px-6">
+  <div class="mx-auto max-w-2xl lg:text-center">
+    <h2 class="text-base font-semibold text-primary">Features</h2>
+    <p class="mt-2 text-3xl font-bold text-gray-900 sm:text-4xl">
+      Effortlessly clean your inbox.
+    </p>
+    <p class="mt-6 text-lg leading-8 text-gray-600">
+      Designed to be secure, intuitive, and fast, Clear My Spam is laser-focused on cleaning your inbox.
+    </p>
+  </div>
+  <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-4xl">
+    <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-6 lg:max-w-none lg:grid-cols-2 lg:gap-y-8">
+      <%= render Home::FeatureComponent.new(
+        title: "Bulk Deletion",
+        description: "Delete hundreds of emails with a single click.",
+        icon: "trash"
+      ) %>
+      <%= render Home::FeatureComponent.new(
+        title: "Data Security",
+        description: "Clear My Spam does not store any of your email data and strictly adheres to Gmail's user data policies.",
+        icon: "shield-halved"
+      ) %>
+      <%= render Home::FeatureComponent.new(
+        title: "One-Click Unsubscribe",
+        description: "Easily unsubscribe from email newsletters and spam lists.",
+        icon: "newspaper"
+      ) %>
+      <%= render Home::FeatureComponent.new(
+        title: "Email Safeguarding",
+        description: "Protect important emails from deletion.",
+        icon: "lock"
+      ) %>
+    </dl>
+  </div>
+</div>

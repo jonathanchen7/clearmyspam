@@ -1,0 +1,30 @@
+<h1 class="sm:mt-16 text-3xl sm:text-5xl font-semibold tracking-tight text-gray-900">
+  Inbox zero made easy.
+</h1>
+<h2 class="mt-6 text-md sm:text-lg sm:leading-8 text-gray-500">
+  Delete thousands of emails and unsubscribe from all newsletters in minutes.
+</h2>
+<div class="mt-4 sm:mt-10 flex items-center justify-center gap-x-6">
+  <% if current_user %>
+    <%= link_to "Dashboard →",
+                app_path,
+                form_class: "contents",
+                data: { "turbo-prefetch": false },
+                class: "font-medium text-sm bg-primary text-white py-1 px-3 rounded-full hover:bg-primary-hover cursor-pointer duration-200" %>
+  <% else %>
+    <%= button_to "Get Started →",
+                  user_google_oauth2_omniauth_authorize_path,
+                  form_class: "contents",
+                  data: { turbo: false },
+                  class: "font-medium text-sm bg-primary text-white py-1 px-3 rounded-full hover:bg-primary-hover cursor-pointer duration-200" %>
+  <% end %>
+  <%= link_to "FAQs",
+              faq_path,
+              form_class: "contents",
+              data: { "turbo-prefetch": false },
+              class: "font-medium text-sm ring-1 ring-gray-300 py-1 px-3 rounded-full hover:bg-gray-50 cursor-pointer" %>
+</div>
+<div class="flex justify-center">
+  <img class="sm:hidden mt-12 mb-8" src="<%= asset_path('mobile_mockup.png') %>" alt="Clear My Spam screenshot"/>
+  <img class="hidden sm:block sm:max-w-2xl sm:max-w-3xl lg:max-w-5xl mx-4 my-16 rounded-2xl shadow-2xl border" src="<%= asset_path('desktop_mockup.png') %>" alt="Clear My Spam screenshot"/>
+</div>

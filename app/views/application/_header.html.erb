@@ -1,0 +1,49 @@
+<div class="s-full h-12 sm:h-16 px-4 sm:px-6 flex flex-row items-center justify-between">
+  <div class="flex-1 flex">
+    <%= link_to root_path do %>
+      <div class="flex flex-row items-center gap-x-2 font-medium">
+        <img class="h-7 sm:h-8 cursor-pointer" src="<%= asset_path('logo.png') %>" alt="Clear My Spam logo"/>
+        <p class="hidden lg:block">clear my spam</p>
+      </div>
+    <% end %>
+  </div>
+  <% unless @hide_header_navigation %>
+    <div class="flex grow py-2 justify-center sm:hidden"
+         data-controller="navigation"
+         data-navigation-target="mobileMenuIcon"
+         data-action="click->navigation#toggleMobileMenu">
+      <%= icon('fa-solid', "bars", class: "text-lg text-gray-500") %>
+      <div class="hidden z-10 border-t flex-col gap-y-2 absolute top-16 right-0 divide-y w-full bg-white shadow-lg" data-navigation-target="mobileMenu">
+        <%= render partial: "mobile_navigation_item", locals: { text: "Home", path: root_path } %>
+        <%= render partial: "mobile_navigation_item", locals: { text: "Pricing", path: pricing_path } %>
+        <%= render partial: "mobile_navigation_item", locals: { text: "FAQs", path: faq_path } %>
+        <% if user_signed_in? %>
+          <%= render partial: "mobile_navigation_item", locals: { text: "Dashboard", path: app_path, icon: "rocket", highlight: true } %>
+        <% end %>
+      </div>
+    </div>
+    <!-- Show three lines and dropdown on mobile instead of the nav pills -->
+    <div class="hidden sm:flex flex-1 flex-row items-center justify-center gap-x-4" data-turbo-prefetch="false">
+      <%= render partial: 'home/navigation_pill', locals: { text: "Home", path: root_path } %>
+      <%= render partial: 'home/navigation_pill', locals: { text: "Pricing", path: pricing_path } %>
+      <%= render partial: 'home/navigation_pill', locals: { text: "FAQs", path: faq_path } %>
+      <% if user_signed_in? %>
+        <%= render partial: 'home/navigation_pill',
+                   locals: { text: "Dashboard", path: app_path, icon_name: "rocket", highlight: true } %>
+      <% end %>
+    </div>
+  <% end %>
+  <div class="flex-1 flex justify-end">
+    <% if user_signed_in? %>
+      <%= render partial: "profile_chip", locals: { user: current_user } %>
+    <% else %>
+      <%=
+        button_to "Log in →",
+                  user_google_oauth2_omniauth_authorize_path,
+                  data: { turbo: false },
+                  form_class: "contents",
+                  class: "font-medium text-xs sm:text-sm ring-1 ring-gray-300 py-1 px-3 rounded-full hover:bg-gray-50 cursor-pointer"
+      %>
+    <% end %>
+  </div>
+</div>

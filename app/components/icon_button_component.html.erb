@@ -1,0 +1,19 @@
+<% styles = "flex items-center justify-center h-8 w-8 rounded-full duration-200 hover:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent" %>
+<% if @path.present? %>
+  <%= button_to @path,
+                class: styles,
+                disabled: @disabled,
+                title: @tooltip,
+                data: @stimulus_data.present? && @stimulus_data.erb_attributes do %>
+    <%= icon_tag %>
+  <% end %>
+<% else %>
+  <button
+    <%= "disabled" if @disabled %>
+    <%= @stimulus_data.html_attributes if @stimulus_data.present? %>
+    title="<%= @tooltip %>"
+    class="<%= styles %>"
+  >
+    <%= icon_tag %>
+  </button>
+<% end %>

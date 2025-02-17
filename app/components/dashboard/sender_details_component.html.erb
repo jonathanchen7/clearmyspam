@@ -1,0 +1,24 @@
+<div>
+  <div class="flex flex-row gap-x-1.5 items-center">
+    <p class="font-medium text-sm"><%= @sender.name %></p>
+    <div class="flex flex-row gap-x-2 items-center text-xs font-medium text-gray-500">
+      <% if @actionable_thread_count.nonzero? %>
+        <p><%= @actionable_thread_count %></p>
+      <% end %>
+
+      <% if @protected_thread_count.nonzero? %>
+        <span class="flex flex-row items-center justify-center gap-x-0.5">
+          <%= icon('fa-solid', "lock", class: "text-2xs") %>
+          <%= @protected_thread_count %>
+        </span>
+      <% end %>
+    </div>
+  </div>
+  <div class="mt-0.5 flex flex-row gap-I-1 text-xs text-gray-500">
+    <p><%= @sender.email %></p>
+    <% if @last_email_date %>
+      <p class="hidden md:block">&nbsp;•&nbsp;</p>
+      <p class="hidden md:block">Last email <%= @last_email_date %> ago</p>
+    <% end %>
+  </div>
+</div>

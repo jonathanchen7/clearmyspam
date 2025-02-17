@@ -1,0 +1,74 @@
+<div class="relative isolate bg-white py-8 sm:py-12">
+  <div class="absolute inset-x-0 top-1/2 -z-10 -translate-y-1/2 transform-gpu overflow-hidden opacity-30 blur-3xl" aria-hidden="true">
+    <div class="ml-[max(50%,38rem)] aspect-[1313/771] w-[82.0625rem] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc]" style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)"></div>
+  </div>
+  <div class="absolute inset-x-0 top-0 -z-10 flex transform-gpu overflow-hidden pt-32 opacity-25 blur-3xl sm:pt-40 xl:justify-end" aria-hidden="true">
+    <div class="ml-[-22rem] aspect-[1313/771] w-[82.0625rem] flex-none origin-top-right rotate-[30deg] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] xl:ml-0 xl:mr-[calc(50%-12rem)]" style="clip-path: polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)"></div>
+  </div>
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="mx-auto max-w-2xl">
+      <h2 class="text-base/7 font-semibold text-indigo-600">Reviews</h2>
+      <p class="mt-2 text-balance text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl">
+        Hear from our customers</p>
+    </div>
+    <div class="mx-auto mt-8 grid max-w-2xl grid-cols-1 grid-rows-1 gap-8 text-sm/6 text-gray-900 sm:mt-12 sm:grid-cols-2 xl:mx-0 xl:max-w-none xl:grid-flow-col xl:grid-cols-4">
+      <figure class="rounded-2xl bg-white shadow-lg ring-1 ring-gray-900/5 sm:col-span-2 xl:col-start-2 xl:row-end-1">
+        <blockquote class="p-6 text-lg font-semibold tracking-tight text-gray-900 sm:p-12 sm:text-xl/8">
+          <p>
+            “Clear My Spam is a game-changer. It's simple, effective, and has saved me countless hours of inbox
+            management. Well worth every penny!”
+          </p>
+        </blockquote>
+        <figcaption class="flex flex-wrap items-center gap-x-4 gap-y-4 border-t border-gray-900/10 px-6 py-4 sm:flex-nowrap">
+          <div class="flex-auto text-left">
+            <div class="font-semibold">Emma Chen</div>
+            <div class="text-gray-600">@emma.h.chen</div>
+          </div>
+        </figcaption>
+      </figure>
+      <div class="hidden sm:block space-y-8 xl:contents xl:space-y-0">
+        <div class="space-y-8 xl:row-span-2">
+          <%= render Home::ReviewComponent.new(
+            text: "Clear My Spam helped me realize how much time I was wasting on email management.",
+            author: "Allie F",
+            socials: "@allie_freund"
+          ) %>
+          <%= render Home::ReviewComponent.new(
+            text: "A hidden gem for anyone tired of drowning in emails.",
+            author: "Abigail T.",
+            socials: "@abigailwuzhere"
+          ) %>
+        </div>
+        <div class="space-y-8 xl:row-start-1">
+          <%= render Home::ReviewComponent.new(
+            text: "I went from 6k+ unread emails to ZERO in two days!",
+            author: "Christine L.",
+            socials: "@christineliu"
+          ) %>
+        </div>
+      </div>
+      <div class="space-y-8 xl:contents xl:space-y-0">
+        <div class="space-y-8 xl:row-start-1">
+          <%=
+            render Home::ReviewComponent.new(
+              text: "Clear My Spam makes it so easy to rid my inbox of marketing emails I’ve accumulated over the years… I’ll be using it regularly to help keep my email organized.",
+              author: "Trinity Cho",
+              socials: "@trinityhcho"
+            ) %>
+        </div>
+        <div class="space-y-8 xl:row-span-2">
+          <%= render Home::ReviewComponent.new(
+            text: "Clearing out my inbox felt like an impossible task, but this made it possible.",
+            author: "Eli G",
+            socials: "@eli.gripp"
+          ) %>
+          <%= render Home::ReviewComponent.new(
+            text: "I got to Inbox Zero in a week! So impressed with the app.",
+            author: "Hongbo C.",
+            socials: "@hongbochen"
+          ) %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
