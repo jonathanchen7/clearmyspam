@@ -164,8 +164,8 @@ GEM
       mutex_m
       representable (~> 3.0)
       retriable (>= 2.0, < 4.a)
-    google-apis-gmail_v1 (0.2.0)
-      google-apis-core (~> 0.1)
+    google-apis-gmail_v1 (0.41.0)
+      google-apis-core (>= 0.15.0, < 2.a)
     google-cloud-env (2.2.1)
       faraday (>= 1.0, < 3.a)
     google-logging-utils (0.1.0)
@@ -211,14 +211,14 @@ GEM
     jbuilder (2.13.0)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
-    json (2.9.1)
+    json (2.10.1)
     jwt (2.10.1)
       base64
     language_server-protocol (3.17.0.4)
     listen (3.9.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
-    logger (1.6.5)
+    logger (1.6.6)
     loofah (2.24.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -502,7 +502,7 @@ DEPENDENCIES
   faker
   font-awesome-sass
   good_job
-  google-apis-gmail_v1 (~> 0.2.0)
+  google-apis-gmail_v1 (~> 0.41.0)
   guard-livereload (~> 2.5)
   importmap-rails
   jbuilder
