@@ -25,6 +25,9 @@
               class: "font-medium text-sm ring-1 ring-gray-300 py-1 px-3 rounded-full hover:bg-gray-50 cursor-pointer" %>
 </div>
 <div class="flex justify-center">
-  <img class="sm:hidden mt-12 mb-8" src="<%= asset_path('mobile_mockup.png') %>" alt="Clear My Spam screenshot"/>
+  <div class="relative sm:hidden mt-12 -mb-48 -z-10">
+    <img src="<%= asset_path('mobile_mockup.png') %>" alt="Clear My Spam screenshot"/>
+    <div class="absolute top-48 inset-0 bg-gradient-to-b from-transparent via-white to-white"></div>
+  </div>
   <img class="hidden sm:block sm:max-w-2xl sm:max-w-3xl lg:max-w-5xl mx-4 my-16 rounded-2xl shadow-2xl border" src="<%= asset_path('desktop_mockup.png') %>" alt="Clear My Spam screenshot"/>
 </div>

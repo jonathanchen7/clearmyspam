@@ -36,8 +36,8 @@ gem "stripe"
 gem "view_component"
 gem "redcarpet"
 
-# Used to color Rails logs.
 gem "colorize"
+gem "awesome_print"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
@@ -69,7 +69,6 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
-  gem "awesome_print"
   gem "guard-livereload", "~> 2.5", require: false
   gem "rack-livereload"
   gem "annotate"

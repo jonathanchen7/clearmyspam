@@ -4,7 +4,8 @@ class DashboardController < AuthenticatedController
   rate_limit to: 20, within: 1.minute, by: -> { current_user.id }
 
   before_action :set_or_refresh_google_auth, except: [:logout]
-  before_action :set_or_create_inbox, only: [:sync, :load_more]
+  before_action :set_or_create_inbox, only: [:sync]
+  before_action :set_cached_inbox, only: [:load_more]
   before_action :set_sender, if: -> { params[:sender_id].present? }
 
   after_action -> { inbox.cache! }, only: [:resync, :load_more]
@@ -64,17 +65,20 @@ class DashboardController < AuthenticatedController
 
     begin
       thread_fetcher = EmailThreadFetcher.new(current_user)
-      if sender.present?
-        email_threads, sender_page_token =
-          thread_fetcher.fetch_threads_from_email!(sender.email,
-                                                   unread_only: Current.options.unread_only,
-                                                   sender_page_token: inbox.next_page_token(sender_id: sender.id))
-        new_emails_count = inbox.populate(email_threads, page_token: sender_page_token, single_sender: true)
-      else
-        email_threads, next_page_token =
-          thread_fetcher.fetch_threads!(unread_only: Current.options.unread_only, page_token: inbox.next_page_token)
-        new_emails_count = inbox.populate(email_threads, page_token: next_page_token)
-      end
+      email_threads, page_token = if sender.present?
+                                    thread_fetcher.fetch_threads_from_email!(
+                                      sender.email,
+                                      unread_only: Current.options.unread_only,
+                                      sender_page_token: inbox.next_page_token(sender_id: sender.id)
+                                    )
+                                  else
+                                    thread_fetcher.fetch_threads!(
+                                      unread_only: Current.options.unread_only,
+                                      page_token: inbox.next_page_token
+                                    )
+                                  end
+      set_cached_inbox # Fetch the inbox from the cache again to ensure we have the latest data.
+      new_emails_count = inbox.populate(email_threads, page_token: page_token, single_sender: sender.present?)
 
       sync_inbox_metrics!
     rescue Google::Apis::RateLimitError

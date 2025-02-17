@@ -78,7 +78,7 @@ class EmailsController < AuthenticatedController
             senders_text = senders.one? ? senders.first.email : "these #{senders.count} senders"
             toast_text = I18n.t("toasts.dispose.delete_all_from_sender.text",
                                 remaining_count: remaining_thread_count,
-                                unread: Current.options.unread_only && " unread",
+                                unread: Current.options.unread_only ? " unread" : nil,
                                 senders: senders_text,
                                 dispose: present_tense_dispose_verb,
                                 disposed: past_tense_dispose_verb)

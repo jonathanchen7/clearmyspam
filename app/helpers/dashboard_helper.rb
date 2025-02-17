@@ -33,8 +33,4 @@ module DashboardHelper
   def actionable_thread_count(email_threads)
     email_threads.select(&:actionable?).count
   end
-
-  def no_more_emails?(inbox)
-    inbox.size >= (Current.options.unread_only ? inbox.metrics.unread : inbox.metrics.total)
-  end
 end
