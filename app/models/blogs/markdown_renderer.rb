@@ -64,7 +64,11 @@ module Blogs
     end
 
     def list_item(text, list_type)
-      %(<li class="text-md text-gray-700 mb-2">#{text}</li>)
+      if list_type == :ordered
+        %(<li class="text-md text-gray-700 mb-2">#{text}</li>)
+      else
+        %(<p class="text-md text-gray-700 mb-2">• #{text}</p>)
+      end
     end
 
     def image(link, title, alt_text)

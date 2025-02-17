@@ -1,5 +1,7 @@
 # Migrating Clear My Spam to Next.js ➡️
 
+##### February 17, 2024
+
 ###### After falling down a dev rabbit hole, I found myself migrating Clear my Spam to Next.js + Vercel over a long weekend. Tedious, but worth it.
 
 ---
@@ -8,6 +10,12 @@ It's only been a few days since I wrote a [blog post](/blogs/hello-world) about
 Clear My Spam's tech stack, and it's already outdated. Oops. I ran into a few
 gotchas while migrating my project from CRA (Create React App) to Next.js that I
 imagine some other people may also run into, so I wanted to document my process.
+
+> Edit - February 17, 2025:
+>
+> Exactly a year later, this post is also outdated 🤦‍♂️. I've since migrated Clear My Spam to a Ruby on Rails app! You
+> can
+> read about it [here](/blogs/rails-migration).
 
 ## Why Now?
 
@@ -92,9 +100,3 @@ Although the process was probably more time consuming than educational, I'm glad
 I took the time to go through this migration. When it comes to code design and
 architecture, simply knowing what tools are available is half of the battle.
 I'll definitely be using Node.js + Vercel + Zustand for my future projects!
-
-> Edit - February 15, 2025:
->
-> After letting Clear My Spam collect dust for a few months, I decided to revisit the project.
-> And what better way to continue progress than to rewrite the ENTIRE APP in Ruby on Rails?
-> I'll be documenting my process in a future blog post, so stay tuned!

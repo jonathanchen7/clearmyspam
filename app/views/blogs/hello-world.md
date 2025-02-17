@@ -1,5 +1,7 @@
 # Hello, World! 👋
 
+##### February 12, 2024
+
 ###### In Clear My Spam's inaugural blog post, I introduce myself, discuss my motivations for building the app, and review the tech stack.
 
 ---
@@ -91,7 +93,7 @@ refactoring hours on my future projects by making design mocks and thinking
 through architecture beforehand. Or not - sometimes my eagerness (or impatience)
 wins out.
 
-![Screenshot of Clear My Spam v0](old-clearmyspam.png "Clear My Spam v0, courtesy of TailwindUI.")
+![Screenshot of Clear My Spam v0](old-mockup.png "Clear My Spam v0, courtesy of TailwindUI.")
 
 Regardless, a few hours here and there over the course of a few months stacks
 up! I'm proud of Clear My Spam and think it looks good, works well, and solves a

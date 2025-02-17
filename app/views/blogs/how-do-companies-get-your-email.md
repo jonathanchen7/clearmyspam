@@ -1,5 +1,7 @@
 # **How Do Companies Get Your Email Address? 📬**
 
+##### February 28, 2024
+
 ###### Ever wonder why you get emails from companies you've never heard of? There are many sneaky techniques companies employ to gather emails for marketing purposes.
 
 ---
