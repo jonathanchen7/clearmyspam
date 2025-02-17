@@ -24,13 +24,16 @@
               answer: "Clear My Spam does not store any email data and will never sell anyone's personal information. Emails are temporarily cached during your browsing session and are never sent to or processed by third parties."
             ) %>
             <%= render FAQ::FAQComponent.new(
-              question: "Is Clear My Spam open source?",
+              question: "Why can I trust Clear My Spam?",
             ) do %>
               <p>
-                Yes! Clear My Spam is fully open source and available on
+                Clear My Spam is open source and available on
                 <a href="https://github.com/jonathanchen7/clearmyspam" target="_blank" rel="noopener noreferrer" class="font-medium text-primary">
                   GitHub,
-                </a> so you can rest assured that your data is safe.
+                </a>
+                allowing anyone to review or audit the code. If
+                you're not a developer, you can trust the experts who have vetted it. Your emails are never stored or
+                shared, so you can rest assured that your data is safe.
             <% end %>
             <%= render FAQ::FAQComponent.new(
               question: "What email providers do you support?",
@@ -38,12 +41,24 @@
             ) %>
             <%= render FAQ::FAQComponent.new(
               question: "How does this work?",
-              answer: "Clear My Spam's uses Google's public Gmail API under the hood to fetch, organize, and delete emails."
-            ) %>
+            ) do %>
+              <p>
+                Clear My Spam uses Google's public
+                <a href="https://developers.google.com/gmail/api/guides" target="_blank" rel="noopener noreferrer">Gmail
+                  API
+                </a>
+                to fetch, organize, and delete emails.
+              </p>
+            <% end %>
             <%= render FAQ::FAQComponent.new(
-              question: "Who is behind Clear My Spam?",
-              answer: "Hey, nice to meet you! Clear My Spam is solely maintained and developed by me (Jonathan Chen), a software engineer with self-diagnosed \"digital OCD\". This website has been incredibly fun to develop and I hope you'll find it useful!"
-            ) %>
+              question: "Who is behind Clear My Spam?"
+            ) do %>
+              <p>
+                Hi, nice to meet you! Clear My Spam is solely maintained and developed by me (Jonathan Chen), a software
+                engineer with self-diagnosed "digital OCD". I've loved building this project and hope you find it
+                useful!
+              </p>
+            <% end %>
           </dl>
         </div>
       </div>

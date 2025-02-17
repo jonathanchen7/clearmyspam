@@ -37,7 +37,7 @@
             <b class="text-primary"><%= current_user.active_account_plan.thread_disposal_limit %></b>
             deleted emails.
           <% else %>
-            You can delete
+            You can <%= Current.options.archive_email_threads? ? "archive" : "delete" %>
             <b class="text-primary">
               <%= current_user.remaining_disposal_count %>
             </b>
