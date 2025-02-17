@@ -3,7 +3,7 @@
 class DashboardController < AuthenticatedController
   rate_limit to: 20, within: 1.minute, by: -> { current_user.id }
 
-  before_action :set_or_refresh_google_auth
+  before_action :set_or_refresh_google_auth, except: [:logout]
   before_action :set_or_create_inbox, only: [:sync, :load_more]
   before_action :set_sender, if: -> { params[:sender_id].present? }
 
