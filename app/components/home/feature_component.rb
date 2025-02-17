@@ -2,7 +2,7 @@
 
 module Home
   class FeatureComponent < ViewComponent::Base
-    def initialize(title:, description:, icon:)
+    def initialize(title:, icon:, description: nil)
       @title = title
       @description = description
       @icon = icon

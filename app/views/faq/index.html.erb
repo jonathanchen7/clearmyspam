@@ -24,9 +24,14 @@
               answer: "Clear My Spam does not store any email data and will never sell anyone's personal information. Emails are temporarily cached during your browsing session and are never sent to or processed by third parties."
             ) %>
             <%= render FAQ::FAQComponent.new(
-              question: "Will you open source this project?",
-              answer: "Yes! Clear My Spam is in the process of being open sourced. Stay tuned for updates!"
-            ) %>
+              question: "Is Clear My Spam open source?",
+            ) do %>
+              <p>
+                Yes! Clear My Spam is fully open source and available on
+                <a href="https://github.com/jonathanchen7/clearmyspam" target="_blank" rel="noopener noreferrer" class="font-medium text-primary">
+                  GitHub,
+                </a> so you can rest assured that your data is safe.
+            <% end %>
             <%= render FAQ::FAQComponent.new(
               question: "What email providers do you support?",
               answer: "At this time, Clear My Spam only supports Gmail and Google Workspace accounts. If you have a request, send it our way!"

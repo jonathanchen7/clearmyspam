@@ -5,9 +5,10 @@
       Effortlessly clean your inbox.
     </p>
     <p class="mt-6 text-lg leading-8 text-gray-600">
-      Designed to be secure, intuitive, and fast, Clear My Spam is laser-focused on cleaning your inbox.
+      Designed to be simple, intuitive, and secure, Clear My Spam is laser-focused on cleaning your inbox.
     </p>
   </div>
+  
   <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-4xl">
     <dl class="grid max-w-xl grid-cols-1 gap-x-8 gap-y-6 lg:max-w-none lg:grid-cols-2 lg:gap-y-8">
       <%= render Home::FeatureComponent.new(
@@ -17,9 +18,20 @@
       ) %>
       <%= render Home::FeatureComponent.new(
         title: "Data Security",
-        description: "Clear My Spam does not store any of your email data and strictly adheres to Gmail's user data policies.",
         icon: "shield-halved"
-      ) %>
+      ) do %>
+        <p>
+          Clear My Spam is fully open source on
+          <a class="font-medium text-primary" href="https://github.com/jonathanchen7/clearmyspam" target="_blank" rel="noopener noreferrer">
+            GitHub
+          </a>
+          and strictly adheres to
+          <a class="font-medium text-primary" href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer">
+            Google's user data policies.
+          </a>
+          Your data is never stored or shared with third parties.
+        </p>
+      <% end %>
       <%= render Home::FeatureComponent.new(
         title: "One-Click Unsubscribe",
         description: "Easily unsubscribe from email newsletters and spam lists.",
