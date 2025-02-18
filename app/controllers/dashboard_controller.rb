@@ -78,7 +78,7 @@ class DashboardController < AuthenticatedController
                                     )
                                   end
       set_cached_inbox # Fetch the inbox from the cache again to ensure we have the latest data.
-      new_emails_count = inbox.populate(email_threads, page_token: page_token, single_sender: sender.present?)
+      new_emails_count = inbox.populate(email_threads, page_token: page_token, sender_id: sender&.id)
 
       sync_inbox_metrics!
     rescue Google::Apis::RateLimitError

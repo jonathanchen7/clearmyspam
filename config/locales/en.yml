@@ -47,7 +47,7 @@ en:
         text: "You have reached the free trial %{disposing} limit. Upgrade your account to unlock unlimited access!"
         cta: "Upgrade"
       delete_all_from_sender:
-        text: "We found %{remaining_count} remaining%{unread} emails in your inbox from %{senders}. Would you like to %{dispose} them? Protected emails will not be %{disposed}."
+        text: "We found <b class=\"text-primary\">%{remaining_count}</b> remaining%{unread} emails in your inbox from <b class=\"text-primary\">%{senders}</b>. Would you like to %{dispose} them? Protected emails will not be %{disposed}."
         cta: "%{dispose} All"
     dispose_all:
       async:

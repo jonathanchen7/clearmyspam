@@ -43,7 +43,8 @@
                     <div class="flex items-center gap-x-2">
                       <div class="flex items-center gap-x-2">
                         <%= check_box_tag(false,
-                                          class: "h-3.5 w-3.5 rounded",
+                                          class: "h-3.5 w-3.5 rounded disabled:opacity-50",
+                                          disabled: sender_email_threads.empty?,
                                           data: {
                                             action: "change->sender-drawer#toggleSelectAll",
                                             "sender-drawer-target": "selectAllCheckbox"
@@ -85,6 +86,7 @@
                     <div class="flex items-center gap-x-2">
                       <%= render PillButtonComponent.new(
                         type: DashboardHelper::ButtonTypes::TEXT,
+                        disabled: sender_email_threads.empty?,
                         stimulus_data: Views::StimulusData.new(
                           controllers: "sender-drawer",
                           actions: { "click" => "sender-drawer#unsubscribe" },
@@ -99,6 +101,7 @@
                         disabled: final_page_fetched,
                         stimulus_data: Views::StimulusData.new(
                           actions: { "click" => "toast#notify" },
+                          targets: { "sender_drawer" => "loadMoreButton" },
                           params: {
                             "toast" => {
                               "title" => "Loading more emails from #{sender.name}...",

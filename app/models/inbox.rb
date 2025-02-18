@@ -41,12 +41,10 @@ class Inbox
   #
   # @param [Array<EmailThread>] email_threads
   # @param [String, nil] page_token The token for the next page of results, if any.
-  # @param [Boolean] single_sender True if all email threads are from a single sender.
+  # @param [String] sender_id Provided only if all email threads are from a single sender.
   # @return [Integer] The number of new email threads added to the inbox.
   # @raise [ArgumentError] If neither next_page_token and sender_page_token are provided.
-  def populate(email_threads, page_token: nil, single_sender: false)
-    return if email_threads.blank?
-
+  def populate(email_threads, page_token: nil, sender_id: false)
     new_email_count = email_threads.count do |email_thread|
       next if emails.key?(email_thread.id)
 
@@ -56,8 +54,8 @@ class Inbox
       emails[email_thread.id] = email_thread
     end
 
-    if single_sender
-      page_tokens.add(page_token, sender_id: email_threads.first.sender.id)
+    if sender_id.present?
+      page_tokens.add(page_token, sender_id: sender_id)
     else
       page_tokens.add(page_token)
     end

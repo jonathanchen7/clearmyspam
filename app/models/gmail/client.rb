@@ -32,7 +32,7 @@ module Gmail
         label_ids << "UNREAD" if unread_only
 
         response = client.list_user_threads("me", max_results: 500, label_ids: label_ids, q: query)
-        response.threads.size
+        response.threads&.size || 0
       end
 
       def get_threads!(user,

@@ -109,7 +109,8 @@ export default class extends Controller {
     ];
 
     buttonsToDisable.forEach((button) => {
-      parentSenderRow.querySelector(button).disabled = true;
+      const buttonElement = parentSenderRow.querySelector(button);
+      if (buttonElement) buttonElement.disabled = true;
     });
   }
 }

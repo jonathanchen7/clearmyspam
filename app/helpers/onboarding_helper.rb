@@ -8,7 +8,7 @@ module OnboardingHelper
     ),
     WizardComponent::Step.new(
       title: "Loading Emails",
-      description: "Your first #{Rails.configuration.sync_fetch_count} emails have been loaded. \"Load More\" emails with the corresponding button.",
+      description: "Your first #{Rails.configuration.sync_fetch_count} emails are grouped by sender. Use \"Load more\" to fetch additional emails.",
       desktop_image: "onboarding/loading_desktop.webp",
       mobile_image: "onboarding/loading_mobile.webp"
     ),

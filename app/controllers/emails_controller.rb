@@ -81,12 +81,13 @@ class EmailsController < AuthenticatedController
                                 unread: Current.options.unread_only ? " unread" : nil,
                                 senders: senders_text,
                                 dispose: present_tense_dispose_verb,
-                                disposed: past_tense_dispose_verb)
+                                disposed: past_tense_dispose_verb).html_safe
             toast_cta = I18n.t("toasts.dispose.delete_all_from_sender.cta", dispose: present_tense_dispose_verb.capitalize)
+
             toast_cta_stimulus_data = Views::StimulusData.new(
               controllers: "inbox",
               actions: { "click" => %w[inbox#disposeAllFromSenders toast#dismiss] },
-              params: { "inbox" => { "sender_emails" => senders.map(&:email) } },
+              params: { "inbox" => { "sender_emails" => senders.map(&:email) }, "toast" => { "action" => "disposeAll" } },
               include_controller: true
             )
           end

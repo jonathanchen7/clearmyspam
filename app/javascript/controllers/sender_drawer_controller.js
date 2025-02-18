@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus";
-import { makeRequest, makeTurboStreamRequest } from "utils/shared";
+import { makeRequest, makeTurboStreamRequest } from "utils/shared"; // Connects to data-controller="sender-drawer"
 
 // Connects to data-controller="sender-drawer"
 export default class extends Controller {
@@ -14,6 +14,7 @@ export default class extends Controller {
     "protectIconButton",
     "unprotectIconButton",
     "unsubscribeButton",
+    "loadMoreButton",
   ];
   static values = {
     senderId: String,
@@ -31,24 +32,29 @@ export default class extends Controller {
   // ------------------ CONNECT + DISCONNECT ------------------
 
   connect() {
-    document.addEventListener(
-      "click",
-      this.#checkIfDrawerShouldClose.bind(this),
-    );
-    document.addEventListener("keydown", this.#handleKeydown.bind(this));
+    this.boundCheckIfDrawerShouldClose =
+      this.#checkIfDrawerShouldClose.bind(this);
+    this.boundHandleKeydown = this.#handleKeydown.bind(this);
+    this.boundHandleToastCtaClick = this.#handleToastCtaClick.bind(this);
+
+    document.addEventListener("click", this.boundCheckIfDrawerShouldClose);
+    document.addEventListener("keydown", this.boundHandleKeydown);
+    window.addEventListener("toast:ctaClick", this.boundHandleToastCtaClick);
+
     document.body.classList.add("overflow-hidden");
   }
 
   disconnect() {
-    document.removeEventListener(
-      "click",
-      this.#checkIfDrawerShouldClose.bind(this),
-    );
-    document.removeEventListener("keydown", this.#handleKeydown.bind(this));
+    document.removeEventListener("click", this.boundCheckIfDrawerShouldClose);
+    document.removeEventListener("keydown", this.boundHandleKeydown);
+    window.removeEventListener("toast:ctaClick", this.boundHandleToastCtaClick);
+
     document.body.classList.remove("overflow-hidden");
   }
 
   #checkIfDrawerShouldClose(e) {
+    if (!this.hasCloseButtonTarget || !this.hasDrawerTarget) return;
+
     if (
       this.closeButtonTarget.contains(e.target) ||
       (!this.drawerTarget.contains(e.target) && !e.target.closest(".toast"))
@@ -123,6 +129,15 @@ export default class extends Controller {
       .catch(() => showUnsubscribeError());
   }
 
+  disableActions(_) {
+    this.selectAllCheckboxTarget.disabled = true;
+    this.protectIconButtonTarget.disabled = true;
+    this.unprotectIconButtonTarget.disabled = true;
+    this.disposeIconButtonTarget.disabled = true;
+    this.unsubscribeButtonTarget.disabled = true;
+    this.loadMoreButtonTarget.disabled = true;
+  }
+
   toggleProtection(event) {
     event.stopPropagation();
     const isProtected = event.params.protected === true;
@@ -169,6 +184,12 @@ export default class extends Controller {
       this.#turboRequestBody(),
       this.disposeIconButtonTarget,
     );
+  }
+
+  #handleToastCtaClick(event) {
+    if (event.detail.action === "disposeAll") {
+      this.disableActions();
+    }
   }
 
   #turboRequestBody(emailThreadIds = this.#selectedEmailIds) {

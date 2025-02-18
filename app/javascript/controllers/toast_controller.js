@@ -2,10 +2,21 @@ import { Controller } from "@hotwired/stimulus"; // Connects to data-controller=
 
 // Connects to data-controller="toast"
 export default class extends Controller {
-  static targets = ["toast"];
+  static targets = ["toast", "cta"];
 
   toastTargetConnected(target) {
     if (target.id === "toast-placeholder") return;
+
+    if (this.hasCtaTarget) {
+      this.ctaTarget.addEventListener("click", (event) => {
+        if (event.params.action) {
+          const ctaEvent = new CustomEvent("toast:ctaClick", {
+            detail: { action: event.params.action },
+          });
+          window.dispatchEvent(ctaEvent);
+        }
+      });
+    }
 
     setTimeout(() => {
       this.#show(target);
