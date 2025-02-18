@@ -45,7 +45,7 @@ class User < ApplicationRecord
         )
         user.option = Option.new(unread_only: true)
       end
-      user.google_refresh_token = auth.credentials.refresh_token
+      user.google_refresh_token = auth.credentials.refresh_token if auth.credentials.refresh_token.present?
       user.save!
 
       user
