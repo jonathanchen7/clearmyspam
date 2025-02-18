@@ -94,9 +94,7 @@ class EmailsController < AuthenticatedController
         end
 
         if dispose_async
-          email_threads.each_slice(Gmail::Client::DISPOSE_BATCH_SIZE).with_index do |emails_slice, index|
-            DisposeEmailsJob.set(wait: (index * 4).seconds).perform_later(current_user, emails_slice, archive: archive_email_threads?)
-          end
+          EmailThread.bulk_dispose(current_user, email_threads, archive: archive_email_threads?)
         elsif archive_email_threads?
           Gmail::Client.archive_threads!(current_user, *email_threads.pluck(:vendor_id))
         else
@@ -151,12 +149,14 @@ class EmailsController < AuthenticatedController
       return
     end
 
-    sender_emails.each do |email|
-      DisposeEmailsFromSenderJob.perform_later(current_user,
-                                               email,
-                                               unread_only: Current.options.unread_only,
-                                               archive: archive_email_threads?)
-    end
+    email_threads, _page_token = EmailThreadFetcher.new(current_user).fetch_threads_from_emails!(
+      sender_emails,
+      unread_only: Current.options.unread_only,
+      max_results: Rails.configuration.sender_dispose_all_max,
+      no_details: true
+    )
+
+    EmailThread.bulk_dispose(current_user, email_threads, archive: archive_email_threads?)
 
     respond_to do |format|
       format.turbo_stream do
@@ -169,7 +169,7 @@ class EmailsController < AuthenticatedController
           text: I18n.t("toasts.dispose_all.async.text",
                        disposing: present_participle_dispose_verb.capitalize,
                        unread: Current.options.unread_only ? " unread" : nil,
-                       senders: senders_text)
+                       senders: senders_text).html_safe
         )
 
         render turbo_stream: build_turbo_stream(toast:, drawer_options: params[:drawer_options])

@@ -40,7 +40,8 @@ module Gmail
                        page_token: nil,
                        label_ids: ["INBOX"],
                        unread_only: false,
-                       query: nil)
+                       query: nil,
+                       no_details: false)
         set_client_authorization(user)
 
         label_ids << "UNREAD" if unread_only
@@ -53,12 +54,16 @@ module Gmail
         if (gmail_threads = response.threads.presence)
           gmail_thread_ids = gmail_threads.map(&:id)
 
-          google_threads = gmail_thread_ids.each_slice(THREAD_DETAILS_BATCH_SIZE).flat_map.with_index do |batch, index|
-            sleep(1) unless index.zero?
-            get_threads_batch_request(batch)
-          end
+          email_threads = if no_details
+                            gmail_thread_ids.map { |id| EmailThread.new(vendor_id: id) }
+                          else
+                            google_threads = gmail_thread_ids.each_slice(THREAD_DETAILS_BATCH_SIZE).flat_map.with_index do |batch, index|
+                              sleep(1) unless index.zero?
+                              get_threads_batch_request(batch)
+                            end
+                            google_threads.map { |t| EmailThread.from_google_thread(t) }.compact
+                          end
 
-          email_threads = google_threads.map { |t| EmailThread.from_google_thread(t) }.compact
           email_threads.each { |thread| thread.user_id = user.id }
         else
           email_threads = []

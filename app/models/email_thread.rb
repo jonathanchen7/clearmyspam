@@ -58,6 +58,13 @@ class EmailThread < ApplicationRecord
       end
     end
 
+    def bulk_dispose(user, email_threads, archive:)
+      email_threads.each_slice(Gmail::Client::DISPOSE_BATCH_SIZE).with_index do |emails_slice, index|
+        DisposeEmailsJob.set(wait: (index * 4).seconds)
+                        .perform_later(user, emails_slice, archive: archive)
+      end
+    end
+
     def fetch_gmail_header(headers, name)
       headers.find { |header| header.name == name }&.value
     end

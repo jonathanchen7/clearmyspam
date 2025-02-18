@@ -52,7 +52,7 @@ en:
     dispose_all:
       async:
         title: "%{disposing}..."
-        text: "%{disposing}%{unread} emails from %{senders} in the background."
+        text: "%{disposing}%{unread} emails from <b class=\"text-primary\">%{senders}</b> in the background."
   buttons:
     load_more: "Load more"
     all_emails_loaded: "All emails loaded"

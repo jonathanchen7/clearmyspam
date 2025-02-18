@@ -9,19 +9,20 @@ class EmailThreadFetcher
     @user = user
   end
 
-  def fetch_threads_from_email!(email, unread_only:, max_results: nil, sender_page_token: nil)
+  def fetch_threads_from_emails!(emails, unread_only:, max_results: nil, sender_page_token: nil, no_details: false)
     max_results ||= Rails.configuration.sync_fetch_count
 
-    query = "from:#{email}"
+    query = "from:(#{emails.join("|")})"
     fetch_threads!(
       max_results: max_results,
       unread_only: unread_only,
       query: query,
-      page_token: sender_page_token
+      page_token: sender_page_token,
+      no_details: no_details
     )
   end
 
-  def fetch_threads!(unread_only:, max_results: nil, query: nil, page_token: nil)
+  def fetch_threads!(unread_only:, max_results: nil, query: nil, page_token: nil, no_details: false)
     max_results ||= Rails.configuration.sync_fetch_count
     Rails.logger.info("Fetching #{max_results} threads for user: #{user.id}".on_blue)
 
@@ -31,6 +32,7 @@ class EmailThreadFetcher
       unread_only: unread_only,
       query: query,
       page_token: page_token,
+      no_details: no_details
     )
     persisted_thread_attributes = upsert_threads(threads)
 

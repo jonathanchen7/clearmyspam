@@ -66,8 +66,8 @@ class DashboardController < AuthenticatedController
     begin
       thread_fetcher = EmailThreadFetcher.new(current_user)
       email_threads, page_token = if sender.present?
-                                    thread_fetcher.fetch_threads_from_email!(
-                                      sender.email,
+                                    thread_fetcher.fetch_threads_from_emails!(
+                                      [sender.email],
                                       unread_only: Current.options.unread_only,
                                       sender_page_token: inbox.next_page_token(sender_id: sender.id)
                                     )
