@@ -36,6 +36,10 @@
                 shared, so you can rest assured that your data is safe.
             <% end %>
             <%= render FAQ::FAQComponent.new(
+              question: "Why wouldn't I just use Gmail's built-in filters?",
+              answer: "You absolutely can! Gmail filters are powerful, but can take a lot of time to set up and configure. Clear My Spam is intentionally designed to reduce complexity and simplify the process of clearing out your inbox. Give it a try and you'll see what I mean!"
+            ) %>
+            <%= render FAQ::FAQComponent.new(
               question: "What email providers do you support?",
               answer: "At this time, Clear My Spam only supports Gmail and Google Workspace accounts. If you have a request, send it our way!"
             ) %>

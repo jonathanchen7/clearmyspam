@@ -2,15 +2,15 @@ databases:
   - name: clearmyspam-db
     databaseName: clearmyspam
     user: clearmyspam
-    plan: basic-256mb
-    diskSizeGB: 1
+    plan: basic-1gb
+    diskSizeGB: 2
     region: oregon
 
 services:
   - type: web
     name: clearmyspam
     runtime: ruby
-    plan: starter
+    plan: standard
     region: oregon
     buildCommand: "./bin/render-build.sh"
     preDeployCommand: "bundle exec rails db:migrate"
