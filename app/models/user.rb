@@ -6,6 +6,7 @@
 #  email                   :string           not null
 #  google_refresh_token    :string
 #  image                   :string
+#  last_logged_in_at       :datetime
 #  name                    :string           not null
 #  onboarding_completed_at :datetime
 #  created_at              :datetime         not null
@@ -46,6 +47,8 @@ class User < ApplicationRecord
         user.option = Option.new(unread_only: true)
       end
       user.google_refresh_token = auth.credentials.refresh_token if auth.credentials.refresh_token.present?
+      user.last_logged_in_at = Time.now
+
       user.save!
 
       user
