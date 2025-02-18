@@ -6,7 +6,7 @@
 #  email                   :string           not null
 #  google_refresh_token    :string
 #  image                   :string
-#  last_logged_in_at       :datetime
+#  last_logged_in_at       :datetime         not null
 #  name                    :string           not null
 #  onboarding_completed_at :datetime
 #  created_at              :datetime         not null
