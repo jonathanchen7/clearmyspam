@@ -3,7 +3,7 @@ databases:
     databaseName: clearmyspam
     user: clearmyspam
     plan: basic-1gb
-    diskSizeGB: 2
+    diskSizeGB: 5
     region: oregon
 
 services:
@@ -15,6 +15,7 @@ services:
     buildCommand: "./bin/render-build.sh"
     preDeployCommand: "bundle exec rails db:migrate"
     startCommand: "bundle exec rails server"
+    autoDeploy: false
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -31,6 +32,7 @@ services:
     region: oregon
     buildCommand: "./bin/render-build.sh"
     startCommand: "bundle exec good_job start"
+    autoDeploy: false
     envVars:
       - key: DATABASE_URL
         fromDatabase:
