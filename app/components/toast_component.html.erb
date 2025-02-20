@@ -27,7 +27,7 @@
         <% if @cta_stimulus_data.present? %>
           <div class="col-start-2 col-span-10" data-toast-target="cta">
             <button <%= @cta_stimulus_data.html_attributes %>
-                    class="rounded-md bg-white text-sm font-medium text-primary hover:text-primary/75 duration-200">
+                    class="<%= class_names(cta_color, "rounded-md bg-white text-sm font-medium hover:text-primary/75 duration-200") %>">
               <%= @cta_text %>
             </button>
           </div>

@@ -4,10 +4,11 @@ class AuthenticatedController < ApplicationController
   before_action :authenticate_user!
   before_action :set_current_options
   before_action :configure_header
+  before_action :initialize_toast
 
   private
 
-  attr_reader :inbox
+  attr_reader :inbox, :toast
 
   def reset_inbox
     Inbox.delete_from_cache!(current_user)
@@ -30,13 +31,9 @@ class AuthenticatedController < ApplicationController
   def new_inbox
     inbox = Inbox.new(current_user.id)
 
-    begin
-      thread_fetcher = EmailThreadFetcher.new(current_user)
-      email_threads, next_page_token = thread_fetcher.fetch_threads!(unread_only: Current.options.unread_only)
-      inbox.populate(email_threads, page_token: next_page_token)
-    rescue Google::Apis::RateLimitError
-      flash.alert = "Gmail rate limit exceeded. Please wait 10 seconds and try again."
-    end
+    thread_fetcher = EmailThreadFetcher.new(current_user)
+    email_threads, next_page_token = thread_fetcher.fetch_threads!(unread_only: Current.options.unread_only)
+    inbox.populate(email_threads, page_token: next_page_token)
 
     inbox
   end
@@ -45,25 +42,21 @@ class AuthenticatedController < ApplicationController
     internal_only ? inbox.metrics.sync_internal!(current_user) : inbox.metrics.sync!(current_user)
   end
 
-  def render_failure(error, toast: false)
+  def with_rate_limit_rescue
+    yield
+  rescue Google::Apis::RateLimitError
+    @inbox = Inbox.new(current_user) if inbox.nil?
+    toast.error I18n.t("toasts.gmail_rate_limit.title"), text: I18n.t("toasts.gmail_rate_limit.text")
+  end
+
+  def render_failure(error, show_toast: false)
     error_message = error.try(:message) || error
     respond_to do |format|
       format.json { render json: { success: false, error: error_message }, status: :bad_request }
       format.turbo_stream do
-        render turbo_stream: [render_toast(title: "Error", text: error_message, type: ToastComponent::TYPE::ERROR)] if toast
+        render turbo_stream: [toast.error("Error", text: error_message)] if show_toast
       end
     end
-  end
-
-  def render_toast(title:, text: nil, type: ToastComponent::TYPE::INFO, icon: nil, cta_text: nil, cta_stimulus_data: nil)
-    turbo_stream.prepend("notifications", ToastComponent.new(
-      title: title,
-      text: text,
-      type: type,
-      icon: icon,
-      cta_text: cta_text,
-      cta_stimulus_data: cta_stimulus_data
-    ))
   end
 
   def set_or_refresh_google_auth
@@ -81,5 +74,9 @@ class AuthenticatedController < ApplicationController
 
   def configure_header
     @hide_header_navigation = true
+  end
+
+  def initialize_toast
+    @toast = ToastComponent.new
   end
 end

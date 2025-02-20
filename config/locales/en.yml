@@ -44,8 +44,8 @@ en:
         title: "%{count} %{email} %{disposing} in the background..."
       free_trial_limit:
         title: "Free trial limit reached"
-        text: "You have reached the free trial %{disposing} limit. Upgrade your account to unlock unlimited access!"
-        cta: "Upgrade"
+        text: "You have reached the free trial %{dispose} limit. Upgrade your account to unlock unlimited access!"
+        cta: "Go Pro →"
       delete_all_from_sender:
         text: "We found <b class=\"text-primary\">%{remaining_count}</b> remaining%{unread} emails in your inbox from <b class=\"text-primary\">%{senders}</b>. Would you like to %{dispose} them? Protected emails will not be %{disposed}."
         cta: "%{dispose} All"
@@ -53,6 +53,9 @@ en:
       async:
         title: "%{disposing}..."
         text: "%{disposing}%{unread} emails from <b class=\"text-primary\">%{senders}</b> in the background."
+    gmail_rate_limit:
+      title: "Error"
+      text: "Gmail needs a moment to catch up. Please try again in 10 seconds."
   buttons:
     load_more: "Load more"
     all_emails_loaded: "All emails loaded"

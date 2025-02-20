@@ -10,8 +10,11 @@ class OptionsController < AuthenticatedController
     Current.options.update(sanitized_params)
 
     if sanitized_params[:unread_only].present?
-      reset_inbox
-      inbox.cache!
+      with_rate_limit_rescue do
+        reset_inbox
+        inbox.cache!
+      end
+
     end
 
     respond_to do |format|

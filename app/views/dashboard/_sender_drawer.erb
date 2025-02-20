@@ -97,7 +97,10 @@
                       <% end %>
                       <% final_page_fetched = @inbox.final_page_fetched?(sender_id: sender.id) %>
                       <%= render PillButtonComponent.new(
-                        path: dashboard_load_more_path(sender_id: sender.id, drawer: true),
+                        path: dashboard_load_more_path(
+                          sender_id: sender.id,
+                          drawer_options: { enabled: true, sender_id: sender.id }
+                        ),
                         disabled: final_page_fetched,
                         stimulus_data: Views::StimulusData.new(
                           actions: { "click" => "toast#notify" },

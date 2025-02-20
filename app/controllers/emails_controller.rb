@@ -20,11 +20,10 @@ class EmailsController < AuthenticatedController
     respond_to do |format|
       format.json { render json: { success: true } }
       format.turbo_stream do
-        toast = ToastComponent.new(
-          type: ToastComponent::TYPE::SUCCESS,
-          title: I18n.t("toasts.protect.success.title", count: email_count, email: emails_noun)
+        render turbo_stream: build_turbo_stream(
+          toast: toast.success(I18n.t("toasts.protect.success.title", count: email_count, email: emails_noun)),
+          drawer_options: params[:drawer_options]
         )
-        render turbo_stream: build_turbo_stream(toast:, drawer_options: params[:drawer_options])
       end
     end
   end
@@ -36,11 +35,10 @@ class EmailsController < AuthenticatedController
     respond_to do |format|
       format.json { render json: { success: true } }
       format.turbo_stream do
-        toast = ToastComponent.new(
-          type: ToastComponent::TYPE::SUCCESS,
-          title: I18n.t("toasts.unprotect.success.title", count: email_count, email: emails_noun)
+        render turbo_stream: build_turbo_stream(
+          toast: toast.success(I18n.t("toasts.unprotect.success.title", count: email_count, email: emails_noun)),
+          drawer_options: params[:drawer_options]
         )
-        render turbo_stream: build_turbo_stream(toast:, drawer_options: params[:drawer_options])
       end
     end
   end
@@ -62,76 +60,55 @@ class EmailsController < AuthenticatedController
     end
 
     dispose_async = email_threads.size > Rails.configuration.async_dispose_threshold
-    toast_text = nil
-    toast_cta = nil
-    toast_cta_stimulus_data = nil
 
     EmailThread.transaction do
-      if email_threads.any?
-        archive_email_threads? ? inbox.archive!(email_threads) : inbox.trash!(email_threads)
+      with_rate_limit_rescue do
+        if email_threads.blank?
+          toast.info I18n.t("toasts.dispose.no_emails.title", dispose: present_tense_dispose_verb)
+        else
+          archive_email_threads? ? inbox.archive!(email_threads) : inbox.trash!(email_threads)
+
+          if dispose_async
+            EmailThread.bulk_dispose(current_user, email_threads, archive: archive_email_threads?)
+            toast.info I18n.t("toasts.dispose.async.title", count: email_count, email: emails_noun, disposing: present_participle_dispose_verb)
+          else
+            vendor_ids = email_threads.pluck(:vendor_id)
+            archive_email_threads? ? Gmail::Client.archive_threads!(current_user, *vendor_ids) : Gmail::Client.trash_threads!(current_user, *vendor_ids)
+            toast.success I18n.t("toasts.dispose.success.title", count: email_count, email: emails_noun, disposed: past_tense_dispose_verb)
+          end
+        end
 
         if senders.present?
           query = "from:(#{senders.map(&:email).join("|")})"
           remaining_thread_count = Gmail::Client.get_thread_count!(current_user, query: query) - email_threads.count
 
           if remaining_thread_count.positive?
-            senders_text = senders.one? ? senders.first.email : "these #{senders.count} senders"
-            toast_text = I18n.t("toasts.dispose.delete_all_from_sender.text",
+            toast.text = I18n.t("toasts.dispose.delete_all_from_sender.text",
                                 remaining_count: remaining_thread_count,
                                 unread: Current.options.unread_only ? " unread" : nil,
-                                senders: senders_text,
+                                senders: senders.one? ? senders.first.email : "these #{senders.count} senders",
                                 dispose: present_tense_dispose_verb,
                                 disposed: past_tense_dispose_verb).html_safe
-            toast_cta = I18n.t("toasts.dispose.delete_all_from_sender.cta", dispose: present_tense_dispose_verb.capitalize)
-
-            toast_cta_stimulus_data = Views::StimulusData.new(
-              controllers: "inbox",
-              actions: { "click" => %w[inbox#disposeAllFromSenders toast#dismiss] },
-              params: { "inbox" => { "sender_emails" => senders.map(&:email) }, "toast" => { "action" => "disposeAll" } },
-              include_controller: true
+            toast.with_destructive_cta(
+              I18n.t("toasts.dispose.delete_all_from_sender.cta", dispose: present_tense_dispose_verb.capitalize),
+              stimulus_data: Views::StimulusData.new(
+                controllers: "inbox",
+                actions: { "click" => %w[inbox#disposeAllFromSenders toast#dismiss] },
+                params: { "inbox" => { "sender_emails" => senders.map(&:email) }, "toast" => { "action" => "disposeAll" } },
+                include_controller: true
+              )
             )
           end
         end
 
-        if dispose_async
-          EmailThread.bulk_dispose(current_user, email_threads, archive: archive_email_threads?)
-        elsif archive_email_threads?
-          Gmail::Client.archive_threads!(current_user, *email_threads.pluck(:vendor_id))
-        else
-          Gmail::Client.trash_threads!(current_user, *email_threads.pluck(:vendor_id))
-        end
+        sync_inbox_metrics!
       end
-
-      sync_inbox_metrics!
     end
 
     respond_to do |format|
       format.json { render json: { success: true } }
       format.turbo_stream do
-        toast_type = ToastComponent::TYPE::INFO
-        if email_threads.blank?
-          toast_title = I18n.t("toasts.dispose.no_emails.title", dispose: present_tense_dispose_verb)
-        elsif dispose_async
-          toast_title = I18n.t("toasts.dispose.async.title",
-                               count: email_count,
-                               email: emails_noun,
-                               disposing: present_participle_dispose_verb)
-        else
-          toast_type = ToastComponent::TYPE::SUCCESS
-          toast_title = I18n.t("toasts.dispose.success.title",
-                               count: email_count,
-                               email: emails_noun,
-                               disposed: past_tense_dispose_verb)
-        end
-        toast = ToastComponent.new(
-          type: toast_type,
-          title: toast_title,
-          text: toast_text,
-          cta_text: toast_cta,
-          cta_stimulus_data: toast_cta_stimulus_data
-        )
-
-        render turbo_stream: build_turbo_stream(toast:, drawer_options: params[:drawer_options])
+        render turbo_stream: build_turbo_stream(toast: toast, drawer_options: params[:drawer_options])
       end
     end
   end
@@ -155,6 +132,9 @@ class EmailsController < AuthenticatedController
       max_results: Rails.configuration.sender_dispose_all_max,
       no_details: true
     )
+    email_threads = email_threads.select(&:actionable?)
+
+    email_threads = email_threads.first(current_user.remaining_disposal_count) if current_user.unpaid?
 
     EmailThread.bulk_dispose(current_user, email_threads, archive: archive_email_threads?)
 
@@ -163,16 +143,18 @@ class EmailsController < AuthenticatedController
         present_participle_dispose_verb = archive_email_threads? ? "archiving" : "deleting"
         senders_text = sender_emails.one? ? sender_emails.first : "these #{sender_emails.count} senders"
 
-        toast = ToastComponent.new(
-          type: ToastComponent::TYPE::INFO,
-          title: I18n.t("toasts.dispose_all.async.title", disposing: present_participle_dispose_verb.capitalize),
-          text: I18n.t("toasts.dispose_all.async.text",
-                       disposing: present_participle_dispose_verb.capitalize,
-                       unread: Current.options.unread_only ? " unread" : nil,
-                       senders: senders_text).html_safe
+        render turbo_stream: build_turbo_stream(
+          toast: toast.info(
+            I18n.t("toasts.dispose_all.async.title", disposing: present_participle_dispose_verb.capitalize),
+            text: I18n.t(
+              "toasts.dispose_all.async.text",
+              disposing: present_participle_dispose_verb.capitalize,
+              unread: Current.options.unread_only ? " unread" : nil,
+              senders: senders_text
+            ).html_safe
+          ),
+          drawer_options: params[:drawer_options]
         )
-
-        render turbo_stream: build_turbo_stream(toast:, drawer_options: params[:drawer_options])
       end
     end
   end
@@ -220,12 +202,12 @@ class EmailsController < AuthenticatedController
   end
 
   def disabled_dispose_toast
-    ToastComponent.new(
-      type: ToastComponent::TYPE::ERROR,
-      title: I18n.t("toasts.dispose.free_trial_limit.title"),
-      text: I18n.t("toasts.dispose.free_trial_limit.text", dispose: "disposing"),
-      cta_text: I18n.t("toasts.dispose.free_trial_limit.cta"),
-      cta_stimulus_data: Views::StimulusData.new(
+    toast.error(
+      I18n.t("toasts.dispose.free_trial_limit.title"),
+      text: I18n.t("toasts.dispose.free_trial_limit.text", dispose: archive_email_threads? ? "archive" : "deletion")
+    ).with_confirm_cta(
+      I18n.t("toasts.dispose.free_trial_limit.cta"),
+      stimulus_data: Views::StimulusData.new(
         controllers: "pricing",
         actions: { "click" => "pricing#checkout" },
         values: { "pricing" => { "plan-type" => "monthly" } },
