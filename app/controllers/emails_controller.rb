@@ -70,7 +70,7 @@ class EmailsController < AuthenticatedController
       if email_threads.any?
         archive_email_threads? ? inbox.archive!(email_threads) : inbox.trash!(email_threads)
 
-        if senders.any?
+        if senders.present?
           query = "from:(#{senders.map(&:email).join("|")})"
           remaining_thread_count = Gmail::Client.get_thread_count!(current_user, query: query) - email_threads.count
 
@@ -204,6 +204,8 @@ class EmailsController < AuthenticatedController
                        current_user.email_threads.where(id: email_thread_ids).to_a
                      elsif senders.present?
                        inbox.sender_emails(*senders.map(&:id))
+                     else
+                       raise ArgumentError, "Either email_thread_ids or sender_ids must be provided."
                      end
 
     @email_threads = email_threads.select(&:actionable?) if action_name == "dispose"
