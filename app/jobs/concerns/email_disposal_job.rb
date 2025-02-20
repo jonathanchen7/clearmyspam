@@ -12,8 +12,12 @@ module EmailDisposalJob
       perform_throttle: [2, 2.seconds]
     )
 
-    retry_on Google::Apis::RateLimitError,
+    retry_on Google::Apis::RateLimitError, Google::Apis::ServerError,
              wait: ->(executions) { (executions * 2) + 15 + (rand(10) * (executions + 1)) },
              attempts: 10
+
+    retry_on Google::Apis::ClientError,
+             wait: ->(executions) { (executions * 2) + 15 + (rand(10) * (executions + 1)) },
+             attempts: 5
   end
 end
