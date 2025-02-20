@@ -29,6 +29,17 @@
 
 en:
   toasts:
+    resync:
+      success:
+        title: "%{count} emails loaded"
+    load_more:
+      success:
+        title: "%{count} more emails loaded%{sender}"
+      no_more:
+        title: "No more emails%{sender}"
+      max_capacity:
+        title: "Inbox is at max capacity"
+        text: "Please %{dispose} some emails to make room for more."
     protect:
       success:
         title: "%{count} %{email} protected"

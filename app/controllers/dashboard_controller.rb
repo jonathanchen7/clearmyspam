@@ -30,7 +30,7 @@ class DashboardController < AuthenticatedController
   def resync
     with_rate_limit_rescue do
       reset_inbox
-      toast.success("#{inbox.size} Emails Loaded")
+      toast.success I18n.t("toasts.resync.success.title")
     end
 
     respond_to do |format|
@@ -42,47 +42,43 @@ class DashboardController < AuthenticatedController
   end
 
   def load_more
-    if inbox.size > Inbox::INBOX_MAX_SIZE
-      render_failure "Inbox is at max capacity.", show_toast: true
-      return
-    end
-
-    if sender.present?
-      if inbox.final_page_fetched?(sender_id: sender.id)
-        render_failure "All emails from #{sender.email} have already been fetched.", show_toast: true
-        return
-      end
+    if inbox.size > Inbox::MAX_CAPACITY
+      toast.error(
+        I18n.t("toasts.load_more.max_capacity.title"),
+        text: I18n.t("toasts.load_more.max_capacity.text", dispose: Current.options.archive ? "archive" : "delete")
+      )
+    elsif sender.present? && inbox.final_page_fetched?(sender_id: sender.id)
+      toast.error I18n.t("toasts.load_more.no_more.title", sender: " from #{sender.name}")
+    elsif sender.blank? && inbox.final_page_fetched?
+      toast.error I18n.t("toasts.load_more.no_more.title", sender: nil)
     else
-      if inbox.final_page_fetched?
-        render_failure "All emails have already been fetched.", show_toast: true
-        return
+      with_rate_limit_rescue do
+        thread_fetcher = EmailThreadFetcher.new(current_user)
+        email_threads, page_token = if sender.present?
+                                      thread_fetcher.fetch_threads_from_emails!(
+                                        [sender.email],
+                                        unread_only: Current.options.unread_only,
+                                        sender_page_token: inbox.next_page_token(sender_id: sender.id)
+                                      )
+                                    else
+                                      thread_fetcher.fetch_threads!(
+                                        unread_only: Current.options.unread_only,
+                                        page_token: inbox.next_page_token
+                                      )
+                                    end
+        set_cached_inbox # Fetch the inbox from the cache again to ensure we have the latest data.
+        new_emails_count = inbox.populate(email_threads, page_token: page_token, sender_id: sender&.id)
+
+        if new_emails_count.positive?
+          toast.success I18n.t("toasts.load_more.success.title",
+                               count: new_emails_count,
+                               sender: sender.present? ? " from #{sender.name}" : nil)
+        else
+          toast.info I18n.t("toasts.load_more.no_more.title", sender: sender.present? ? " from #{sender.name}" : nil)
+        end
+
+        sync_inbox_metrics!
       end
-    end
-
-    with_rate_limit_rescue do
-      thread_fetcher = EmailThreadFetcher.new(current_user)
-      email_threads, page_token = if sender.present?
-                                    thread_fetcher.fetch_threads_from_emails!(
-                                      [sender.email],
-                                      unread_only: Current.options.unread_only,
-                                      sender_page_token: inbox.next_page_token(sender_id: sender.id)
-                                    )
-                                  else
-                                    thread_fetcher.fetch_threads!(
-                                      unread_only: Current.options.unread_only,
-                                      page_token: inbox.next_page_token
-                                    )
-                                  end
-      set_cached_inbox # Fetch the inbox from the cache again to ensure we have the latest data.
-      new_emails_count = inbox.populate(email_threads, page_token: page_token, sender_id: sender&.id)
-
-      if new_emails_count.positive?
-        toast.success "#{new_emails_count} New Emails Loaded #{sender.present? ? "from #{sender.name}" : nil}"
-      else
-        toast.info "No New Emails Found #{sender.present? ? "for #{sender.name}" : nil}"
-      end
-
-      sync_inbox_metrics!
     end
 
     respond_to do |format|
