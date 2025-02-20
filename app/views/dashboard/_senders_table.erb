@@ -4,7 +4,7 @@
     <div id="notifications" class="absolute"></div>
     <% if @inbox.present? %>
       <div class="flex flex-col divide-y border-b" data-turbo-prefetch="false" data-inbox-target="sendersTable">
-        <% @inbox.emails_by_sender(hide_personal_emails: Current.options.hide_personal_emails).each do |sender, sender_email_threads| %>
+        <% @inbox.emails_by_sender(hide_personal: Current.options.hide_personal).each do |sender, sender_email_threads| %>
           <%= render Dashboard::SenderRowComponent.new(
             sender,
             sender_emails: sender_email_threads,
@@ -29,7 +29,7 @@
             <b class="text-primary"><%= current_user.active_account_plan.thread_disposal_limit %></b>
             deleted emails.
           <% else %>
-            You can <%= Current.options.archive_email_threads? ? "archive" : "delete" %>
+            You can <%= Current.options.archive ? "archive" : "delete" %>
             <b class="text-primary">
               <%= current_user.remaining_disposal_count %>
             </b>

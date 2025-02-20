@@ -44,9 +44,9 @@ class EmailsController < AuthenticatedController
   end
 
   def dispose
-    present_tense_dispose_verb = archive_email_threads? ? "archive" : "delete"
-    present_participle_dispose_verb = archive_email_threads? ? "archiving" : "deleting"
-    past_tense_dispose_verb = archive_email_threads? ? "archived" : "deleted"
+    present_tense_dispose_verb = archive? ? "archive" : "delete"
+    present_participle_dispose_verb = archive? ? "archiving" : "deleting"
+    past_tense_dispose_verb = archive? ? "archived" : "deleted"
 
     if current_user.disable_dispose?
       respond_to do |format|
@@ -66,14 +66,14 @@ class EmailsController < AuthenticatedController
         if email_threads.blank?
           toast.info I18n.t("toasts.dispose.no_emails.title", dispose: present_tense_dispose_verb)
         else
-          archive_email_threads? ? inbox.archive!(email_threads) : inbox.trash!(email_threads)
+          archive? ? inbox.archive!(email_threads) : inbox.trash!(email_threads)
 
           if dispose_async
-            EmailThread.bulk_dispose(current_user, email_threads, archive: archive_email_threads?)
+            EmailThread.bulk_dispose(current_user, email_threads, archive: archive?)
             toast.info I18n.t("toasts.dispose.async.title", count: email_count, email: emails_noun, disposing: present_participle_dispose_verb)
           else
             vendor_ids = email_threads.pluck(:vendor_id)
-            archive_email_threads? ? Gmail::Client.archive_threads!(current_user, *vendor_ids) : Gmail::Client.trash_threads!(current_user, *vendor_ids)
+            archive? ? Gmail::Client.archive_threads!(current_user, *vendor_ids) : Gmail::Client.trash_threads!(current_user, *vendor_ids)
             toast.success I18n.t("toasts.dispose.success.title", count: email_count, email: emails_noun, disposed: past_tense_dispose_verb)
           end
         end
@@ -136,11 +136,11 @@ class EmailsController < AuthenticatedController
 
     email_threads = email_threads.first(current_user.remaining_disposal_count) if current_user.unpaid?
 
-    EmailThread.bulk_dispose(current_user, email_threads, archive: archive_email_threads?)
+    EmailThread.bulk_dispose(current_user, email_threads, archive: archive?)
 
     respond_to do |format|
       format.turbo_stream do
-        present_participle_dispose_verb = archive_email_threads? ? "archiving" : "deleting"
+        present_participle_dispose_verb = archive? ? "archiving" : "deleting"
         senders_text = sender_emails.one? ? sender_emails.first : "these #{sender_emails.count} senders"
 
         render turbo_stream: build_turbo_stream(
@@ -204,7 +204,7 @@ class EmailsController < AuthenticatedController
   def disabled_dispose_toast
     toast.error(
       I18n.t("toasts.dispose.free_trial_limit.title"),
-      text: I18n.t("toasts.dispose.free_trial_limit.text", dispose: archive_email_threads? ? "archive" : "deletion")
+      text: I18n.t("toasts.dispose.free_trial_limit.text", dispose: archive? ? "archive" : "deletion")
     ).with_confirm_cta(
       I18n.t("toasts.dispose.free_trial_limit.cta"),
       stimulus_data: Views::StimulusData.new(
@@ -216,8 +216,8 @@ class EmailsController < AuthenticatedController
     )
   end
 
-  def archive_email_threads?
-    @archive_email_threads ||= Current.options.archive_email_threads
+  def archive?
+    @archive ||= Current.options.archive
   end
 
   def emails_noun

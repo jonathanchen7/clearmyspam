@@ -103,7 +103,7 @@ class Inbox
     end
   end
 
-  def emails_by_sender(hide_personal_emails: false)
+  def emails_by_sender(hide_personal: false)
     # There's an edge case where EmailThreads from the same email address (with different sender objects) are grouped
     # together. In this case, the sender for whichever EmailThread is processed first will be the sender for the group.
     # To address this, we sort the emails by date (newest first) before grouping them.
@@ -112,7 +112,7 @@ class Inbox
                               .group_by(&:sender)
                               .sort_by { |_, sender_emails| -sender_emails.size }
                               .to_h
-    email_threads = email_threads.reject { |sender, _| sender.personal? } if hide_personal_emails
+    email_threads = email_threads.reject { |sender, _| sender.personal? } if hide_personal
 
     email_threads
   end

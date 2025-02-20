@@ -34,6 +34,7 @@ class AuthenticatedController < ApplicationController
     thread_fetcher = EmailThreadFetcher.new(current_user)
     email_threads, next_page_token = thread_fetcher.fetch_threads!(unread_only: Current.options.unread_only)
     inbox.populate(email_threads, page_token: next_page_token)
+    inbox.metrics.sync!(current_user)
 
     inbox
   end

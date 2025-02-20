@@ -12,10 +12,10 @@
     )
   ) %>
   <%= render IconButtonComponent.new(
-    icon: Current.options.archive_email_threads? ? "box-archive" : "trash-can",
+    icon: Current.options.archive ? "box-archive" : "trash-can",
     color: "text-danger",
     disabled: true,
-    tooltip: "#{Current.options.archive_email_threads? ? "Archive" : "Delete"} Selected",
+    tooltip: "#{Current.options.archive ? "Archive" : "Delete"} Selected",
     stimulus_data: Views::StimulusData.new(
       targets: { "inbox" => "disposeIconButton" },
       actions: { "click" => "inbox#disposeSelected" }

@@ -87,7 +87,7 @@ class InboxTest < ActiveSupport::TestCase
     email_thread5 = build(:email_thread, sender: new_business_sender)
     inbox = setup_inbox([email_thread1, email_thread2, email_thread3, email_thread4, email_thread5])
 
-    result = inbox.emails_by_sender(hide_personal_emails: false)
+    result = inbox.emails_by_sender(hide_personal: false)
     assert_equal 2, result.size
     assert_equal [new_business_sender, personal_sender], result.keys
     assert_equal [email_thread1, email_thread2].sort, result[personal_sender].sort

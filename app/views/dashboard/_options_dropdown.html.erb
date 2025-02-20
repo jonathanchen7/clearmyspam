@@ -5,8 +5,8 @@
       <%= render partial: "application/toggle",
                  locals: {
                    path: options_update_path,
-                   params: { options: { hide_personal_emails: !Current.options.hide_personal_emails } },
-                   enabled: Current.options.hide_personal_emails,
+                   params: { options: { hide_personal: !Current.options.hide_personal } },
+                   enabled: Current.options.hide_personal,
                    data: Views::StimulusData.new(
                      targets: { "options" => "hidePersonalEmailsToggle" },
                      actions: { "click" => "options#disableOptions" }
@@ -41,19 +41,19 @@
       %>
       <div class="flex flex-row gap-x-2">
         <%= button_to "Delete", options_update_path,
-                      params: { options: { archive_email_threads: false } },
+                      params: { options: { archive: false } },
                       class: class_names(
                         "rounded-sm outline outline-1 px-2 py-1",
-                        Current.options.archive_email_threads ? unselected_button_styling : selected_button_styling),
+                        Current.options.archive ? unselected_button_styling : selected_button_styling),
                       data: Views::StimulusData.new(
                         targets: { "options" => "trashOption" },
                         actions: { "click" => "options#disableOptions" },
                       ).erb_attributes %>
         <%= button_to "Archive", options_update_path,
-                      params: { options: { archive_email_threads: true } },
+                      params: { options: { archive: true } },
                       class: class_names(
                         "rounded-sm outline outline-1 px-2 py-1",
-                        Current.options.archive_email_threads ? selected_button_styling : unselected_button_styling),
+                        Current.options.archive ? selected_button_styling : unselected_button_styling),
                       data: Views::StimulusData.new(
                         targets: { "options" => "archiveOption" },
                         actions: { "click" => "options#disableOptions" },

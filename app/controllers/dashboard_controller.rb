@@ -9,7 +9,7 @@ class DashboardController < AuthenticatedController
   before_action :set_cached_inbox, only: [:load_more]
   before_action :set_sender, if: -> { params[:sender_id].present? }
 
-  after_action -> { inbox&.cache! }, only: [:resync, :load_more]
+  after_action -> { inbox.cache! }, only: [:resync, :load_more]
 
   attr_reader :sender
 
@@ -17,10 +17,7 @@ class DashboardController < AuthenticatedController
   end
 
   def sync
-    with_rate_limit_rescue do
-      set_or_create_inbox
-      sync_inbox_metrics!
-    end
+    with_rate_limit_rescue { set_or_create_inbox }
 
     respond_to do |format|
       format.json { render json: { success: true } }
@@ -33,7 +30,6 @@ class DashboardController < AuthenticatedController
   def resync
     with_rate_limit_rescue do
       reset_inbox
-      sync_inbox_metrics!
       toast.success("#{inbox.size} Emails Loaded")
     end
 

@@ -15,7 +15,7 @@ module Dashboard
     end
 
     def dispose_button_text
-      Current.options.archive_email_threads? ? I18n.t("buttons.archive_all") : I18n.t("buttons.delete_all")
+      Current.options.archive ? I18n.t("buttons.archive_all") : I18n.t("buttons.delete_all")
     end
   end
 end

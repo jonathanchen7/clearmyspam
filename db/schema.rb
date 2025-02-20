@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_02_18_042007) do
+ActiveRecord::Schema[7.2].define(version: 2025_02_20_073213) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -135,9 +135,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_18_042007) do
   end
 
   create_table "options", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.boolean "hide_personal_emails", default: false, null: false
+    t.boolean "hide_personal", default: false, null: false
     t.uuid "user_id"
-    t.boolean "archive_email_threads", default: false, null: false
+    t.boolean "archive", default: false, null: false
     t.boolean "unread_only", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
