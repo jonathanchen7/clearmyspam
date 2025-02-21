@@ -30,7 +30,7 @@ class DashboardController < AuthenticatedController
   def resync
     with_rate_limit_rescue do
       reset_inbox
-      toast.success I18n.t("toasts.resync.success.title")
+      toast.success I18n.t("toasts.resync.success.title", count: inbox.size)
     end
 
     respond_to do |format|
