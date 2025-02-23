@@ -88,6 +88,7 @@
     <orderEntry type="library" scope="PROVIDED" name="guard-compat (v1.2.1, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="guard-livereload (v2.5.2, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="hashie (v5.0.0, rbenv: 3.3.4) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="honeybadger (v5.26.4, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="http_parser.rb (v0.8.0, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="httpclient (v2.8.3, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="i18n (v1.14.7, rbenv: 3.3.4) [gem]" level="application" />
@@ -585,6 +586,17 @@
                 </subtasks>
               </RakeTaskImpl>
               <RakeTaskImpl description="" fullCommand="db:truncate_all" id="truncate_all" />
+            </subtasks>
+          </RakeTaskImpl>
+          <RakeTaskImpl id="honeybadger">
+            <subtasks>
+              <RakeTaskImpl description="Notify Honeybadger of a new deploy" fullCommand="honeybadger:deploy" id="deploy" />
+              <RakeTaskImpl id="heroku">
+                <subtasks>
+                  <RakeTaskImpl description="Install Heroku deploy notifications addon" fullCommand="honeybadger:heroku:add_deploy_notification" id="add_deploy_notification" />
+                </subtasks>
+              </RakeTaskImpl>
+              <RakeTaskImpl description="Verify your gem installation by sending a test exception to the honeybadger service" fullCommand="honeybadger:test" id="test" />
             </subtasks>
           </RakeTaskImpl>
           <RakeTaskImpl id="importmap">
