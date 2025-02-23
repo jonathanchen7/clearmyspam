@@ -18,8 +18,8 @@ module.exports = {
         sans: ["Inter var", ...defaultTheme.fontFamily.sans],
       },
       colors: {
-        primary: "#157bbf",
-        "primary-hover": "#155f8f",
+        primary: "#1467c6",
+        "primary-hover": "#0e4d95",
         success: "#44af69",
         danger: "#d32f2f",
         warning: "#ffe600",

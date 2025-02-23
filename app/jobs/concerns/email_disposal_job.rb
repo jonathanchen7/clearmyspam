@@ -18,6 +18,6 @@ module EmailDisposalJob
 
     retry_on Google::Apis::ClientError,
              wait: ->(executions) { (executions * 2) + 15 + (rand(10) * (executions + 1)) },
-             attempts: 5
+             attempts: 3
   end
 end

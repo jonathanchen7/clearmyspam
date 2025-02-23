@@ -1,14 +1,17 @@
 # frozen_string_literal: true
 
 class AuthenticatedController < ApplicationController
+  rescue_from Google::Apis::AuthorizationError,
+              Google::Apis::ClientError,
+              with: ->(error) { handle_google_authorization_error(error) }
+
   before_action :authenticate_user!
   before_action :set_current_options
   before_action :configure_header
-  before_action :initialize_toast
 
   private
 
-  attr_reader :inbox, :toast
+  attr_reader :inbox
 
   def reset_inbox
     Inbox.delete_from_cache!(current_user)
@@ -77,7 +80,13 @@ class AuthenticatedController < ApplicationController
     @hide_header_navigation = true
   end
 
-  def initialize_toast
-    @toast = ToastComponent.new
+  def handle_google_authorization_error(error)
+    raise error if error.is_a?(Google::Apis::ClientError) && error.message.exclude?("PERMISSION_DENIED")
+
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace("senders_table", partial: "dashboard/invalid_permissions")
+      end
+    end
   end
 end

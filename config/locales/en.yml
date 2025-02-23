@@ -28,6 +28,10 @@
 #       enabled: "ON"
 
 en:
+  dashboard:
+    missing_permission:
+      title: "Missing Permissions 🥲"
+      text: "Clear My Spam needs access to all requested permissions in order to display and delete your emails."
   toasts:
     resync:
       success:

@@ -7,7 +7,6 @@ Devise.setup do |config|
     email
     profile
     gmail.modify
-    gmail.settings.basic
   ].freeze
 
   config.omniauth :google_oauth2,
