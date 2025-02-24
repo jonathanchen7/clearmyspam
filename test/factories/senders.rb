@@ -17,7 +17,7 @@ FactoryBot.define do
 
     trait :business do
       transient do
-        email { Faker::Internet.email(domain: "mailchimp.com") }
+        email { Faker::Internet.email(domain: "clearymspam.com") }
       end
     end
 

@@ -3,6 +3,7 @@
 # Table name: users
 #
 #  id                      :uuid             not null, primary key
+#  admin                   :boolean          default(FALSE)
 #  email                   :string           not null
 #  google_refresh_token    :string
 #  image                   :string
@@ -94,10 +95,6 @@ class User < ApplicationRecord
     else
       0
     end
-  end
-
-  def admin?
-    email == "jonathanchen.dev@gmail.com"
   end
 
   def onboarding_completed?

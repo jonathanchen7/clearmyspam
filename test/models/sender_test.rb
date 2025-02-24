@@ -11,9 +11,9 @@ class SenderTest < ActiveSupport::TestCase
 
   test "#initialize extracts the email" do
     senders_to_email = {
-      "Jonathan Chen <jonathanchen.dev@gmail.com>" => "jonathanchen.dev@gmail.com",
-      "<jonathanchen.dev@gmail.com>" => "jonathanchen.dev@gmail.com",
-      "jonathanchen.dev@gmail.com" => "jonathanchen.dev@gmail.com"
+      "Jonathan Chen <jonathan@clearmyspam.com>" => "jonathan@clearmyspam.com",
+      "<jonathan@clearmyspam.com>" => "jonathan@clearmyspam.com",
+      "jonathan@clearmyspam.com" => "jonathan@clearmyspam.com"
     }
 
     senders_to_email.each do |raw_sender, email|
@@ -24,8 +24,8 @@ class SenderTest < ActiveSupport::TestCase
 
   test "#initialize extracts the name, defaulting to the email" do
     senders_to_name = {
-      "Jonathan Chen <jonathanchen.dev@gmail.com>" => "Jonathan Chen",
-      "<jonathanchen.dev@gmail.com>" => "jonathanchen.dev@gmail.com"
+      "Jonathan Chen <jonathan@clearmyspam.com>" => "Jonathan Chen",
+      "<jonathan@clearmyspam.com>" => "jonathan@clearmyspam.com"
     }
 
     senders_to_name.each do |raw_sender, name|
@@ -56,7 +56,7 @@ class SenderTest < ActiveSupport::TestCase
 
   test "#domain returns the sender domain" do
     senders_to_domain = {
-      "Jonathan Chen <jonathanchen.dev@gmail.com>" => "gmail.com",
+      "Jonathan Chen <jonathan@clearmyspam.com>" => "clearmyspam.com",
       "Jonathan Chen <jonathanchen@crazydomain.org>" => "crazydomain.org"
     }
 
@@ -74,7 +74,7 @@ class SenderTest < ActiveSupport::TestCase
       assert sender.personal?
     end
 
-    bad_domains = %w[google.com crazydomain.org company.net test.co]
+    bad_domains = %w[google.com crazydomain.org clearmyspam.com company.net test.co]
     bad_domains.each do |domain|
       raw_sender = "Jonathan Chen <jonathanchen@#{domain}>"
       sender = Sender.new(raw_sender, as_of_date: nil)

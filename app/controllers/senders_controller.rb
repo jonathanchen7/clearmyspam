@@ -23,7 +23,7 @@ class SendersController < AuthenticatedController
     url = UnsubscribeLinkFinder.find_link!(current_user, inbox.sender_emails(sender.id).first)
 
     if url.blank?
-      render_failure("We couldn't find a link to unsubscribe from #{sender.email}.", toast: true)
+      render_failure("We couldn't find a link to unsubscribe from #{sender.email}.", show_toast: true)
     else
       render json: { success: true, url: url }
     end
