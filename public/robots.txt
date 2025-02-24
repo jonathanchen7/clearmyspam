@@ -1,6 +1,0 @@
-User-agent: *
-Allow: /
-Allow: /faq
-Allow: /pricing
-Allow: /blogs/
-Disallow: /*
