@@ -105,5 +105,5 @@ Rails.application.configure do
   config.sender_fetch_count = 150
   config.async_dispose_threshold = 5
   config.sender_dispose_all_max = 500
-  config.trial_thread_disposal_limit = 250
+  config.trial_thread_disposal_limit = 1000
 end
