@@ -89,6 +89,16 @@ class DashboardController < AuthenticatedController
     end
   end
 
+  def help
+    @show_onboarding_wizard = true
+
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace("onboarding", partial: "onboarding")
+      end
+    end
+  end
+
   def logout
     logout!
   end

@@ -36,6 +36,7 @@ Rails.application.routes.draw do
     post :sync
     post :resync
     post :logout
+    post :help
   end
   post "load_more(/:sender_id)", to: "dashboard#load_more", controller: "dashboard", as: :dashboard_load_more
   get "app", to: "dashboard#index"

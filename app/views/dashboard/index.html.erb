@@ -1,5 +1,6 @@
 <div id="inbox" data-controller="inbox">
   <%= render partial: "toolbar" %>
   <%= render partial: "senders_table" %>
-  <%= render WizardComponent.new("onboarding", steps: OnboardingHelper::ONBOARDING_STEPS) unless current_user.onboarding_completed? %>
+  <%= render partial: "onboarding" %>
+  <%= render FloatingHelpButtonComponent.new %>
 </div>

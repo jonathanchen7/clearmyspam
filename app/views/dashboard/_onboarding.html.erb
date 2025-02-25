@@ -1,0 +1,5 @@
+<%= turbo_frame_tag "onboarding" do %>
+  <% if !current_user.onboarding_completed? || defined?(@show_onboarding_wizard) %>
+    <%= render WizardComponent.new("onboarding", steps: OnboardingHelper::ONBOARDING_STEPS) %>
+  <% end %>
+<% end %>
