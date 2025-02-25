@@ -52,6 +52,8 @@ class User < ApplicationRecord
 
       user.save!
 
+      UserMailer.with(user: user).welcome.deliver_later
+
       user
     end
   end
