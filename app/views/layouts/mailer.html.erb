@@ -1,13 +1,67 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <style>
-      /* Email styles need to be inline */
-    </style>
-  </head>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <style>
+      body { margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+      table { border-collapse: collapse; width: 100%; }
+      td { padding: 0; }
+      img { border: 0; display: block; }
+      .container { width: 100%; max-width: 600px; margin: 0 auto; }
+      .content-section { margin: 36px 0; }
+      .content-image { width: 100%; max-width: 600px; border-radius: 8px; border: 1px solid #e5e7eb; }
+      .main-content { padding: 40px 20px; background-color: #f3f4f6; }
+      .content-box { background-color: #ffffff; border-radius: 8px; padding: 24px; }
+      .footer { padding: 20px; text-align: center; }
+      .footer-text { font-size: 14px; color: #808080; padding-bottom: 12px; }
+      .footer-links { font-size: 14px; }
+      .footer-link { color: #292929; text-decoration: none; padding: 0 10px; }
+      h1, h2, h3 { margin-top: 0; margin-bottom: 6px; font-weight: 600; }
+      p { margin-top: 0; margin-bottom: 0; }
+      img { margin: 12px 0; }
+  </style>
+</head>
 
-  <body>
-    <%= yield %>
-  </body>
+<body>
+<table>
+  <tr>
+    <td class="main-content">
+      <div class="container">
+        <div class="content-box">
+          <div style="margin-bottom: 12px">
+            <%= image_tag "logo.png", alt: "Clear My Spam logo", style: "margin: 0 0; height: 40px; width: auto; display: inline-block; vertical-align: middle;" %>
+            <span style="font-weight: 600; vertical-align: middle; padding-left: 6px;">clear my spam</span>
+          </div>
+
+          <%= yield %>
+
+          <table style="width: 100%;">
+            <tr>
+              <td style="padding-bottom: 6px;">Until next time!</td>
+            </tr>
+            <tr>
+              <td style="font-weight: 600;">Jonathan</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </td>
+  </tr>
+
+  <tr>
+    <td class="footer">
+      <div class="container">
+        <div class="footer-text">
+          <%= Time.current.year %> Clear My Spam. All rights reserved.
+        </div>
+        <div class="footer-links">
+          <a href="https://clearmyspam.com/faq" class="footer-link">FAQ</a>
+          <a href="https://clearmyspam.com/terms" class="footer-link">Terms of Service</a>
+          <a href="https://clearmyspam.com/privacy" class="footer-link">Privacy Policy</a>
+        </div>
+      </div>
+    </td>
+  </tr>
+</table>
+</body>
 </html>
