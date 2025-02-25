@@ -33,6 +33,8 @@ class User < ApplicationRecord
 
   validates :email, uniqueness: true
 
+  class GoogleRefreshTokenMissingError < StandardError; end
+
   class << self
     def from_omniauth(auth)
       user = where(vendor_id: auth.uid).first_or_create do |user|

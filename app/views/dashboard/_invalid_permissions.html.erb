@@ -3,7 +3,7 @@
     <h1 class="text-3xl font-semibold mb-2"><%= I18n.t "dashboard.missing_permission.title" %></h1>
     <p class="text-md mb-8"><%= I18n.t "dashboard.missing_permission.text" %></p>
     <%= button_to "Grant Access",
-                  user_google_oauth2_omniauth_authorize_path,
+                  user_google_oauth2_omniauth_authorize_path(prompt: "consent"),
                   data: { turbo: false },
                   class: "font-medium text-sm bg-primary text-white py-1 px-3 rounded-full hover:bg-primary-hover cursor-pointer duration-200" %>
   </div>

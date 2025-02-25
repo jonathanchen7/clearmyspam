@@ -3,6 +3,7 @@
 class AuthenticatedController < ApplicationController
   rescue_from Google::Apis::AuthorizationError,
               Google::Apis::ClientError,
+              User::GoogleRefreshTokenMissingError,
               with: ->(error) { handle_google_authorization_error(error) }
 
   rescue_from Signet::AuthorizationError, with: :logout!
@@ -66,6 +67,8 @@ class AuthenticatedController < ApplicationController
   end
 
   def set_or_refresh_google_auth
+    raise User::GoogleRefreshTokenMissingError if current_user.google_refresh_token.blank?
+
     current_user.update(
       google_access_token: session[:google_access_token],
       google_access_token_expires_at: session[:google_access_token_expires_at]
