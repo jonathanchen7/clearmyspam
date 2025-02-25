@@ -41,12 +41,13 @@ class EmailThread < ApplicationRecord
       raw_date = fetch_gmail_header(headers, "Date")
 
       if raw_sender.present? && raw_date.present?
+        date = DateTime.parse(raw_date)
         # Since we store the sender on the EmailThread instead of the sender_id, it may be out of date.
         # Reference inbox.senders for the most up-to-date sender information.
         new(
           sender: Sender.new(raw_sender, as_of_date: date),
           vendor_id: thread.id,
-          date: DateTime.parse(raw_date),
+          date: date,
           subject: fetch_gmail_header(headers, "Subject"),
           snippet: parse_snippet(latest_message.snippet),
           label_ids: latest_message.label_ids,
