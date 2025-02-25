@@ -48,13 +48,13 @@ class User < ApplicationRecord
           thread_disposal_limit: AccountPlan::DEFAULT_THREAD_DISPOSAL_LIMIT
         )
         user.option = Option.new(unread_only: true)
+
+        UserMailer.with(user: user).welcome.deliver_later
       end
       user.google_refresh_token = auth.credentials.refresh_token if auth.credentials.refresh_token.present?
       user.last_logged_in_at = Time.now
 
       user.save!
-
-      UserMailer.with(user: user).welcome.deliver_later
 
       user
     end
