@@ -90,10 +90,7 @@ class DashboardController < AuthenticatedController
   end
 
   def logout
-    Inbox.delete_from_cache!(current_user)
-    sign_out(current_user)
-
-    redirect_to root_path
+    logout!
   end
 
   private

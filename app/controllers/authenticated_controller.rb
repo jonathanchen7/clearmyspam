@@ -5,6 +5,8 @@ class AuthenticatedController < ApplicationController
               Google::Apis::ClientError,
               with: ->(error) { handle_google_authorization_error(error) }
 
+  rescue_from Signet::AuthorizationError, with: :logout!
+
   before_action :authenticate_user!
   before_action :set_current_options
   before_action :configure_header
@@ -88,5 +90,12 @@ class AuthenticatedController < ApplicationController
         render turbo_stream: turbo_stream.replace("senders_table", partial: "dashboard/invalid_permissions")
       end
     end
+  end
+
+  def logout!
+    Inbox.delete_from_cache!(current_user)
+    sign_out(current_user)
+
+    redirect_to root_url
   end
 end
