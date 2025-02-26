@@ -33,6 +33,8 @@ class User < ApplicationRecord
 
   validates :email, uniqueness: true
 
+  after_create :send_welcome_email
+
   class GoogleRefreshTokenMissingError < StandardError; end
 
   class << self
@@ -48,8 +50,6 @@ class User < ApplicationRecord
           thread_disposal_limit: AccountPlan::DEFAULT_THREAD_DISPOSAL_LIMIT
         )
         user.option = Option.new(unread_only: true)
-
-        UserMailer.with(user: user).welcome.deliver_later
       end
       user.google_refresh_token = auth.credentials.refresh_token if auth.credentials.refresh_token.present?
       user.last_logged_in_at = Time.now
@@ -114,5 +114,9 @@ class User < ApplicationRecord
       client_secret: Rails.application.credentials.dig(:google, :client_secret),
       refresh_token: google_refresh_token
     )
+  end
+
+  def send_welcome_email
+    UserMailer.with(user: self).welcome.deliver_later
   end
 end
