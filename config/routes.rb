@@ -21,6 +21,8 @@ Rails.application.routes.draw do
     post :billing_portal
   end
 
+  get "/sitemap.xml", to: "sitemap#index", format: "xml"
+
   # get "blogs/", to: "blogs#index"
   get "blogs/:slug", to: "blogs#show", as: :blogs_show
 
