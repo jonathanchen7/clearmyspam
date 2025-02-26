@@ -8,6 +8,8 @@ class Inbox
     TRASH = 3
   end
 
+  class CachingError < StandardError; end
+
   attr_reader :user_id, :emails, :senders, :page_tokens, :metrics
 
   delegate :size, to: :emails

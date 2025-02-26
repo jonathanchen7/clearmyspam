@@ -8,6 +8,8 @@ class AuthenticatedController < ApplicationController
 
   rescue_from Signet::AuthorizationError, with: :logout!
 
+  rescue_from Inbox::CachingError, with: :handle_inbox_cache_error
+
   before_action :authenticate_user!
   before_action :set_current_options
   before_action :configure_header
@@ -28,7 +30,7 @@ class AuthenticatedController < ApplicationController
   def set_cached_inbox
     cached_inbox = Inbox.fetch_from_cache(current_user)
     if cached_inbox.blank?
-      raise ArgumentError, "Could not find cached inbox."
+      raise Inbox::CachingError, "Could not find cached inbox."
     else
       @inbox = cached_inbox
     end
@@ -91,6 +93,19 @@ class AuthenticatedController < ApplicationController
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: turbo_stream.replace("senders_table", partial: "dashboard/invalid_permissions")
+      end
+    end
+  end
+
+  def handle_inbox_cache_error
+    toast.error(
+      "Error",
+      text: "Sorry, something went wrong. Try refreshing the page or waiting a few seconds between each action."
+    )
+
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.prepend("notifications", toast)
       end
     end
   end
