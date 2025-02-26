@@ -20,7 +20,13 @@ class SendersController < AuthenticatedController
   end
 
   def unsubscribe
-    url = UnsubscribeLinkFinder.find_link!(current_user, inbox.sender_emails(sender.id).first)
+    sender_emails = inbox.sender_emails(sender.id)
+
+    url = nil
+    sender_emails.first(3).each do |email|
+      url = UnsubscribeLinkFinder.find_link!(current_user, email)
+      break if url.present?
+    end
 
     if url.blank?
       render_failure("We couldn't find a link to unsubscribe from #{sender.email}.", show_toast: true)
