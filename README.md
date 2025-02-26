@@ -1,7 +1,9 @@
 # Clear My Spam
 
-Clear My Spam is an open source Ruby on Rails app designed to declutter your Gmail inbox, with an emphasis on
+[Clear My Spam](https://clearmyspam.com) is an open source Ruby on Rails app designed to declutter your Gmail inbox, with an emphasis on
 simplicity, usability, and security.
+
+[https://clearmyspam.com](https://clearmypam.com)
 
 ## Requirements
 
