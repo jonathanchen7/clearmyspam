@@ -33,7 +33,7 @@ class EmailThread < ApplicationRecord
     # Converts a `Google::Apis::GmailV1::Thread` object into an `EmailThread` object.
     #
     # @param thread [Google::Apis::GmailV1::Thread] The Google thread to convert.
-    # @return [EmailThread] The converted EmailThread object.
+    # @return [EmailThread, nil] The converted EmailThread object, or nil if one could not be extracted.
     def from_google_thread(thread)
       latest_message = thread.messages.first
       headers = latest_message.payload.headers
@@ -56,6 +56,7 @@ class EmailThread < ApplicationRecord
         )
       else
         Rails.logger.error("Error creating EmailThread from Google thread: #{thread.id}")
+        nil
       end
     end
 
