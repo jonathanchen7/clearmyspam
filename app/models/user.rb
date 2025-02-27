@@ -105,6 +105,10 @@ class User < ApplicationRecord
     onboarding_completed_at.present?
   end
 
+  def to_honeybadger_context
+    { user_id: id, user_email: email }
+  end
+
   private
 
   def oauth_client

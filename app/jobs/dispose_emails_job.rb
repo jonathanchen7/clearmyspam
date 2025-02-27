@@ -12,6 +12,8 @@ class DisposeEmailsJob < ApplicationJob
 
   # If you change the signature of this method, make sure to also update the good_job concurrency controls.
   def perform(user, email_threads, archive:)
+    Honeybadger.context(user)
+
     return if email_threads.blank?
 
     user.refresh_google_auth! if user.google_auth_expired?
