@@ -8,13 +8,7 @@ class DisposeEmailsJob < ApplicationJob
     perform_limit: 1
   )
 
-  retry_on Google::Apis::RateLimitError, Google::Apis::ServerError,
-           wait: ->(_) { rand(5..60) },
-           attempts: 15
-
-  retry_on Google::Apis::ClientError,
-           wait: ->(_) { rand(5..60) },
-           attempts: 5
+  retry_on RetryError, wait: ->(_) { rand(5..60) }, attempts: 15
 
   # If you change the signature of this method, make sure to also update the good_job concurrency controls.
   def perform(user, email_threads, archive:)
@@ -29,5 +23,7 @@ class DisposeEmailsJob < ApplicationJob
       Gmail::Client.trash_threads!(user, *email_threads.map(&:vendor_id))
       user.email_threads.where(id: email_threads.map(&:id)).update_all(trashed: true)
     end
+  rescue Google::Apis::RateLimitError, Google::Apis::ServerError, Google::Apis::ClientError
+    raise RetryError
   end
 end
