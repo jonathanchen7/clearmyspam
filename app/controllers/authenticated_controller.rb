@@ -12,7 +12,7 @@ class AuthenticatedController < ApplicationController
 
   before_action :authenticate_user!
   before_action :set_current_options
-  before_action :configure_header
+  before_action :set_on_dashboard
 
   private
 
@@ -75,8 +75,8 @@ class AuthenticatedController < ApplicationController
     Current.options = Option.find_or_create_by(user_id: current_user.id)
   end
 
-  def configure_header
-    @hide_header_navigation = true
+  def set_on_dashboard
+    @on_dashboard = true
   end
 
   def handle_google_authorization_error(error)

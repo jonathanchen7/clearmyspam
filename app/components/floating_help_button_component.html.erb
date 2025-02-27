@@ -1,9 +1,0 @@
-<div class="fixed bottom-24 md:bottom-4 right-4 z-20">
-  <%= button_to helpers.dashboard_help_path,
-                method: :post, form: { data: { turbo_stream: true } },
-                class: "bg-primary hover:bg-primary-hover rounded-full w-10 h-10 md:w-12 md:h-12 flex items-center justify-center shadow-lg duration-200",
-                title: "Help",
-                aria: { label: "Help" } do %>
-    <%= icon("fa-solid", "question", class: "text-white") %>
-  <% end %>
-</div>
