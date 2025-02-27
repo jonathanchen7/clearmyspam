@@ -7,8 +7,8 @@ class AuthenticatedController < ApplicationController
               with: ->(error) { handle_google_authorization_error(error) }
 
   rescue_from Signet::AuthorizationError, with: :logout!
-
   rescue_from Inbox::CachingError, with: :handle_inbox_cache_error
+  rescue_from Google::Apis::RateLimitError, with: :handle_google_rate_limit_error
 
   before_action :authenticate_user!
   before_action :set_current_options
@@ -51,17 +51,9 @@ class AuthenticatedController < ApplicationController
     internal_only ? inbox.metrics.sync_internal!(current_user) : inbox.metrics.sync!(current_user)
   end
 
-  def with_rate_limit_rescue
-    yield
-  rescue Google::Apis::RateLimitError
-    @inbox = Inbox.new(current_user) if inbox.nil?
-    toast.error I18n.t("toasts.gmail_rate_limit.title"), text: I18n.t("toasts.gmail_rate_limit.text")
-  end
-
   def render_failure(error, show_toast: false)
     error_message = error.try(:message) || error
     respond_to do |format|
-      format.json { render json: { success: false, error: error_message }, status: :bad_request }
       format.turbo_stream do
         render turbo_stream: [toast.error("Error", text: error_message)] if show_toast
       end
@@ -93,6 +85,17 @@ class AuthenticatedController < ApplicationController
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: turbo_stream.replace("senders_table", partial: "dashboard/invalid_permissions")
+      end
+    end
+  end
+
+  def handle_google_rate_limit_error
+    @inbox = Inbox.new(current_user) if inbox.nil?
+    toast.error I18n.t("toasts.gmail_rate_limit.title"), text: I18n.t("toasts.gmail_rate_limit.text")
+
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: build_turbo_stream(toast: toast)
       end
     end
   end

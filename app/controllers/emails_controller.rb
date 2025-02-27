@@ -18,7 +18,6 @@ class EmailsController < AuthenticatedController
     sync_inbox_metrics!(internal_only: true)
 
     respond_to do |format|
-      format.json { render json: { success: true } }
       format.turbo_stream do
         render turbo_stream: build_turbo_stream(
           toast: toast.success(I18n.t("toasts.protect.success.title", count: email_count, email: emails_noun)),
@@ -33,7 +32,6 @@ class EmailsController < AuthenticatedController
     sync_inbox_metrics!(internal_only: true)
 
     respond_to do |format|
-      format.json { render json: { success: true } }
       format.turbo_stream do
         render turbo_stream: build_turbo_stream(
           toast: toast.success(I18n.t("toasts.unprotect.success.title", count: email_count, email: emails_noun)),
@@ -50,7 +48,6 @@ class EmailsController < AuthenticatedController
 
     if current_user.disable_dispose?
       respond_to do |format|
-        format.json { render json: { success: false } }
         format.turbo_stream do
           render turbo_stream: build_turbo_stream(toast: disabled_dispose_toast)
         end
@@ -62,51 +59,48 @@ class EmailsController < AuthenticatedController
     dispose_async = email_threads.size > Rails.configuration.async_dispose_threshold
 
     EmailThread.transaction do
-      with_rate_limit_rescue do
-        if email_threads.blank?
-          toast.info I18n.t("toasts.dispose.no_emails.title", dispose: present_tense_dispose_verb)
+      if email_threads.blank?
+        toast.info I18n.t("toasts.dispose.no_emails.title", dispose: present_tense_dispose_verb)
+      else
+        archive? ? inbox.archive!(email_threads) : inbox.trash!(email_threads)
+
+        if dispose_async
+          EmailThread.bulk_dispose(current_user, email_threads, archive: archive?)
+          toast.info I18n.t("toasts.dispose.async.title", count: email_count, email: emails_noun, disposing: present_participle_dispose_verb)
         else
-          archive? ? inbox.archive!(email_threads) : inbox.trash!(email_threads)
-
-          if dispose_async
-            EmailThread.bulk_dispose(current_user, email_threads, archive: archive?)
-            toast.info I18n.t("toasts.dispose.async.title", count: email_count, email: emails_noun, disposing: present_participle_dispose_verb)
-          else
-            vendor_ids = email_threads.pluck(:vendor_id)
-            archive? ? Gmail::Client.archive_threads!(current_user, *vendor_ids) : Gmail::Client.trash_threads!(current_user, *vendor_ids)
-            toast.success I18n.t("toasts.dispose.success.title", count: email_count, email: emails_noun, disposed: past_tense_dispose_verb)
-          end
+          vendor_ids = email_threads.pluck(:vendor_id)
+          archive? ? Gmail::Client.archive_threads!(current_user, *vendor_ids) : Gmail::Client.trash_threads!(current_user, *vendor_ids)
+          toast.success I18n.t("toasts.dispose.success.title", count: email_count, email: emails_noun, disposed: past_tense_dispose_verb)
         end
-
-        if senders.present?
-          query = "from:(#{senders.map(&:email).join("|")})"
-          remaining_thread_count = Gmail::Client.get_thread_count!(current_user, query: query) - email_threads.count
-
-          if remaining_thread_count.positive?
-            toast.text = I18n.t("toasts.dispose.delete_all_from_sender.text",
-                                remaining_count: remaining_thread_count,
-                                unread: Current.options.unread_only ? " unread" : nil,
-                                senders: senders.one? ? senders.first.email : "these #{senders.count} senders",
-                                dispose: present_tense_dispose_verb,
-                                disposed: past_tense_dispose_verb).html_safe
-            toast.with_destructive_cta(
-              I18n.t("toasts.dispose.delete_all_from_sender.cta", dispose: present_tense_dispose_verb.capitalize),
-              stimulus_data: Views::StimulusData.new(
-                controllers: "inbox",
-                actions: { "click" => %w[inbox#disposeAllFromSenders toast#dismiss] },
-                params: { "inbox" => { "sender_emails" => senders.map(&:email) }, "toast" => { "action" => "disposeAll" } },
-                include_controller: true
-              )
-            )
-          end
-        end
-
-        sync_inbox_metrics!
       end
+
+      if senders.present?
+        query = "from:(#{senders.map(&:email).join("|")})"
+        remaining_thread_count = Gmail::Client.get_thread_count!(current_user, query: query) - email_threads.count
+
+        if remaining_thread_count.positive?
+          toast.text = I18n.t("toasts.dispose.delete_all_from_sender.text",
+                              remaining_count: remaining_thread_count,
+                              unread: Current.options.unread_only ? " unread" : nil,
+                              senders: senders.one? ? senders.first.email : "these #{senders.count} senders",
+                              dispose: present_tense_dispose_verb,
+                              disposed: past_tense_dispose_verb).html_safe
+          toast.with_destructive_cta(
+            I18n.t("toasts.dispose.delete_all_from_sender.cta", dispose: present_tense_dispose_verb.capitalize),
+            stimulus_data: Views::StimulusData.new(
+              controllers: "inbox",
+              actions: { "click" => %w[inbox#disposeAllFromSenders toast#dismiss] },
+              params: { "inbox" => { "sender_emails" => senders.map(&:email) }, "toast" => { "action" => "disposeAll" } },
+              include_controller: true
+            )
+          )
+        end
+      end
+
+      sync_inbox_metrics!
     end
 
     respond_to do |format|
-      format.json { render json: { success: true } }
       format.turbo_stream do
         render turbo_stream: build_turbo_stream(toast: toast, drawer_options: params[:drawer_options])
       end

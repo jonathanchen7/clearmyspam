@@ -10,14 +10,11 @@ class OptionsController < AuthenticatedController
     Current.options.update(sanitized_params)
 
     if sanitized_params[:unread_only].present?
-      with_rate_limit_rescue do
-        reset_inbox
-        inbox.cache!
-      end
+      reset_inbox
+      inbox.cache!
     end
 
     respond_to do |format|
-      format.json { render json: { success: true } }
       format.turbo_stream do
         render turbo_stream: build_turbo_stream(sanitized_params)
       end

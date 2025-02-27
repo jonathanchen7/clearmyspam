@@ -17,10 +17,9 @@ class DashboardController < AuthenticatedController
   end
 
   def sync
-    with_rate_limit_rescue { set_or_create_inbox }
+    set_or_create_inbox
 
     respond_to do |format|
-      format.json { render json: { success: true } }
       format.turbo_stream do
         render turbo_stream: build_turbo_stream(toast: toast)
       end
@@ -28,13 +27,10 @@ class DashboardController < AuthenticatedController
   end
 
   def resync
-    with_rate_limit_rescue do
-      reset_inbox
-      toast.success I18n.t("toasts.resync.success.title", count: inbox.size)
-    end
+    reset_inbox
+    toast.success I18n.t("toasts.resync.success.title", count: inbox.size)
 
     respond_to do |format|
-      format.json { render json: { success: true } }
       format.turbo_stream do
         render turbo_stream: build_turbo_stream(toast: toast)
       end
@@ -52,37 +48,34 @@ class DashboardController < AuthenticatedController
     elsif sender.blank? && inbox.final_page_fetched?
       toast.error I18n.t("toasts.load_more.no_more.title", sender: nil)
     else
-      with_rate_limit_rescue do
-        thread_fetcher = EmailThreadFetcher.new(current_user)
-        email_threads, page_token = if sender.present?
-                                      thread_fetcher.fetch_threads_from_emails!(
-                                        [sender.email],
-                                        unread_only: Current.options.unread_only,
-                                        sender_page_token: inbox.next_page_token(sender_id: sender.id)
-                                      )
-                                    else
-                                      thread_fetcher.fetch_threads!(
-                                        unread_only: Current.options.unread_only,
-                                        page_token: inbox.next_page_token
-                                      )
-                                    end
-        set_cached_inbox # Fetch the inbox from the cache again to ensure we have the latest data.
-        new_emails_count = inbox.populate(email_threads, page_token: page_token, sender_id: sender&.id)
+      thread_fetcher = EmailThreadFetcher.new(current_user)
+      email_threads, page_token = if sender.present?
+                                    thread_fetcher.fetch_threads_from_emails!(
+                                      [sender.email],
+                                      unread_only: Current.options.unread_only,
+                                      sender_page_token: inbox.next_page_token(sender_id: sender.id)
+                                    )
+                                  else
+                                    thread_fetcher.fetch_threads!(
+                                      unread_only: Current.options.unread_only,
+                                      page_token: inbox.next_page_token
+                                    )
+                                  end
+      set_cached_inbox # Fetch the inbox from the cache again to ensure we have the latest data.
+      new_emails_count = inbox.populate(email_threads, page_token: page_token, sender_id: sender&.id)
 
-        if new_emails_count.positive?
-          toast.success I18n.t("toasts.load_more.success.title",
-                               count: new_emails_count,
-                               sender: sender.present? ? " from #{sender.name}" : nil)
-        else
-          toast.info I18n.t("toasts.load_more.no_more.title", sender: sender.present? ? " from #{sender.name}" : nil)
-        end
-
-        sync_inbox_metrics!
+      if new_emails_count.positive?
+        toast.success I18n.t("toasts.load_more.success.title",
+                             count: new_emails_count,
+                             sender: sender.present? ? " from #{sender.name}" : nil)
+      else
+        toast.info I18n.t("toasts.load_more.no_more.title", sender: sender.present? ? " from #{sender.name}" : nil)
       end
+
+      sync_inbox_metrics!
     end
 
     respond_to do |format|
-      format.json { render json: { success: true } }
       format.turbo_stream do
         render turbo_stream: build_turbo_stream(toast: toast, drawer_options: params[:drawer_options])
       end

@@ -12,9 +12,10 @@ class SendersController < AuthenticatedController
 
   def show
     respond_to do |format|
-      format.json { render json: { success: true } }
       format.turbo_stream do
-        render turbo_stream: turbo_stream.append("inbox", partial: "dashboard/sender_drawer", locals: { sender: sender })
+        render turbo_stream: turbo_stream.append("inbox",
+                                                 partial: "dashboard/sender_drawer",
+                                                 locals: { sender: sender })
       end
     end
   end
@@ -41,6 +42,6 @@ class SendersController < AuthenticatedController
     sender_id = params.require(:sender_id)
     @sender = inbox.sender_lookup(sender_id)
 
-    render json: { success: false, error: "Invalid sender." }, status: :not_found if sender.blank?
+    raise "sender could not be found" if sender.blank?
   end
 end
