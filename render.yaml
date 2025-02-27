@@ -13,7 +13,7 @@ services:
     plan: standard
     region: oregon
     buildCommand: "./bin/render-build.sh"
-    preDeployCommand: "bundle exec rails db:migrate"
+    preDeployCommand: "bundle exec rails db:migrate && bundle exec rails blogs:sync_metadata"
     startCommand: "bundle exec rails server"
     autoDeploy: false
     envVars:

@@ -1,8 +1,9 @@
 class BlogsController < ApplicationController
   def show
-    slug = params.require(:slug)
-    @blog = Blog.new(slug)
-  rescue ArgumentError
-    render file: "public/404.html", status: :not_found
+    @blog = Blog.find_by_slug!(params[:slug])
+  end
+
+  def index
+    @blogs = Blog.order(published_at: :desc)
   end
 end

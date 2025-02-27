@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_02_24_172255) do
+ActiveRecord::Schema[7.2].define(version: 2025_02_27_115222) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -24,6 +24,17 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_24_172255) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_account_plans_on_user_id"
+  end
+
+  create_table "blogs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "slug", null: false
+    t.string "title", null: false
+    t.string "subtitle", null: false
+    t.string "tag", null: false
+    t.datetime "published_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_blogs_on_slug", unique: true
   end
 
   create_table "email_threads", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

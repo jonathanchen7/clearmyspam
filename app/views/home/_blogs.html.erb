@@ -6,25 +6,9 @@
         Read our recent posts</p>
     </div>
     <div class="mx-auto mt-8 grid max-w-2xl grid-cols-1 gap-y-2 sm:gap-x-4 sm:gap-y-8 border-t border-gray-200 pt-6 sm:pt-12 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-      <%= render Home::BlogPreviewComponent.new(
-        title: "Hello World 👋",
-        subtitle: "In Clear My Spam's inaugural blog post, I introduce myself, discuss my motivations for building the app, and review the tech stack.",
-        tag: "Clear My Spam",
-        slug: "hello-world",
-      ) %>
-      <%= render Home::BlogPreviewComponent.new(
-        title: "How Do Companies Get Your Email Address? 📬",
-        subtitle: " Ever wonder why you get emails from companies you've never heard of? There are many sneaky techniques companies employ to gather emails for marketing purposes.",
-        tag: "Email",
-        slug: "how-do-companies-get-your-email",
-      ) %>
-      <%= render Home::BlogPreviewComponent.new(
-        title: "Clear My Spam on Rails? 🛤️",
-        subtitle: "After letting Clear My Spam collect dust for many months, I revisited the project. And in typical dev fashion, I decided to completely rewrite the app in Ruby on Rails.",
-        tag: "Development",
-        slug: "rails-migration",
-      ) %>
-      <!-- More posts... -->
+      <% Blog.recent.each do |blog| %>
+        <%= render Home::BlogPreviewComponent.new(blog) %>
+      <% end %>
     </div>
   </div>
 </div>

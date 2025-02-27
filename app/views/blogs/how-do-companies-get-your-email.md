@@ -1,4 +1,8 @@
-# **How Do Companies Get Your Email Address? 📬**
+<!--
+tags: Email
+-->
+
+# How Do Companies Get Your Email Address? 📬
 
 ##### February 28, 2024
 
