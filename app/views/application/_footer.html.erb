@@ -1,5 +1,5 @@
 <div class="<%= class_names(
-                  !current_user.active_pro? && "mb-24 sm:mb-20 md:mb-0",
+                  @on_dashboard && !current_user.active_pro? && "mb-24 sm:mb-20 md:mb-0",
                   "w-full px-4 py-2 md:py-4 flex flex-col gap-y-2 sm:flex-row sm:justify-between items-center text-xs text-gray-400"
                 ) %>">
   <div>jonathanchen.dev</div>
