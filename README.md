@@ -25,17 +25,20 @@ simplicity, usability, and security.
 2. Install Ruby on Rails (if you haven't.)
 3. Run `bundle install` to install Rails dependencies and `npm install` to install [Hotwire](https://hotwired.dev/).
 4. Run `rails db:setup` to create a development database and run migrations.
-5. Delete `credentials.yml.enc` from the `config`
-   directory and replace them with your own `credentials.yml.enc` +
-   `master.key` ([Ruby on Rails Guide](https://guides.rubyonrails.org/security.html#custom-credentials)).
+5. Delete `development.yml.enc` and `development.key` from `config/credentials/` and replace them with your own ([Ruby on Rails Guide](https://guides.rubyonrails.org/security.html#custom-credentials)).
     ```yml
+    # Gmail, Stripe, and Honeybadger credentials are optional. Without them, you may see some errors when running tests.
     google:
       client_id: <client_id>
       client_secret: <client_secret>
-    stripe: # Stripe credentials are optional.
+    gmail:
+      mailer_password: <gmail_app_password>
+    stripe:
       api_key: <stripe_api_key>
       weekly_price_id: <stripe_weekly_price_id>
       monthly_price_id: <stripe_monthly_price_id>
+    honeybadger:
+      api_key: <honeybadger_api_key>
     ```
 6. Use [`overmind`](https://github.com/DarthSim/overmind) to run the app locally + debug.
     ```bash
