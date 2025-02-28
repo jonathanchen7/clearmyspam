@@ -1,6 +1,6 @@
 <div class="<%= class_names(@featured ? "ring-primary" : "ring-gray-200", "rounded-3xl p-8 ring-2 xl:p-10") %>">
   <div class="flex items-center justify-between gap-x-4">
-    <h3 id="tier-startup" class="text-lg/8 font-semibold text-primary"><%= @name %></h3>
+    <h3 class="text-lg/8 font-semibold text-primary"><%= @name %></h3>
     <% if @tag %>
       <p class="rounded-full bg-primary/10 px-2.5 py-1 text-xs/5 font-semibold text-primary"><%= @tag %></p>
     <% end %>

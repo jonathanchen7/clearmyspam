@@ -7,7 +7,7 @@
       <p class="text-sm"><%= user.name %></p>
       <p class="text-xs text-gray-400"><%= user.email %></p>
     </div>
-    <%= image_tag user.image,
+    <%= image_tag user.image || "https://ui-avatars.com/api/?name=#{user.name}",
                   alt: "profile picture",
                   class: "h-7 w-7 sm:h-9 sm:w-9 rounded-full outline outline-1 outline-gray-300" %>
   </div>
