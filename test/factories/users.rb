@@ -6,7 +6,7 @@ FactoryBot.define do
     email { Faker::Internet.email }
     name { Faker::Name.name }
     vendor_id { Faker::Alphanumeric.alphanumeric(number: 10) }
-    last_logged_in_at { Time.now }
+    last_login_at { Time.now }
 
     after(:create) do |user|
       create(:account_plan, :free, user: user)

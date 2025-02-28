@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_02_27_115222) do
+ActiveRecord::Schema[7.2].define(version: 2025_02_28_041404) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -164,7 +164,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_27_115222) do
     t.datetime "updated_at", null: false
     t.string "vendor_id", null: false
     t.datetime "onboarding_completed_at"
-    t.datetime "last_logged_in_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "last_login_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.boolean "admin", default: false
     t.index ["vendor_id"], name: "index_users_on_vendor_id", unique: true
   end
