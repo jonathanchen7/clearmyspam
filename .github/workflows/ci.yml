@@ -57,6 +57,7 @@ jobs:
       - name: Run tests
         env:
           RAILS_ENV: test
+          RAILS_TEST_MASTER_KEY: ${{ secrets.RAILS_TEST_MASTER_KEY }}
           DATABASE_URL: postgres://postgres:postgres@localhost:5432
         run: bin/rails db:test:prepare test test:system
 
