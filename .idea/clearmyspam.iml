@@ -485,6 +485,11 @@
               <RakeTaskImpl description="" fullCommand="assets:clean" id="clean" />
             </subtasks>
           </RakeTaskImpl>
+          <RakeTaskImpl id="blogs">
+            <subtasks>
+              <RakeTaskImpl description="Extract data from blog markdown files and save to database" fullCommand="blogs:sync_metadata" id="sync_metadata" />
+            </subtasks>
+          </RakeTaskImpl>
           <RakeTaskImpl id="cache_digests">
             <subtasks>
               <RakeTaskImpl description="Lookup first-level dependencies for TEMPLATE (like messages/show or comments/_comment.html)" fullCommand="cache_digests:dependencies" id="dependencies" />

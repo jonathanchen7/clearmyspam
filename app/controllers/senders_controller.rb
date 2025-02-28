@@ -29,11 +29,7 @@ class SendersController < AuthenticatedController
       break if url.present?
     end
 
-    if url.blank?
-      render_failure("We couldn't find a link to unsubscribe from #{sender.email}.", show_toast: true)
-    else
-      render json: { success: true, url: url }
-    end
+    render json: { success: true, url: url }
   end
 
   private
