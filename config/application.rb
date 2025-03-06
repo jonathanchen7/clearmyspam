@@ -26,6 +26,8 @@ module ClearMySpam
     config.active_job.queue_adapter = :good_job
     config.good_job.execution_mode = :external
 
+    config.semantic_logger.add_appender(appender: :honeybadger_insights)
+
     ENV["GOOGLE_API_USE_RAILS_LOGGER"] = "false"
   end
 end

@@ -38,7 +38,8 @@ gem "redcarpet"
 gem "honeybadger", "~> 5.26"
 
 gem "colorize"
-gem "awesome_print"
+gem "amazing_print"
+gem "rails_semantic_logger"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
