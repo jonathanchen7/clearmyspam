@@ -23,6 +23,10 @@ framework and the Ruby language. Since learning Ruby on Rails I haven't gotten t
 experiment with a Rails frontend (since my company uses React), so what better way to learn than to
 rewrite an existing app?
 
+For some additional context, this rewrite was absolutely not necessary - my Next.js app had few users, no scaling issues,
+and worked just fine. It was a little difficult to extend and test (given the lack of OO principles), but my motivation
+was purely educational.
+
 If you haven't used Ruby on Rails before, it's a full-stack web app framework that emphasizes **convention over
 configuration**. It's a great choice for quickly building web application if you're familiar with
 Ruby and/or MVC frameworks and there are a ton of nice-to-have features, like a native database querying API,
@@ -73,8 +77,13 @@ this one.
 
 I am **extremely** happy with the result of this refactor. The codebase is cleaner, more organized, and only 60%
 the size of the original TypeScript codebase (while being more feature-rich). I learned how to build and deploy a Rails
-app from scratch, and feel confident in my ability to test and extend the app. In fact, I'm feeling comfortable enough
-to open source the codebase and sell Clear My Spam as a service! I'd call that a success.
+app from scratch, and feel confident in my ability to test and extend the app.
+
+To my fellow developers - if you've never written a full stack app from scratch using the same language/framework as your
+company, I would highly recommend trying it out. The easiest way may just be to rewrite one of your personal projects! 
+Unless you were a founding or early engineer, there are likely tons of setup/configuration bits that you've never had
+to deal with (especially for Rails). Going through the process from scratch forces you to learn about many framework
+and language quirks that you might otherwise not know about or interact with. 
 
 ![React app lines of code](react-loc.png "Ruby on Rails lines of code")
 ![Ruby on Rails lines of code](rails-loc.png "Ruby on Rails lines of code")
