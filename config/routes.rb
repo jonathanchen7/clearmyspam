@@ -11,6 +11,7 @@ Rails.application.routes.draw do
   end
 
   # Marketing
+  get "f5bot", to: "home#index"
   get "home/index"
   get "faq", to: "faq#index"
 
