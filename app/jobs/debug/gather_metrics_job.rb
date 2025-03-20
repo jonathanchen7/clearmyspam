@@ -74,7 +74,7 @@ module Debug
         top_users.each_with_index do |user, index|
           puts "#{index + 1}. User ID: #{user.id}"
           puts "   Email: #{user.email}"
-          puts "   Synced emails: #{user.email_threads.count}"
+          puts "   Synced emails: #{user.email_threads.where(created_at: time_range).count}"
           puts "   Disposed emails: #{user.disposed_count}"
           puts "\n"
 
