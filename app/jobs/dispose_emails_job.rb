@@ -8,7 +8,7 @@ class DisposeEmailsJob < ApplicationJob
     perform_limit: 1
   )
 
-  retry_on RetryError, wait: ->(_) { rand(5..60) }, attempts: 15
+  retry_on RetryError, wait: ->(attempt) { attempt < 10 ? rand(5..60) : rand(60..180) }, attempts: 15
 
   # If you change the signature of this method, make sure to also update the good_job concurrency controls.
   def perform(user, email_threads, archive:)
