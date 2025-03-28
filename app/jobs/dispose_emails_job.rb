@@ -5,10 +5,12 @@ class DisposeEmailsJob < ApplicationJob
 
   good_job_control_concurrency_with(
     key: -> { "#{arguments.find { |arg| arg.is_a?(User) }.id}:dispose" },
-    perform_limit: 1
+    perform_limit: 3
   )
 
-  retry_on RetryError, wait: ->(attempt) { attempt < 10 ? rand(5..60) : rand(60..180) }, attempts: 15
+  retry_on RetryError,
+           wait: ->(attempt) { [attempt < 10 ? rand(5..60) : (2**(attempt - 10)) * rand(60..180), 1200].min },
+           attempts: 15
 
   # If you change the signature of this method, make sure to also update the good_job concurrency controls.
   def perform(user, email_threads, archive:)
