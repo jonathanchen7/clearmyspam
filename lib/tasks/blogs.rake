@@ -3,8 +3,12 @@ namespace :blogs do
   task sync_metadata: :environment do
     blog_files = Dir.glob(Rails.root.join("app/views/blogs/*.md"))
 
+    # Keep track of processed slugs
+    processed_slugs = []
+
     blog_files.each do |file|
       slug = File.basename(file, ".md")
+      processed_slugs << slug
 
       # Read the first few lines to extract metadata
       # This assumes all blogs have a title, subtitle, and date
@@ -34,5 +38,9 @@ namespace :blogs do
 
       puts "Saved metadata for blog: #{slug}"
     end
+
+    # Delete blogs that don't have corresponding markdown files
+    blogs_to_delete = Blog.where.not(slug: processed_slugs)
+    blogs_to_delete.destroy_all
   end
 end

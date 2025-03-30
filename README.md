@@ -43,7 +43,7 @@ simplicity, usability, and security.
 6. Use [`overmind`](https://github.com/DarthSim/overmind) to run the app locally + debug.
     ```bash
     # Use this command to start the web server, background job server, and live reloading for ERB + Tailwind changes.
-    overmind start -f Procfile.dev
+    overmind start
     
     # If you want to connect to the web server or background job server separately for debugging, use these commands.
     overmind connect web

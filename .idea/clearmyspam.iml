@@ -88,7 +88,6 @@
     <orderEntry type="library" scope="PROVIDED" name="guard-compat (v1.2.1, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="guard-livereload (v2.5.2, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="hashie (v5.0.0, rbenv: 3.3.4) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="honeybadger (v5.26.4, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="http_parser.rb (v0.8.0, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="httpclient (v2.8.3, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="i18n (v1.14.7, rbenv: 3.3.4) [gem]" level="application" />
@@ -152,7 +151,6 @@
     <orderEntry type="library" scope="PROVIDED" name="rails (v7.2.2.1, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rails-dom-testing (v2.2.0, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rails-html-sanitizer (v1.6.2, rbenv: 3.3.4) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="rails_semantic_logger (v4.17.0, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="railties (v7.2.2.1, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rainbow (v3.1.1, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rake (v13.2.1, rbenv: 3.3.4) [gem]" level="application" />
@@ -176,8 +174,6 @@
     <orderEntry type="library" scope="PROVIDED" name="rubyzip (v2.4.1, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="sassc (v2.4.0, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="securerandom (v0.4.1, rbenv: 3.3.4) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="selenium-webdriver (v4.29.1, rbenv: 3.3.4) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="semantic_logger (v4.16.1, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="shellany (v0.0.1, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="signet (v0.19.0, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="snaky_hash (v2.0.1, rbenv: 3.3.4) [gem]" level="application" />
@@ -196,7 +192,7 @@
     <orderEntry type="library" scope="PROVIDED" name="uber (v0.1.0, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="unicode-display_width (v3.1.4, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="unicode-emoji (v4.0.4, rbenv: 3.3.4) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="uri (v1.0.2, rbenv: 3.3.4) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="uri (v1.0.3, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="useragent (v0.16.11, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="version_gem (v1.1.4, rbenv: 3.3.4) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="view_component (v3.21.0, rbenv: 3.3.4) [gem]" level="application" />
