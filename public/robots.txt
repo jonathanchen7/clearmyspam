@@ -1,10 +1,5 @@
 User-agent: *
-Disallow: /
-Allow: /$
-Allow: /faq
-Allow: /blogs/
-Allow: /pricing
-Allow: /privacy
-Allow: /terms
+Disallow: 
+Disallow: /app/
 
 Sitemap: https://clearmyspam.com/sitemap.xml
