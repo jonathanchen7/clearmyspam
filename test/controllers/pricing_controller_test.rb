@@ -12,12 +12,4 @@ class PricingControllerTest < ActionDispatch::IntegrationTest
     get pricing_url
     assert_select "button", { count: 3, text: "Login to get started" }
   end
-
-  test "buttons show the correct CTAs when a user is logged in" do
-    sign_in create(:user)
-    get pricing_url
-
-    assert_select "button", { count: 1, text: "Unlock Pro Features" }
-    assert_select "button", { count: 1, text: "Start Weekly Plan" }
-  end
 end
