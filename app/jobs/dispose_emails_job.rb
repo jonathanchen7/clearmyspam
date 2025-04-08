@@ -22,7 +22,7 @@ class DisposeEmailsJob < ApplicationJob
 
     return if email_threads.blank?
 
-    user.refresh_google_auth! if user.google_auth_expired?
+    user.refresh_google_auth!
 
     if archive
       Gmail::Client.archive_threads!(user, *email_threads.map(&:vendor_id))

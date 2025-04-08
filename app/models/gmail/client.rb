@@ -7,7 +7,7 @@ module Gmail
     class_attribute :client, default: Google::Apis::GmailV1::GmailService.new
 
     THREAD_DETAILS_BATCH_SIZE = 20
-    DISPOSE_BATCH_SIZE = 20
+    DISPOSE_BATCH_SIZE = 15
 
     class << self
       def get_inbox_metrics!(user)
@@ -115,7 +115,7 @@ module Gmail
       private
 
       def set_client_authorization(user)
-        user.refresh_google_auth! if user.google_auth_expired?
+        user.refresh_google_auth!
 
         client.authorization = user.google_access_token
       end

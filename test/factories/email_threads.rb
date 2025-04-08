@@ -4,7 +4,7 @@ FactoryBot.define do
   factory :email_thread do
     id { SecureRandom.uuid }
     vendor_id { Faker::Alphanumeric.alphanumeric(number: 10) }
-    user { build(:user) }
+    user
     protected { false }
     trashed { false }
     archived { false }

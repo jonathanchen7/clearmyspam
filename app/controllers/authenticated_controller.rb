@@ -68,7 +68,7 @@ class AuthenticatedController < ApplicationController
       google_access_token_expires_at: session[:google_access_token_expires_at]
     )
 
-    current_user.refresh_google_auth!(session: session) if current_user.google_auth_expired?
+    current_user.refresh_google_auth!(session: session)
   end
 
   def set_current_options
