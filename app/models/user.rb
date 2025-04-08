@@ -25,6 +25,7 @@ class User < ApplicationRecord
   has_one :active_account_plan, -> { order(created_at: :desc) }, class_name: "AccountPlan"
   has_one :option, autosave: true
   has_many :email_threads
+  has_many :pending_email_disposals
 
   attribute :google_access_token, :string
   attribute :google_access_token_expires_at, :datetime
@@ -64,7 +65,9 @@ class User < ApplicationRecord
     google_access_token_expires_at.nil? || google_access_token_expires_at < Time.now
   end
 
-  def refresh_google_auth!(session: nil)
+  def refresh_google_auth!(force: false, session: nil)
+    return unless force || google_auth_expired?
+
     Rails.logger.info("Refreshing Google access token for user: #{id}".on_blue)
 
     response = oauth_client.fetch_access_token!

@@ -54,17 +54,20 @@ class EmailThread < ApplicationRecord
           trashed: false,
           archived: false
         )
-      else
-        Rails.logger.error("Error creating EmailThread from Google thread: #{thread.id}")
-        nil
       end
+    rescue StandardError => e
+      Rails.logger.error("Error creating EmailThread from Google thread: #{thread.id}")
+      Honeybadger.notify(e)
+      nil
     end
 
     def bulk_dispose(user, email_threads, archive:)
-      email_threads.each_slice(Gmail::Client::DISPOSE_BATCH_SIZE).with_index do |emails_slice, index|
-        DisposeEmailsJob.set(wait: (index * 4).seconds)
-                        .perform_later(user, emails_slice, archive: archive)
+      email_threads.each_slice(1000) do |thread_batch|
+        disposal_attributes = thread_batch.map { |thread| thread.pending_disposal_attributes(archive: archive) }
+        PendingEmailDisposal.insert_all(disposal_attributes, unique_by: %i[user_id vendor_id])
       end
+
+      DisposeEmailsJob.perform_later(user, archive: archive)
     end
 
     def fetch_gmail_header(headers, name)
@@ -80,6 +83,17 @@ class EmailThread < ApplicationRecord
         .gsub("&quot;", '"') # Replace HTML-escaped quotes with a ".
         .gsub(/&#(\d+);/) { |match| match.to_i.chr } # Replace HTML-escaped characters with actual chars.
     end
+  end
+
+  def pending_disposal_attributes(archive:)
+    {
+      id: SecureRandom.uuid,
+      user_id: user_id,
+      email_thread_id: id,
+      vendor_id: vendor_id,
+      archive: archive,
+      created_at: Time.current
+    }
   end
 
   def fetch_gmail_details!(user)

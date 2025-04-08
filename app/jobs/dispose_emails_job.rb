@@ -1,37 +1,57 @@
 class DisposeEmailsJob < ApplicationJob
-  include GoodJob::ActiveJobExtensions::Concurrency
-
   queue_as :default
 
-  good_job_control_concurrency_with(
-    key: -> { "#{arguments.find { |arg| arg.is_a?(User) }.id}:dispose" },
-    perform_limit: 1
-  )
+  attr_reader :user, :archive
 
-  retry_on RetryError,
-           wait: ->(attempt) {
-             base_delay = [15 * (2 ** attempt), 1800].min  # Cap at 30 minutes
-             jitter = rand(-base_delay * 0.15..base_delay * 0.15)  # Add ±15% jitter
-             base_delay + jitter
-           },
-           attempts: 20  # Reduce max attempts since we're using longer delays
+  retry_on StandardError, attempts: 8, wait: ->(attempt) {
+    # This calculates an exponential backoff delay in seconds between retry attempts
+    # attempt 1: 2 * (2^1) = 4 seconds
+    # attempt 2: 2 * (2^2) = 8 seconds
+    # And so on...
+    2 * (2 ** attempt)
+  }
 
-  # If you change the signature of this method, make sure to also update the good_job concurrency controls.
-  def perform(user, email_threads, archive:)
+  def perform(user, archive:)
     Honeybadger.context(user)
 
-    return if email_threads.blank?
+    @user = user
+    @archive = archive
 
-    user.refresh_google_auth!
+    ApplicationRecord.transaction do
+      return unless acquire_advisory_lock && pending_email_disposals.exists?
 
-    if archive
-      Gmail::Client.archive_threads!(user, *email_threads.map(&:vendor_id))
-      user.email_threads.where(id: email_threads.map(&:id)).update_all(archived: true)
-    else
-      Gmail::Client.trash_threads!(user, *email_threads.map(&:vendor_id))
-      user.email_threads.where(id: email_threads.map(&:id)).update_all(trashed: true)
+      user.refresh_google_auth!
+
+      if archive
+        Gmail::Client.archive_threads!(user, *pending_email_disposals.map(&:vendor_id))
+      else
+        Gmail::Client.trash_threads!(user, *pending_email_disposals.map(&:vendor_id))
+      end
+
+      archive ? email_threads.update_all(archived: true) : email_threads.update_all(trashed: true)
+      disposed_count = pending_email_disposals.delete_all
+
+      if disposed_count == Gmail::Client::DISPOSE_BATCH_SIZE
+        DisposeEmailsJob.set(wait: 1.second).perform_later(user, archive: archive)
+      end
     end
-  rescue Google::Apis::RateLimitError, Google::Apis::ServerError, Google::Apis::ClientError
-    raise RetryError
+  end
+
+  private
+
+  def acquire_advisory_lock
+    lock_key = "dispose_emails:#{user.id}:#{archive}"
+    ApplicationRecord.sanitize_sql_for_conditions(["pg_try_advisory_xact_lock(?)", Zlib.crc32(lock_key)])
+  end
+
+  def pending_email_disposals
+    @pending_email_disposals ||= user.pending_email_disposals
+                                     .where(archive: archive)
+                                     .order(created_at: :asc)
+                                     .limit(Gmail::Client::DISPOSE_BATCH_SIZE)
+  end
+
+  def email_threads
+    @email_threads ||= EmailThread.where(id: pending_email_disposals.map(&:email_thread_id))
   end
 end
