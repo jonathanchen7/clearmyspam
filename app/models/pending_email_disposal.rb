@@ -3,11 +3,11 @@
 # Table name: pending_email_disposals
 #
 #  id              :uuid             not null, primary key
+#  archive         :boolean          not null
+#  created_at      :datetime         not null
 #  email_thread_id :uuid             not null
 #  user_id         :uuid             not null
 #  vendor_id       :string           not null
-#  archive         :boolean          not null
-#  created_at      :datetime         not null
 #
 # Indexes
 #

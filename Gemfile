@@ -72,7 +72,7 @@ group :development do
   gem "web-console"
   gem "guard-livereload", "~> 2.5", require: false
   gem "rack-livereload"
-  gem "annotate"
+  gem "annotaterb"
 end
 
 group :test do
