@@ -25,15 +25,7 @@ class InboxMetrics
     @total = threads_total
     @unread = threads_unread
 
-    if user.metrics.nil?
-      user.metrics = Metrics.new(
-        initial_total_threads: threads_total,
-        initial_unread_threads: threads_unread,
-        total_threads: threads_total,
-        unread_threads: threads_unread
-      )
-      user.metrics.save!
-    elsif user.metrics.initial_total_threads.zero?
+    if user.metrics.initial_total_threads.zero?
       user.metrics.update!(
         initial_total_threads: threads_total,
         initial_unread_threads: threads_unread,

@@ -69,8 +69,9 @@ class Inbox
   def protect!(email_threads)
     return unless email_threads.present?
 
-    EmailThread.transaction do
+    ApplicationRecord.transaction do
       EmailThread.where(id: email_threads.map(&:id)).update_all(protected: true)
+      ProtectedEmail.insert_all(email_threads.map { |email_thread| { user_id: user_id, vendor_id: email_thread.vendor_id } })
       email_threads.each { |email_thread| emails[email_thread.id].protected = true }
     end
   end
@@ -79,8 +80,9 @@ class Inbox
   def unprotect!(email_threads)
     return unless email_threads.present?
 
-    EmailThread.transaction do
+    ApplicationRecord.transaction do
       EmailThread.where(id: email_threads.map(&:id)).update_all(protected: false)
+      ProtectedEmail.where(user_id: user_id, vendor_id: email_threads.map(&:vendor_id)).delete_all
       email_threads.each { |email_thread| emails[email_thread.id].protected = false }
     end
   end
