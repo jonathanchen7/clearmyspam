@@ -7,7 +7,7 @@ class InboxTest < ActiveSupport::TestCase
     email_thread1 = build(:email_thread)
     email_thread2 = build(:email_thread)
     email_thread3 = build(:email_thread)
-    inbox = Inbox.new("user_id")
+    inbox = Inbox.new(SecureRandom.uuid)
 
     new_email_count = inbox.populate([email_thread1, email_thread2, email_thread3], page_token: "first_page_token")
 
@@ -113,7 +113,7 @@ class InboxTest < ActiveSupport::TestCase
   private
 
   def setup_inbox(email_threads)
-    inbox = Inbox.new("user_id")
+    inbox = Inbox.new(SecureRandom.uuid)
     inbox.populate(email_threads, page_token: "next_page_token")
 
     inbox

@@ -10,6 +10,7 @@ FactoryBot.define do
 
     after(:create) do |user|
       create(:account_plan, :free, user: user)
+      create(:metrics, user: user)
     end
   end
 end
