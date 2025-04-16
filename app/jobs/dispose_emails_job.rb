@@ -11,29 +11,32 @@ class DisposeEmailsJob < ApplicationJob
     2 * (2 ** attempt)
   }
 
-  def perform(user, archive:)
+  def perform(user)
     Honeybadger.context(user)
 
     @user = user
-    @archive = archive
 
     ApplicationRecord.transaction do
       return unless acquire_advisory_lock && pending_email_disposals.exists?
 
       user.refresh_google_auth!
 
-      if archive
-        Gmail::Client.archive_threads!(user, *pending_email_disposals.map(&:vendor_id))
-      else
-        Gmail::Client.trash_threads!(user, *pending_email_disposals.map(&:vendor_id))
+      pending_email_disposals.group_by(&:archive).each do |archive, emails|
+        next if emails.empty?
+
+        vendor_ids = emails.map(&:vendor_id)
+        if archive
+          Gmail::Client.archive_threads!(user, *vendor_ids)
+          email_threads(vendor_ids).update_all(archived: true)
+        else
+          Gmail::Client.trash_threads!(user, *vendor_ids)
+          email_threads(vendor_ids).update_all(trashed: true)
+        end
       end
 
-      archive ? email_threads.update_all(archived: true) : email_threads.update_all(trashed: true)
       disposed_count = pending_email_disposals.delete_all
 
-      if disposed_count == Gmail::Client::DISPOSE_BATCH_SIZE
-        DisposeEmailsJob.set(wait: 1.second).perform_later(user, archive: archive)
-      end
+      DisposeEmailsJob.set(wait: 1.second).perform_later(user) if disposed_count == Gmail::Client::DISPOSE_BATCH_SIZE
     end
   end
 
@@ -46,12 +49,11 @@ class DisposeEmailsJob < ApplicationJob
 
   def pending_email_disposals
     @pending_email_disposals ||= user.pending_email_disposals
-                                     .where(archive: archive)
                                      .order(created_at: :asc)
                                      .limit(Gmail::Client::DISPOSE_BATCH_SIZE)
   end
 
-  def email_threads
-    @email_threads ||= EmailThread.where(id: pending_email_disposals.map(&:email_thread_id))
+  def email_threads(vendor_ids)
+    user.email_threads.where(vendor_id: vendor_ids)
   end
 end

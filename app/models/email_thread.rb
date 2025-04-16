@@ -67,7 +67,7 @@ class EmailThread < ApplicationRecord
         PendingEmailDisposal.insert_all(disposal_attributes, unique_by: %i[user_id vendor_id])
       end
 
-      DisposeEmailsJob.perform_later(user, archive: archive)
+      DisposeEmailsJob.perform_later(user)
     end
 
     def fetch_gmail_header(headers, name)
@@ -87,12 +87,10 @@ class EmailThread < ApplicationRecord
 
   def pending_disposal_attributes(archive:)
     {
-      id: SecureRandom.uuid,
       user_id: user_id,
       email_thread_id: id,
       vendor_id: vendor_id,
-      archive: archive,
-      created_at: Time.current
+      archive: archive
     }
   end
 
