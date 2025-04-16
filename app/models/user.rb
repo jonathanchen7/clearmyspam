@@ -24,6 +24,7 @@ class User < ApplicationRecord
   has_many :account_plans, autosave: true
   has_one :active_account_plan, -> { order(created_at: :desc) }, class_name: "AccountPlan"
   has_one :option, autosave: true
+  has_one :metrics
   has_many :email_threads
   has_many :pending_email_disposals
 
@@ -51,6 +52,12 @@ class User < ApplicationRecord
           thread_disposal_limit: AccountPlan::DEFAULT_THREAD_DISPOSAL_LIMIT
         )
         user.option = Option.new(unread_only: true)
+        user.metrics = Metrics.new(
+          initial_total_threads: 0,
+          initial_unread_threads: 0,
+          total_threads: 0,
+          unread_threads: 0
+        )
       end
       user.google_refresh_token = auth.credentials.refresh_token if auth.credentials.refresh_token.present?
       user.last_login_at = Time.now

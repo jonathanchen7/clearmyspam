@@ -28,9 +28,11 @@ class DisposeEmailsJob < ApplicationJob
         if archive
           Gmail::Client.archive_threads!(user, *vendor_ids)
           email_threads(vendor_ids).update_all(archived: true)
+          user.metrics.archived_count += vendor_ids.count
         else
           Gmail::Client.trash_threads!(user, *vendor_ids)
           email_threads(vendor_ids).update_all(trashed: true)
+          user.metrics.trashed_count += vendor_ids.count
         end
       end
 
