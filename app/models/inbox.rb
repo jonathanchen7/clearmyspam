@@ -129,11 +129,11 @@ class Inbox
   end
 
   def senders_lookup(sender_ids)
-    senders.values_at(*sender_ids.map(&:to_i))
+    senders.values_at(*sender_ids.map(&:to_s))
   end
 
   def sender_lookup(sender_id)
-    senders[sender_id.to_i]
+    senders[sender_id.to_s]
   end
 
   def cache!
