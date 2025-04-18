@@ -10,15 +10,15 @@ class Sender
   attr_reader :email, :name, :as_of_date
 
   class << self
-    def extract_from_gmail_thread(gmail_thread)
+    def from_gmail_thread(gmail_thread)
       latest_message = gmail_thread.messages.first
       headers = latest_message.payload.headers
-      raw_sender = EmailThread.fetch_gmail_header(headers, "From")
-      raw_date = EmailThread.fetch_gmail_header(headers, "Date")
+      raw_sender = Email.fetch_gmail_header(headers, "From")
+      date = DateTime.parse(Email.fetch_gmail_header(headers, "Date"))
 
-      new(raw_sender, as_of_date: raw_date)
+      new(raw_sender, as_of_date: date)
     rescue => e
-      Rails.logger.error("Error extracting sender from Gmail thread #{gmail_thread.id}: #{e}".on_red)
+      Honeybadger.notify(e)
       nil
     end
   end
@@ -29,6 +29,10 @@ class Sender
 
     @name = raw_sender[NAME_REGEX, 1] || email
     @as_of_date = as_of_date
+  end
+
+  def id
+    hash.to_s
   end
 
   def domain
@@ -46,8 +50,9 @@ class Sender
   end
 
   # #hash, #==, and #eql? are necessary for different instances of the same sender to be considered equal.
-  delegate :hash, to: :email
-  alias :id :hash
+  def hash
+    email.hash
+  end
 
   def ==(other)
     email == other.email

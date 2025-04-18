@@ -27,6 +27,10 @@ class PageTokens
     (sender_id.present? ? sender_page_tokens[sender_id] : inbox_page_tokens)&.last == END_OF_RESULTS
   end
 
+  def next(sender_id: nil)
+    next_page_token(sender_id: sender_id)
+  end
+
   def next_page_token(sender_id: nil)
     raise ArgumentError, "Final page has already been fetched" if final_page_fetched?(sender_id: sender_id)
 

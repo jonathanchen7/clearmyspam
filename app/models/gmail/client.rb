@@ -136,6 +136,23 @@ module Gmail
       @user = user
     end
 
+    def get_emails!(max_results: 20, page_token: nil, label_ids: ["INBOX"], unread_only: false, query: nil)
+      set_client_authorization
+
+      label_ids << "UNREAD" if unread_only
+      # threads.list uses 10 quota units. The max allowed value is 500.
+      response = client.list_user_threads("me", max_results:, page_token:, label_ids:, q: query)
+      return [[], nil] if response.threads.blank?
+
+      gmail_threads = response.threads.map(&:id).each_slice(THREAD_DETAILS_BATCH_SIZE).flat_map.with_index do |batch, index|
+        sleep(1) unless index.zero?
+        get_threads_batch_request(batch)
+      end
+      emails = gmail_threads.map { |t| Email.from_gmail_thread(t) }.compact
+
+      [emails, response.next_page_token]
+    end
+
     def get_unique_senders!(max_results: Rails.configuration.sync_fetch_count, page_token: nil)
       set_client_authorization
 
@@ -150,9 +167,10 @@ module Gmail
       end
 
       senders = google_threads.each_with_object({}) do |t, hash|
-        sender = Sender.extract_from_gmail_thread(t)
+        sender = Sender.from_gmail_thread(t)
+        next unless sender.present?
 
-        hash[sender.id] = sender if sender.present? && (!hash.key?(sender.id) || sender.newer_than?(hash[sender.id]))
+        hash[sender.id] = sender if !hash.key?(sender.id) || sender.newer_than?(hash[sender.id])
       end
 
       # TODO: Mark protected senders.
