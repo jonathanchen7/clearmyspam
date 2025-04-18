@@ -91,4 +91,26 @@ class PageTokensTest < ActiveSupport::TestCase
       page_tokens.next_page_token(sender_id: "sender1")
     end
   end
+
+  test "#for returns the correct page token" do
+    page_tokens = PageTokens.new
+
+    assert_nil page_tokens.for(page: 1)
+    assert_nil page_tokens.for(page: 2)
+    assert_nil page_tokens.for(page: 1, sender_id: "sender1")
+
+    page_tokens.add("token1")
+    page_tokens.add("token2")
+    page_tokens.add(nil)
+
+    page_tokens.add("sender_token1", sender_id: "sender1")
+    page_tokens.add("sender_token2", sender_id: "sender1")
+
+    assert page_tokens.for(page: 1) == "token1"
+    assert page_tokens.for(page: 2) == "token2"
+    assert page_tokens.for(page: 3) == "end_of_results"
+
+    assert page_tokens.for(page: 1, sender_id: "sender1") == "sender_token1"
+    assert page_tokens.for(page: 2, sender_id: "sender1") == "sender_token2"
+  end
 end

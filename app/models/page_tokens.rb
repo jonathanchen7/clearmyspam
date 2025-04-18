@@ -41,6 +41,14 @@ class PageTokens
     end
   end
 
+  def for(page: 1, sender_id: nil)
+    if sender_id.present?
+      sender_page_tokens[sender_id]&.[](page - 1)
+    else
+      inbox_page_tokens[page - 1]
+    end
+  end
+
   private
 
   def duplicate_token?(page_token, sender_id: nil)
