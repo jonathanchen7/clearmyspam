@@ -5,7 +5,7 @@
 #  id              :uuid             not null, primary key
 #  archive         :boolean          not null
 #  created_at      :datetime         not null
-#  email_thread_id :uuid             not null
+#  email_thread_id :uuid
 #  user_id         :uuid             not null
 #  vendor_id       :string           not null
 #
@@ -17,5 +17,12 @@
 
 class PendingEmailDisposal < ApplicationRecord
   belongs_to :user
-  belongs_to :email_thread
+  belongs_to :email_thread, optional: true
+
+  class << self
+    def insert_attributes(user, email_ids)
+      archive = user.option.archive
+      email_ids.map { |email_id| { user_id: user.id, vendor_id: email_id, archive: archive } }
+    end
+  end
 end
