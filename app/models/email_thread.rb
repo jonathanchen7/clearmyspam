@@ -88,7 +88,6 @@ class EmailThread < ApplicationRecord
   def pending_disposal_attributes(archive:)
     {
       user_id: user_id,
-      email_thread_id: id,
       vendor_id: vendor_id,
       archive: archive
     }

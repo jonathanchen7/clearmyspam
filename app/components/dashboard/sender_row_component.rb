@@ -19,7 +19,7 @@ module Dashboard
     end
 
     def last_email_date
-      time_ago_in_words(sender_emails.map(&:date).max)
+      time_ago_in_words(@sender.as_of_date)
     end
   end
 end
