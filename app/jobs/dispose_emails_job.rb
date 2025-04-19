@@ -27,15 +27,14 @@ class DisposeEmailsJob < ApplicationJob
         vendor_ids = emails.map(&:vendor_id)
         if archive
           Gmail::Client.archive_threads!(user, *vendor_ids)
-          email_threads(vendor_ids).update_all(archived: true)
           user.metrics.archived_count += vendor_ids.count
         else
           Gmail::Client.trash_threads!(user, *vendor_ids)
-          email_threads(vendor_ids).update_all(trashed: true)
           user.metrics.trashed_count += vendor_ids.count
         end
       end
 
+      user.metrics.save!
       disposed_count = pending_email_disposals.delete_all
 
       DisposeEmailsJob.set(wait: 1.second).perform_later(user) if disposed_count == Gmail::Client::DISPOSE_BATCH_SIZE
@@ -53,9 +52,5 @@ class DisposeEmailsJob < ApplicationJob
     @pending_email_disposals ||= user.pending_email_disposals
                                      .order(created_at: :asc)
                                      .limit(Gmail::Client::DISPOSE_BATCH_SIZE)
-  end
-
-  def email_threads(vendor_ids)
-    user.email_threads.where(vendor_id: vendor_ids)
   end
 end
