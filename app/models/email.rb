@@ -29,7 +29,6 @@ class Email
         label_ids: latest_message.label_ids
       )
     rescue StandardError => e
-      raise e
       Honeybadger.notify(e)
       nil
     end
