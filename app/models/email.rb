@@ -72,7 +72,9 @@ class Email
   end
 
   def protected?
-    @protected || false
+    return @protected if defined?(@protected)
+
+    true
   end
 
   def actionable?
