@@ -2,9 +2,8 @@ module Debug
   class DeleteUserDataJob < ApplicationJob
     queue_as :default
 
-    def perform(user, delete_email_threads: true, delete_account_plans: true, delete_options: true, delete_user: true)
+    def perform(user, delete_account_plans: true, delete_options: true, delete_user: true)
       models_to_delete = {
-        EmailThread => delete_email_threads,
         AccountPlan => delete_account_plans,
         Option => delete_options,
         User => delete_user

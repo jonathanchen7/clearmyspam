@@ -34,7 +34,7 @@ class UnsubscribeLinkFinder
     end
 
     def check_headers_for_unsubscribe_link(headers)
-      raw_link = EmailThread.fetch_gmail_header(headers, "List-Unsubscribe")
+      raw_link = Email.fetch_gmail_header(headers, "List-Unsubscribe")
       if raw_link.present?
         $1 if raw_link =~ /(#{LINK_REGEX.source})/
       end

@@ -48,19 +48,14 @@ class DashboardController < AuthenticatedController
     elsif sender.blank? && inbox.final_page_fetched?
       toast.error I18n.t("toasts.load_more.no_more.title", sender: nil)
     else
-      thread_fetcher = EmailThreadFetcher.new(current_user)
-      email_threads, page_token = if sender.present?
-                                    thread_fetcher.fetch_threads_from_emails!(
-                                      [sender.email],
-                                      unread_only: Current.options.unread_only,
-                                      sender_page_token: inbox.next_page_token(sender_id: sender.id)
-                                    )
-                                  else
-                                    thread_fetcher.fetch_threads!(
-                                      unread_only: Current.options.unread_only,
-                                      page_token: inbox.next_page_token
-                                    )
-                                  end
+      gmail_client = Gmail::Client.new(current_user)
+      email_threads, page_token = gmail_client.get_emails!(
+        query: sender.present? ? "from:#{sender.email}" : nil,
+        max_results: Rails.configuration.sync_fetch_count,
+        unread_only: Current.options.unread_only,
+        page_token: inbox.page_tokens.next(sender_id: sender&.id)
+      )
+
       set_cached_inbox # Fetch the inbox from the cache again to ensure we have the latest data.
       new_emails_count = inbox.populate(email_threads, page_token: page_token, sender_id: sender&.id)
 

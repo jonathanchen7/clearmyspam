@@ -8,8 +8,8 @@ export default class extends Controller {
     "drawer",
     "closeButton",
     "selectAllCheckbox",
-    "emailThread",
-    "emailThreadCheckbox",
+    "email",
+    "emailCheckbox",
     "disposeIconButton",
     "protectIconButton",
     "unprotectIconButton",
@@ -24,7 +24,7 @@ export default class extends Controller {
   // ------------------ GETTERS ------------------
 
   get #selectedEmailIds() {
-    return this.emailThreadCheckboxTargets
+    return this.emailCheckboxTargets
       .filter((checkbox) => checkbox.checked)
       .map((checkbox) => checkbox.id);
   }
@@ -73,11 +73,11 @@ export default class extends Controller {
 
   toggleSelectAll(event) {
     if (event.target.checked) {
-      this.emailThreadCheckboxTargets.forEach((checkbox) => {
+      this.emailCheckboxTargets.forEach((checkbox) => {
         checkbox.checked = true;
       });
     } else {
-      this.emailThreadCheckboxTargets.forEach((checkbox) => {
+      this.emailCheckboxTargets.forEach((checkbox) => {
         checkbox.checked = false;
       });
     }
@@ -85,9 +85,9 @@ export default class extends Controller {
     this.updateIconButtonsState();
   }
 
-  selectEmailThread(e) {
-    const emailThreadContainer = e.target.closest(".email-thread");
-    const checkbox = emailThreadContainer.querySelector("input[type=checkbox]");
+  selectEmail(e) {
+    const emailContainer = e.target.closest(".email");
+    const checkbox = emailContainer.querySelector("input[type=checkbox]");
     checkbox.click();
 
     this.checkboxClicked(e);
@@ -96,7 +96,7 @@ export default class extends Controller {
   checkboxClicked(event) {
     event.stopPropagation();
     this.selectAllCheckboxTarget.checked =
-      this.#selectedEmailIds.length === this.emailThreadCheckboxTargets.length;
+      this.#selectedEmailIds.length === this.emailCheckboxTargets.length;
 
     this.updateIconButtonsState();
   }
@@ -144,7 +144,7 @@ export default class extends Controller {
     makeTurboStreamRequest(
       isProtected ? "emails/unprotect" : "emails/protect",
       "POST",
-      this.#turboRequestBody([event.params.emailThreadId]),
+      this.#turboRequestBody([event.params.emailId]),
       event.target.closest("button"),
     );
   }
@@ -154,7 +154,7 @@ export default class extends Controller {
     makeTurboStreamRequest(
       "emails/dispose",
       "POST",
-      this.#turboRequestBody([event.params.emailThreadId]),
+      this.#turboRequestBody([event.params.emailId]),
       event.target.closest("button"),
     );
   }
@@ -192,17 +192,17 @@ export default class extends Controller {
     }
   }
 
-  #turboRequestBody(emailThreadIds = this.#selectedEmailIds) {
+  #turboRequestBody(emailIds = this.#selectedEmailIds) {
     let result = {
       drawer_options: {
         enabled: true,
         sender_id: this.senderIdValue,
       },
     };
-    if (emailThreadIds.length === this.emailThreadCheckboxTargets.length) {
+    if (emailIds.length === this.emailCheckboxTargets.length) {
       result["sender_ids"] = [this.senderIdValue];
     } else {
-      result["email_thread_ids"] = emailThreadIds;
+      result["email_ids"] = emailIds;
     }
 
     return result;

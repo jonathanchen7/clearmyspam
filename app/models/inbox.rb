@@ -39,21 +39,21 @@ class Inbox
     @metrics = InboxMetrics.new
   end
 
-  # Populates the inbox with the given email threads.
+  # Populates the inbox with the given emails.
   #
-  # @param [Array<EmailThread>] email_threads
+  # @param [Array<Email>] emails
   # @param [String, nil] page_token The token for the next page of results, if any.
   # @param [String] sender_id Provided only if all email threads are from a single sender.
   # @return [Integer] The number of new email threads added to the inbox.
   # @raise [ArgumentError] If neither next_page_token and sender_page_token are provided.
-  def populate(email_threads, page_token: nil, sender_id: false)
-    new_email_count = email_threads.count do |email_thread|
-      next if emails.key?(email_thread.id)
+  def populate(new_emails, page_token: nil, sender_id: false)
+    new_email_count = new_emails.count do |email|
+      next if emails.key?(email.vendor_id)
 
-      email_sender = email_thread.sender
+      email_sender = email.sender
       senders[email_sender.id] = email_sender if !senders.key?(email_sender.id) || email_sender.newer_than?(senders[email_sender.id])
 
-      emails[email_thread.id] = email_thread
+      emails[email.vendor_id] = email
     end
 
     if sender_id.present?
@@ -65,67 +65,55 @@ class Inbox
     new_email_count
   end
 
-  # @param [Array<EmailThread>] email_threads
-  def protect!(email_threads)
-    return unless email_threads.present?
+  # @param [Array<Email>] emails
+  def protect!(emails)
+    return unless emails.present?
 
-    ApplicationRecord.transaction do
-      EmailThread.where(id: email_threads.map(&:id)).update_all(protected: true)
-      ProtectedEmail.insert_all(email_threads.map { |email_thread| { user_id: user_id, vendor_id: email_thread.vendor_id } })
-      email_threads.each { |email_thread| emails[email_thread.id].protected = true }
-    end
+    ProtectedEmail.insert_all(emails.map { |email| { user_id: user_id, vendor_id: email.vendor_id } })
+    emails.each { |email| email.protected = true }
   end
 
-  # @param [Array<EmailThread>] email_threads
-  def unprotect!(email_threads)
-    return unless email_threads.present?
+  # @param [Array<Email>] emails
+  def unprotect!(emails)
+    return unless emails.present?
 
-    ApplicationRecord.transaction do
-      EmailThread.where(id: email_threads.map(&:id)).update_all(protected: false)
-      ProtectedEmail.where(user_id: user_id, vendor_id: email_threads.map(&:vendor_id)).delete_all
-      email_threads.each { |email_thread| emails[email_thread.id].protected = false }
-    end
+    ProtectedEmail.where(user_id: user_id, vendor_id: emails.map(&:vendor_id)).delete_all
+    emails.each { |email| email.protected = false }
   end
 
-  # @param [Array<EmailThread>] email_threads
-  def archive!(email_threads)
-    return unless email_threads.present?
+  # @param [Array<Email>] emails
+  def archive!(emails)
+    return unless emails.present?
 
-    EmailThread.transaction do
-      EmailThread.where(id: email_threads.map(&:id)).update_all(archived: true)
-      email_threads.select { |email_thread| emails.delete(email_thread.id) }
-    end
+    emails.each { |email| self.emails.delete(email.vendor_id) }
   end
 
-  # @param [Array<EmailThread>] email_threads
-  def trash!(email_threads)
-    return unless email_threads.present?
+  # @param [Array<Email>] emails
+  def trash!(emails)
+    return unless emails.present?
 
-    EmailThread.transaction do
-      EmailThread.where(id: email_threads.map(&:id)).update_all(trashed: true)
-      email_threads.select { |email_thread| emails.delete(email_thread.id) }
-    end
+    emails.each { |email| self.emails.delete(email.vendor_id) }
   end
 
   def emails_by_sender(hide_personal: false)
-    # There's an edge case where EmailThreads from the same email address (with different sender objects) are grouped
-    # together. In this case, the sender for whichever EmailThread is processed first will be the sender for the group.
+    # There's an edge case where Emails from the same email address (with different sender objects) are grouped
+    # together. In this case, the sender for whichever Email is processed first will be the sender for the group.
     # To address this, we sort the emails by date (newest first) before grouping them.
-    email_threads = all_emails.sort_by(&:date)
-                              .reverse
-                              .group_by(&:sender)
-                              .sort_by { |_, sender_emails| -sender_emails.size }
-                              .to_h
-    email_threads = email_threads.reject { |sender, _| sender.personal? } if hide_personal
+    email_groups = all_emails.sort_by(&:date)
+                             .reverse
+                             .group_by(&:sender)
+                             .sort_by { |_, sender_emails| -sender_emails.size }
+                             .to_h
+    email_groups = email_groups.reject { |sender, _| sender.personal? } if hide_personal
 
-    email_threads
+    email_groups
   end
 
   def sender_emails(*sender_ids, sorted: false)
-    email_threads = all_emails.select { |email_thread| sender_ids.include?(email_thread.sender.id) }
-    email_threads = email_threads.sort_by(&:date).reverse if sorted
+    result = all_emails.select { |email| sender_ids.include?(email.sender.id) }
+    result = result.sort_by(&:date).reverse if sorted
 
-    email_threads
+    result
   end
 
   def senders_lookup(sender_ids)

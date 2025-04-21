@@ -1,4 +1,5 @@
 class Email
+  attr_accessor :protected
   attr_reader :vendor_id, :raw_sender, :date, :subject, :snippet, :label_ids
 
   def initialize(vendor_id:, raw_sender:, date:, subject:, snippet:, label_ids:)
@@ -37,6 +38,16 @@ class Email
       headers.find { |header| header.name == name }&.value
     end
 
+    def bulk_dispose(user, vendor_ids:)
+      archive = user.option.archive
+      vendor_ids.each_slice(1000) do |vendor_ids_batch|
+        disposal_attributes = vendor_ids_batch.map { |vendor_id| { user_id: user.id, vendor_id: vendor_id, archive: archive } }
+        PendingEmailDisposal.insert_all(disposal_attributes, unique_by: %i[user_id vendor_id])
+      end
+
+      DisposeEmailsJob.perform_later(user)
+    end
+
     private
 
     def extract_snippet(snippet)
@@ -61,6 +72,10 @@ class Email
   end
 
   def protected?
-    @protected ||= ProtectedEmail.exists?(user: user, vendor_id: vendor_id)
+    @protected || false
+  end
+
+  def actionable?
+    !protected?
   end
 end

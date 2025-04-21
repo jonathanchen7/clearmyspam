@@ -16,8 +16,9 @@ class ProtectedEmail < ApplicationRecord
   belongs_to :user
 
   class << self
-    def protected_emails(user, vendor_ids)
-      where(user: user, vendor_id: vendor_ids).pluck(:vendor_id)
+    def actionable_email_ids(user, email_ids)
+      protected_email_ids = where(user: user, vendor_id: email_ids).pluck(:vendor_id)
+      email_ids - protected_email_ids
     end
   end
 end

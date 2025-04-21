@@ -24,43 +24,6 @@ module Gmail
         new(user).get_thread_count!(query:, label_ids:, unread_only:)
       end
 
-      def get_threads!(user,
-                       max_results:,
-                       page_token: nil,
-                       label_ids: ["INBOX"],
-                       unread_only: false,
-                       query: nil,
-                       no_details: false)
-        set_client_authorization(user)
-
-        label_ids << "UNREAD" if unread_only
-        # threads.list uses 10 quota units. The max allowed value is 500.
-        response = client.list_user_threads("me",
-                                            max_results: max_results,
-                                            page_token: page_token,
-                                            label_ids: label_ids,
-                                            q: query)
-        if (gmail_threads = response.threads.presence)
-          gmail_thread_ids = gmail_threads.map(&:id)
-
-          email_threads = if no_details
-                            gmail_thread_ids.map { |id| EmailThread.new(vendor_id: id) }
-                          else
-                            google_threads = gmail_thread_ids.each_slice(THREAD_DETAILS_BATCH_SIZE).flat_map.with_index do |batch, index|
-                              sleep(1) unless index.zero?
-                              get_threads_batch_request(batch)
-                            end
-                            google_threads.map { |t| EmailThread.from_google_thread(t) }.compact
-                          end
-
-          email_threads.each { |thread| thread.user_id = user.id }
-        else
-          email_threads = []
-        end
-
-        [email_threads, response.next_page_token]
-      end
-
       def get_thread_details!(user, thread_id:)
         set_client_authorization(user)
 
@@ -108,32 +71,28 @@ module Gmail
 
         client.authorization = user.google_access_token
       end
-
-      def get_threads_batch_request(gmail_thread_ids)
-        Rails.logger.info("Fetching batch of #{gmail_thread_ids.size} threads")
-        google_threads = []
-        client.batch do |gmail|
-          gmail_thread_ids.each do |tid|
-            # threads.get uses 10 quota units. Batch requests should be ~20 emails to avoid rate limits.
-            gmail.get_user_thread("me", tid,
-                                  format: "metadata",
-                                  metadata_headers: %w[From Date Subject]) do |result, error|
-              if error
-                Rails.logger.error("Error fetching thread #{tid}: #{error}".on_red)
-                raise error
-              else
-                google_threads << result
-              end
-            end
-          end
-        end
-
-        google_threads
-      end
     end
 
     def initialize(user)
       @user = user
+    end
+
+    # Returns a list of Gmail thread IDs that match the provided query.
+    #
+    # @param max_results [Integer] The maximum number of threads to return.
+    # @param page_token [String, nil] The page token to use for pagination.
+    # @param label_ids [Array<String>] The label IDs to filter the threads by.
+    # @param unread_only [Boolean] Whether to only return unread threads.
+    # @param query [String, nil] The query to filter the threads by.
+    # @return [Array<String>, String>] A list of Gmail thread IDs and the next page token.
+    def list_emails!(max_results: 20, page_token: nil, label_ids: ["INBOX"], unread_only: false, query: nil)
+      set_client_authorization
+
+      label_ids << "UNREAD" if unread_only
+      response = client.list_user_threads("me", max_results:, page_token:, label_ids:, q: query)
+      return [[], nil] if response.threads.blank?
+
+      [response.threads.map(&:id), response.next_page_token]
     end
 
     def get_emails!(max_results: 20, page_token: nil, label_ids: ["INBOX"], unread_only: false, query: nil)
@@ -148,7 +107,10 @@ module Gmail
         sleep(1) unless index.zero?
         get_threads_batch_request(batch)
       end
+
       emails = gmail_threads.map { |t| Email.from_gmail_thread(t) }.compact
+      protected_emails = user.protected_emails.where(vendor_id: emails.map(&:vendor_id)).pluck(:vendor_id).to_set
+      emails.each { |email| email.protected = protected_emails.include?(email.vendor_id) }
 
       [emails, response.next_page_token]
     end

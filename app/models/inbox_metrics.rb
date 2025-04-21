@@ -12,10 +12,9 @@ class InboxMetrics
   end
 
   def sync_internal!(user)
-    internal_metrics = user.email_threads.group(:protected, :archived, :trashed).count
-    @protected = internal_metrics.fetch([true, false, false], 0)
-    @archived = internal_metrics.fetch([false, true, false], 0)
-    @trashed = internal_metrics.fetch([false, false, true], 0)
+    @protected = user.protected_emails.count
+    @archived = user.metrics.archived_count
+    @trashed = user.metrics.trashed_count
 
     @updated_at = Time.current
   end

@@ -1,5 +1,5 @@
 <%# locals: (sender:) %>
-<% sender_email_threads = @inbox.sender_emails(sender.id, sorted: true) %>
+<% sender_emails = @inbox.sender_emails(sender.id, sorted: true) %>
 <%= turbo_frame_tag "sender_drawer",
                     data: Views::StimulusData.new(
                       include_controller: true,
@@ -22,8 +22,8 @@
                         <%= render Dashboard::SenderPictureComponent.new(sender) %>
                         <%= render Dashboard::SenderDetailsComponent.new(
                           sender,
-                          actionable_thread_count: actionable_thread_count(sender_email_threads),
-                          protected_thread_count: protected_thread_count(sender_email_threads)
+                          actionable_thread_count: actionable_thread_count(sender_emails),
+                          protected_thread_count: protected_thread_count(sender_emails)
                         ) %>
                       </div>
                     </div>
@@ -44,7 +44,7 @@
                       <div class="flex items-center gap-x-2">
                         <%= check_box_tag(false,
                                           class: "h-3.5 w-3.5 rounded disabled:opacity-50",
-                                          disabled: sender_email_threads.empty?,
+                                          disabled: sender_emails.empty?,
                                           data: {
                                             action: "change->sender-drawer#toggleSelectAll",
                                             "sender-drawer-target": "selectAllCheckbox"
@@ -86,7 +86,7 @@
                     <div class="flex items-center gap-x-2">
                       <%= render PillButtonComponent.new(
                         type: DashboardHelper::ButtonTypes::TEXT,
-                        disabled: sender_email_threads.empty?,
+                        disabled: sender_emails.empty?,
                         stimulus_data: Views::StimulusData.new(
                           controllers: "sender-drawer",
                           actions: { "click" => "sender-drawer#unsubscribe" },
@@ -117,9 +117,9 @@
                     </div>
                   </div>
                 </div>
-                <% if sender_email_threads.any? %>
+                <% if sender_emails.any? %>
                   <div class="relative flex-1 divide-y mb-2">
-                    <%= render Dashboard::EmailThreadComponent.with_collection(sender_email_threads) %>
+                    <%= render Dashboard::EmailComponent.with_collection(sender_emails) %>
                   </div>
                 <% else %>
                   <div class="flex flex-col items-center justify-center text-gray-500 text-sm mt-4">

@@ -8,13 +8,13 @@ class EmailsController < AuthenticatedController
 
   before_action :set_cached_inbox
   before_action :set_senders, except: %i[dispose_all]
-  before_action :set_email_threads, except: %i[dispose_all]
+  before_action :set_emails, except: %i[dispose_all]
   before_action :set_or_refresh_google_auth, only: %i[dispose]
 
   after_action -> { inbox.cache! }
 
   def protect
-    inbox.protect!(email_threads)
+    inbox.protect!(emails)
     sync_inbox_metrics!(internal_only: true)
 
     respond_to do |format|
@@ -28,7 +28,7 @@ class EmailsController < AuthenticatedController
   end
 
   def unprotect
-    inbox.unprotect!(email_threads)
+    inbox.unprotect!(emails)
     sync_inbox_metrics!(internal_only: true)
 
     respond_to do |format|
@@ -56,19 +56,19 @@ class EmailsController < AuthenticatedController
       return
     end
 
-    dispose_async = email_threads.size > Rails.configuration.async_dispose_threshold
+    dispose_async = emails.size > Rails.configuration.async_dispose_threshold
 
-    EmailThread.transaction do
-      if email_threads.blank?
+    ApplicationRecord.transaction do
+      if emails.blank?
         toast.info I18n.t("toasts.dispose.no_emails.title", dispose: present_tense_dispose_verb)
       else
-        archive? ? inbox.archive!(email_threads) : inbox.trash!(email_threads)
+        archive? ? inbox.archive!(emails) : inbox.trash!(emails)
 
         if dispose_async
-          EmailThread.bulk_dispose(current_user, email_threads, archive: archive?)
+          Email.bulk_dispose(current_user, vendor_ids: emails.map(&:vendor_id))
           toast.info I18n.t("toasts.dispose.async.title", count: email_count, email: emails_noun, disposing: present_participle_dispose_verb)
         else
-          vendor_ids = email_threads.pluck(:vendor_id)
+          vendor_ids = emails.map(&:vendor_id)
           archive? ? Gmail::Client.archive_threads!(current_user, *vendor_ids) : Gmail::Client.trash_threads!(current_user, *vendor_ids)
           toast.success I18n.t("toasts.dispose.success.title", count: email_count, email: emails_noun, disposed: past_tense_dispose_verb)
         end
@@ -76,7 +76,7 @@ class EmailsController < AuthenticatedController
 
       if senders.present?
         query = "from:(#{senders.map(&:email).join("|")})"
-        remaining_thread_count = Gmail::Client.get_thread_count!(current_user, query: query) - email_threads.count
+        remaining_thread_count = Gmail::Client.get_thread_count!(current_user, query: query) - emails.count
 
         if remaining_thread_count.positive?
           toast.text = I18n.t("toasts.dispose.delete_all_from_sender.text",
@@ -120,17 +120,16 @@ class EmailsController < AuthenticatedController
       return
     end
 
-    email_threads, _page_token = EmailThreadFetcher.new(current_user).fetch_threads_from_emails!(
-      sender_emails,
-      unread_only: Current.options.unread_only,
+    email_ids, _page_token = Gmail::Client.new(current_user).list_emails!(
       max_results: Rails.configuration.sender_dispose_all_max,
-      no_details: true
+      unread_only: Current.options.unread_only,
+      query: "from:(#{sender_emails.join("|")})"
     )
-    email_threads = email_threads.select(&:actionable?)
 
-    email_threads = email_threads.first(current_user.remaining_disposal_count) if current_user.unpaid?
+    actionable_email_ids = ProtectedEmail.actionable_email_ids(current_user, email_ids)
+    actionable_email_ids = actionable_email_ids.first(current_user.remaining_disposal_count) if current_user.unpaid?
 
-    EmailThread.bulk_dispose(current_user, email_threads, archive: archive?)
+    Email.bulk_dispose(current_user, vendor_ids: actionable_email_ids)
 
     respond_to do |format|
       format.turbo_stream do
@@ -155,11 +154,11 @@ class EmailsController < AuthenticatedController
 
   private
 
-  attr_reader :email_threads, :senders
+  attr_reader :inbox, :senders, :emails
 
   def validate_email_threads_or_senders_provided
-    if params[:email_thread_ids].blank? && params[:sender_ids].blank?
-      raise ArgumentError, "Either email_thread_ids or sender_ids must be provided."
+    if params[:email_ids].blank? && params[:sender_ids].blank?
+      raise ArgumentError, "Either email_ids or sender_ids must be provided."
     end
   end
 
@@ -175,23 +174,23 @@ class EmailsController < AuthenticatedController
     end
   end
 
-  def set_email_threads
-    @email_threads = if (email_thread_ids = params[:email_thread_ids].presence)
-                       current_user.email_threads.where(id: email_thread_ids).to_a
-                     elsif senders.present?
-                       inbox.sender_emails(*senders.map(&:id))
-                     else
-                       raise ArgumentError, "Either email_thread_ids or sender_ids must be provided."
-                     end
+  def set_emails
+    @emails = if (email_ids = params[:email_ids].presence)
+                inbox.emails.values_at(*email_ids).compact
+              elsif senders.present?
+                inbox.sender_emails(*senders.map(&:id))
+              else
+                raise ArgumentError, "Either email_ids or sender_ids must be provided."
+              end
 
-    @email_threads = email_threads.select(&:actionable?) if action_name == "dispose"
+    @emails = emails.select(&:actionable?) if action_name == "dispose"
     if current_user.unpaid? && action_name == "dispose"
-      @email_threads = email_threads.first(current_user.remaining_disposal_count)
+      @emails = emails.first(current_user.remaining_disposal_count)
     end
 
-    if email_threads.size > 1000
-      @email_threads = @email_threads.limit(1000)
-      Rails.logger.warn("User #{current_user.id} attempted to #{action_name} #{email_threads.size} emails.")
+    if emails.size > 1000
+      @emails = @emails.first(1000)
+      Rails.logger.warn("User #{current_user.id} attempted to #{action_name} #{emails.size} emails.")
     end
   end
 
@@ -219,6 +218,6 @@ class EmailsController < AuthenticatedController
   end
 
   def email_count
-    email_threads.count
+    emails.count
   end
 end
