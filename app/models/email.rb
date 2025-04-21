@@ -1,10 +1,10 @@
 class Email
   attr_accessor :protected
-  attr_reader :vendor_id, :raw_sender, :date, :subject, :snippet, :label_ids
+  attr_reader :vendor_id, :sender, :date, :subject, :snippet, :label_ids
 
-  def initialize(vendor_id:, raw_sender:, date:, subject:, snippet:, label_ids:)
+  def initialize(vendor_id:, sender:, date:, subject:, snippet:, label_ids:)
     @vendor_id = vendor_id
-    @raw_sender = raw_sender
+    @sender = sender
     @date = date
     @subject = subject
     @snippet = snippet
@@ -20,10 +20,12 @@ class Email
       latest_message = gmail_thread.messages.first
       headers = latest_message.payload.headers
 
+      sender = Sender.from_gmail_thread(gmail_thread)
+
       new(
         vendor_id: gmail_thread.id,
-        raw_sender: fetch_gmail_header(headers, "From"),
-        date: DateTime.parse(fetch_gmail_header(headers, "Date")),
+        sender: sender,
+        date: sender.as_of_date,
         subject: fetch_gmail_header(headers, "Subject"),
         snippet: extract_snippet(latest_message.snippet),
         label_ids: latest_message.label_ids
@@ -34,7 +36,7 @@ class Email
     end
 
     def fetch_gmail_header(headers, name)
-      headers.find { |header| header.name == name }&.value
+      headers.find { |header| header.name.downcase == name.downcase }&.value
     end
 
     def bulk_dispose(user, vendor_ids:)

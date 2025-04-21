@@ -13,8 +13,8 @@ class Sender
     def from_gmail_thread(gmail_thread)
       latest_message = gmail_thread.messages.first
       headers = latest_message.payload.headers
-      raw_sender = Email.fetch_gmail_header(headers, "From")
-      date = DateTime.parse(Email.fetch_gmail_header(headers, "Date"))
+      raw_sender = Email.fetch_gmail_header(headers, "from")
+      date = DateTime.parse(Email.fetch_gmail_header(headers, "date"))
 
       new(raw_sender, as_of_date: date)
     rescue => e
