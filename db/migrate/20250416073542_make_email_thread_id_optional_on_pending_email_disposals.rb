@@ -4,4 +4,4 @@ class MakeEmailThreadIdOptionalOnPendingEmailDisposals < ActiveRecord::Migration
   def change
     change_column_null :pending_email_disposals, :email_thread_id, true
   end
-end 
+end
