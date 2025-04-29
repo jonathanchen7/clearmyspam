@@ -446,7 +446,7 @@ GEM
       railties (>= 6.0.0)
     stringio (3.1.7)
     stripe (15.0.0)
-    tailwindcss-rails (3.3.1)
+    tailwindcss-rails (3.3.2)
       railties (>= 7.0.0)
       tailwindcss-ruby (~> 3.0)
     tailwindcss-ruby (3.4.17-aarch64-linux)
@@ -533,7 +533,7 @@ DEPENDENCIES
   sprockets-rails
   stimulus-rails
   stripe
-  tailwindcss-rails (~> 3.3.1)
+  tailwindcss-rails (~> 3.3.2)
   turbo-rails
   tzinfo-data
   view_component
