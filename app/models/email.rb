@@ -65,7 +65,7 @@ class Email
   end
 
   def fetch_gmail_details!(user)
-    Gmail::Client.get_thread_details!(user, thread_id: vendor_id)
+    Gmail::Client.new(user).get_thread_details!(thread_id: vendor_id)
   end
 
   def unread?
@@ -80,5 +80,11 @@ class Email
 
   def actionable?
     !protected?
+  end
+
+  private
+
+  def <=>(other)
+    other.date <=> date
   end
 end

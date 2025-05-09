@@ -25,8 +25,4 @@ module DashboardHelper
 
     stream
   end
-
-  def actionable_thread_count(email_threads)
-    email_threads.select(&:actionable?).count
-  end
 end

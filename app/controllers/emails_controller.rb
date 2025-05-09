@@ -76,7 +76,7 @@ class EmailsController < AuthenticatedController
 
       if senders.present?
         query = "from:(#{senders.map(&:email).join("|")})"
-        remaining_thread_count = Gmail::Client.get_thread_count!(current_user, query: query) - emails.count
+        remaining_thread_count = Gmail::Client.new(current_user).get_thread_count!(query: query) - emails.count
 
         if remaining_thread_count.positive?
           toast.text = I18n.t("toasts.dispose.delete_all_from_sender.text",

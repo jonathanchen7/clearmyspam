@@ -13,13 +13,13 @@
     <%= render Dashboard::SenderPictureComponent.new(@sender) %>
     <%= render Dashboard::SenderDetailsComponent.new(
       @sender,
-      actionable_thread_count: actionable_thread_count,
+      email_count: @sender_emails.count,
       last_email_date: last_email_date
     ) %>
   </div>
   <%= render Dashboard::SenderActionsComponent.new(
     @sender,
-    has_actionable_emails: actionable_thread_count.positive?,
+    has_actionable_emails: @sender_emails.count.positive?,
     final_page_fetched: @final_page_fetched
   ) %>
 <% end %>

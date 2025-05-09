@@ -2,8 +2,10 @@
   <div class="flex flex-row gap-x-1.5 items-center">
     <p class="font-medium text-sm"><%= @sender.name %></p>
     <div class="flex flex-row gap-x-2 items-center text-xs font-medium text-gray-500">
-      <% if @actionable_thread_count.nonzero? %>
-        <p><%= @actionable_thread_count %></p>
+      <% unless @sender.email_count.nil? %>
+        <p><%= @sender.email_count %></p>
+      <% else %>
+        <p><%= @email_count %></p>
       <% end %>
     </div>
   </div>

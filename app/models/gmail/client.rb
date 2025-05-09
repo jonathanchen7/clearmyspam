@@ -20,16 +20,6 @@ module Gmail
         [response.threads_total, response.threads_unread]
       end
 
-      def get_thread_count!(user, query:, label_ids: ["INBOX"], unread_only: false)
-        new(user).get_thread_count!(query:, label_ids:, unread_only:)
-      end
-
-      def get_thread_details!(user, thread_id:)
-        set_client_authorization(user)
-
-        client.get_user_thread("me", thread_id, format: "full")
-      end
-
       def archive_threads!(user, *gmail_thread_ids)
         set_client_authorization(user)
 
@@ -132,6 +122,7 @@ module Gmail
         sender = Sender.from_gmail_thread(t)
         next unless sender.present?
 
+        sender.email_count = get_thread_count!(query: "from:#{sender.email}")
         hash[sender.id] = sender if !hash.key?(sender.id) || sender.newer_than?(hash[sender.id])
       end
 
@@ -140,26 +131,32 @@ module Gmail
       [senders.values, response.next_page_token]
     end
 
-      # Returns the number of Gmail threads that match the provided query.
-      #
-      # @param query [String, nil] An optional query string to filter the threads.
-      # @return [Integer] The count of threads matching the query (max 2500).
-      def get_thread_count!(query:, label_ids: ["INBOX"], unread_only: false)
-        set_client_authorization
+    # Returns the number of Gmail threads that match the provided query.
+    #
+    # @param query [String, nil] An optional query string to filter the threads.
+    # @return [Integer] The count of threads matching the query (max 2500).
+    def get_thread_count!(query:, label_ids: ["INBOX"], unread_only: false)
+      set_client_authorization
 
-        label_ids << "UNREAD" if unread_only
-        response = client.list_user_threads("me", max_results: 500, label_ids: label_ids, q: query)
-        return 0 unless response.threads&.any?
+      label_ids << "UNREAD" if unread_only
+      response = client.list_user_threads("me", max_results: 500, label_ids: label_ids, q: query)
+      return 0 unless response.threads&.any?
 
-        total_count = response.threads.size
-        while response.next_page_token && total_count < 2500
-          response = client.list_user_threads("me", max_results: 500, label_ids: label_ids, q: query, page_token: response.next_page_token)
-          break unless response.threads&.any?
-          total_count += response.threads.size
-        end
-
-        total_count
+      total_count = response.threads.size
+      while response.next_page_token && total_count < 2500
+        response = client.list_user_threads("me", max_results: 500, label_ids: label_ids, q: query, page_token: response.next_page_token)
+        break unless response.threads&.any?
+        total_count += response.threads.size
       end
+
+      total_count
+    end
+
+    def get_thread_details!(thread_id:)
+      set_client_authorization
+
+      client.get_user_thread("me", thread_id, format: "full")
+    end
 
     private
 

@@ -7,6 +7,7 @@ class Sender
   FORMATTED_EMAIL_REGEX = /<#{EMAIL_REGEX.source}>/
   NAME_REGEX = /"?([^"]*)"? <.*>/
 
+  attr_accessor :email_count
   attr_reader :email, :name, :as_of_date
 
   class << self
@@ -29,6 +30,14 @@ class Sender
 
     @name = raw_sender[NAME_REGEX, 1] || email
     @as_of_date = as_of_date
+  end
+
+  def get_email_count!(user)
+    @email_count = Gmail::Client.new(user).get_thread_count!(query: "from:#{email}")
+  end
+
+  def get_emails!(user)
+    @emails = Gmail::Client.new(user).get_emails!(query: "from:#{email}")
   end
 
   def id

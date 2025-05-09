@@ -6,16 +6,18 @@ class SendersController < AuthenticatedController
 
   before_action :set_cached_inbox
   before_action :set_sender
+  before_action :set_emails, only: [:show]
   before_action :set_or_refresh_google_auth, only: [:unsubscribe]
 
-  attr_reader :sender, :inbox
+  attr_reader :sender, :inbox, :emails
 
   def show
+    sender.get_email_count!(current_user)
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: turbo_stream.append("inbox",
                                                  partial: "dashboard/sender_drawer",
-                                                 locals: { sender: sender })
+                                                 locals: { sender: sender, emails: emails })
       end
     end
   end
@@ -39,5 +41,9 @@ class SendersController < AuthenticatedController
     @sender = inbox.sender_lookup(sender_id)
 
     raise "sender could not be found" if sender.blank?
+  end
+
+  def set_emails
+    @emails = sender.get_emails!(current_user).first.sort
   end
 end
