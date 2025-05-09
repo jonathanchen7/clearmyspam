@@ -14,10 +14,6 @@ module Dashboard
       sender_emails.select(&:actionable?).count
     end
 
-    def protected_thread_count
-      sender_emails.select(&:protected?).count
-    end
-
     def last_email_date
       time_ago_in_words(@sender.as_of_date)
     end

@@ -22,8 +22,7 @@
                         <%= render Dashboard::SenderPictureComponent.new(sender) %>
                         <%= render Dashboard::SenderDetailsComponent.new(
                           sender,
-                          actionable_thread_count: actionable_thread_count(sender_emails),
-                          protected_thread_count: protected_thread_count(sender_emails)
+                          actionable_thread_count: actionable_thread_count(sender_emails)
                         ) %>
                       </div>
                     </div>

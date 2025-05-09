@@ -5,13 +5,6 @@
       <% if @actionable_thread_count.nonzero? %>
         <p><%= @actionable_thread_count %></p>
       <% end %>
-
-      <% if @protected_thread_count.nonzero? %>
-        <span class="flex flex-row items-center justify-center gap-x-0.5">
-          <%= icon('fa-solid', "lock", class: "text-2xs") %>
-          <%= @protected_thread_count %>
-        </span>
-      <% end %>
     </div>
   </div>
   <div class="mt-0.5 flex flex-row gap-I-1 text-xs text-gray-500">

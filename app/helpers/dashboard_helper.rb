@@ -26,10 +26,6 @@ module DashboardHelper
     stream
   end
 
-  def protected_thread_count(email_threads)
-    email_threads.select(&:protected?).count
-  end
-
   def actionable_thread_count(email_threads)
     email_threads.select(&:actionable?).count
   end
