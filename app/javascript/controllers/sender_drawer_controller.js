@@ -15,10 +15,13 @@ export default class extends Controller {
     "unprotectIconButton",
     "unsubscribeButton",
     "loadMoreButton",
+    "previousPageButton",
+    "nextPageButton",
   ];
   static values = {
     senderId: String,
     senderEmail: String,
+    page: Number,
   };
 
   // ------------------ GETTERS ------------------
@@ -110,12 +113,30 @@ export default class extends Controller {
 
   // ------------------ ACTIONS ------------------
 
+  previousPage() {
+    makeTurboStreamRequest(
+      `senders/${this.senderIdValue}/update_page`,
+      "POST",
+      { page: this.pageValue - 1 },
+      this.previousPageButtonTarget
+    );
+  }
+
+  nextPage() {
+    makeTurboStreamRequest(
+      `senders/${this.senderIdValue}/update_page`,
+      "POST",
+      { page: this.pageValue + 1 },
+      this.nextPageButtonTarget
+    );
+  }
+
   unsubscribe() {
     this.unsubscribeButtonTarget.disabled = true;
 
     const showUnsubscribeError = () =>
       alert(
-        `We couldn't find any links to unsubscribe from ${this.senderEmailValue}.`,
+        `We couldn't find any links to unsubscribe from ${this.senderEmailValue}.`
       );
 
     makeRequest(`/senders/${this.senderIdValue}/unsubscribe`, "POST")
@@ -145,7 +166,7 @@ export default class extends Controller {
       isProtected ? "emails/unprotect" : "emails/protect",
       "POST",
       this.#turboRequestBody([event.params.emailId]),
-      event.target.closest("button"),
+      event.target.closest("button")
     );
   }
 
@@ -155,7 +176,7 @@ export default class extends Controller {
       "emails/dispose",
       "POST",
       this.#turboRequestBody([event.params.emailId]),
-      event.target.closest("button"),
+      event.target.closest("button")
     );
   }
 
@@ -164,7 +185,7 @@ export default class extends Controller {
       "/emails/protect",
       "POST",
       this.#turboRequestBody(),
-      this.protectIconButtonTarget,
+      this.protectIconButtonTarget
     );
   }
 
@@ -173,7 +194,7 @@ export default class extends Controller {
       "/emails/unprotect",
       "POST",
       this.#turboRequestBody(this.#selectedEmailIds),
-      this.unprotectIconButtonTarget,
+      this.unprotectIconButtonTarget
     );
   }
 
@@ -182,7 +203,7 @@ export default class extends Controller {
       "/emails/dispose",
       "POST",
       this.#turboRequestBody(),
-      this.disposeIconButtonTarget,
+      this.disposeIconButtonTarget
     );
   }
 

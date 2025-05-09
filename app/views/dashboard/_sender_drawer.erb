@@ -1,10 +1,10 @@
-<%# locals: (sender:, emails: []) %>
+<%# locals: (sender:, emails: [], page: 1) %>
 <%= turbo_frame_tag "sender_drawer",
                     data: Views::StimulusData.new(
                       include_controller: true,
                       controllers: "sender-drawer",
                       targets: { "sender-drawer" => "drawerContainer" },
-                      values: { "sender-drawer" => { "sender-id" => sender.id.to_s, "sender-email" => sender.email } }
+                      values: { "sender-drawer" => { "sender-id" => sender.id.to_s, "sender-email" => sender.email, "page" => page } }
                     ).erb_attributes do %>
   <div class="relative" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
     <div class="fixed inset-0 z-20 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
@@ -37,7 +37,7 @@
                       </button>
                     </div>
                   </div>
-                  <div class="flex items-center justify-between py-1 sm:py-2 px-2 sm:px-4">
+                  <div class="flex items-center justify-between py-1 sm:py-2 pl-2 sm:pl-4">
                     <div class="flex items-center gap-x-2">
                       <div class="flex items-center gap-x-2">
                         <%= check_box_tag(false,
@@ -81,7 +81,34 @@
                         ) %>
                       </div>
                     </div>
-                    <div class="flex items-center gap-x-2">
+                    <div class="flex items-center gap-x-1 sm:gap-x-2">
+                      <% total_count = sender.email_count || 0 %>
+                      <% emails_per_page = Rails.configuration.sender_emails_per_page %>
+                      <% start_index = ((page - 1) * emails_per_page) + 1 %>
+                      <% end_index = start_index + emails_per_page - 1 %>
+                      <p class="text-xs sm:text-sm text-gray-600">
+                        <%= "#{start_index}-#{end_index} of #{total_count}" %>
+                      </p>
+                      <div class="flex items-center gap-x-1">
+                          <%= render IconButtonComponent.new(
+                            icon: "chevron-left",
+                            color: "text-gray-400",
+                          disabled: page == 1,
+                          stimulus_data: Views::StimulusData.new(
+                            actions: { "click" => "sender-drawer#previousPage" },
+                            targets: { "sender-drawer" => "previousPageButton" },
+                          )
+                        ) %>
+                        <%= render IconButtonComponent.new(
+                          icon: "chevron-right",
+                          color: "text-gray-400",
+                          disabled: end_index >= total_count,
+                          stimulus_data: Views::StimulusData.new(
+                            actions: { "click" => "sender-drawer#nextPage" },
+                            targets: { "sender-drawer" => "nextPageButton" },
+                            )
+                          ) %>
+                      </div>
                       <%= render PillButtonComponent.new(
                         type: DashboardHelper::ButtonTypes::TEXT,
                         disabled: emails.empty?,
@@ -92,25 +119,6 @@
                         )
                       ) do %>
                         Unsubscribe
-                      <% end %>
-                      <% final_page_fetched = @inbox.final_page_fetched?(sender_id: sender.id) %>
-                      <%= render PillButtonComponent.new(
-                        path: dashboard_load_more_path(
-                          sender_id: sender.id,
-                          drawer_options: { enabled: true, sender_id: sender.id }
-                        ),
-                        disabled: final_page_fetched,
-                        stimulus_data: Views::StimulusData.new(
-                          actions: { "click" => "toast#notify" },
-                          targets: { "sender_drawer" => "loadMoreButton" },
-                          params: {
-                            "toast" => {
-                              "title" => "Loading more emails from #{sender.name}...",
-                              "text" => "This may take up to 30 seconds."
-                            }
-                          }
-                        )) do %>
-                        <%= final_page_fetched ? I18n.t("buttons.all_emails_loaded") : I18n.t("buttons.load_more") %>
                       <% end %>
                     </div>
                   </div>

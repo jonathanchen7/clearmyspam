@@ -6,8 +6,10 @@ class SendersController < AuthenticatedController
 
   before_action :set_cached_inbox
   before_action :set_sender
-  before_action :set_emails, only: [:show]
+  before_action :set_emails, only: [:show, :update_page]
   before_action :set_or_refresh_google_auth, only: [:unsubscribe]
+
+  after_action -> { inbox.cache! }, only: [:show, :update_page]
 
   attr_reader :sender, :inbox, :emails
 
@@ -17,9 +19,22 @@ class SendersController < AuthenticatedController
       format.turbo_stream do
         render turbo_stream: turbo_stream.append("inbox",
                                                  partial: "dashboard/sender_drawer",
-                                                 locals: { sender: sender, emails: emails })
+                                                 locals: {
+                                                  sender: sender,
+                                                  emails: emails
+                                                })
       end
     end
+  end
+
+  def update_page
+    render turbo_stream: turbo_stream.replace("sender_drawer",
+                                              partial: "dashboard/sender_drawer",
+                                              locals: {
+                                              sender: sender,
+                                              emails: emails,
+                                              page: params[:page]
+                                            })
   end
 
   def unsubscribe
@@ -44,6 +59,12 @@ class SendersController < AuthenticatedController
   end
 
   def set_emails
-    @emails = sender.get_emails!(current_user).first.sort
+    page = params[:page] || 1
+    page_token = page == 1 ? nil : inbox.page_tokens.for(page: page - 1, sender_id: sender.id)
+
+    emails, next_page_token = sender.get_emails!(current_user, page_token: page_token)
+    inbox.page_tokens.add(next_page_token, sender_id: sender.id)
+
+    @emails = emails.sort
   end
 end

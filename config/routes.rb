@@ -59,7 +59,7 @@ Rails.application.routes.draw do
   # Sender actions.
   get "senders/:sender_id", to: "senders#show", as: :senders_show
   post "senders/:sender_id/unsubscribe", to: "senders#unsubscribe", as: :senders_unsubscribe
-  post "senders/:sender_id/fetch_more", to: "senders#fetch_more", as: :senders_fetch_more
+  post "senders/:sender_id/update_page", to: "senders#update_page", as: :senders_update_page
 
   root "home#index"
 end

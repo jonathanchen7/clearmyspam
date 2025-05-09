@@ -36,8 +36,12 @@ class Sender
     @email_count = Gmail::Client.new(user).get_thread_count!(query: "from:#{email}")
   end
 
-  def get_emails!(user)
-    @emails = Gmail::Client.new(user).get_emails!(query: "from:#{email}")
+  def get_emails!(user, page_token: nil)
+    @emails = Gmail::Client.new(user).get_emails!(
+      max_results: Rails.configuration.sender_emails_per_page,
+      query: "from:#{email}",
+      page_token: page_token
+    )
   end
 
   def id
