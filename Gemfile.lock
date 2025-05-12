@@ -127,7 +127,7 @@ GEM
       railties (>= 5.0.0)
     faker (3.5.1)
       i18n (>= 1.8.11, < 2)
-    faraday (2.13.0)
+    faraday (2.13.1)
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
@@ -156,7 +156,7 @@ GEM
       fugit (>= 1.11.0)
       railties (>= 6.1.0)
       thor (>= 1.0.0)
-    google-apis-core (0.16.0)
+    google-apis-core (0.17.0)
       addressable (~> 2.5, >= 2.5.1)
       googleauth (~> 1.9)
       httpclient (>= 2.8.3, < 3.a)
@@ -164,12 +164,12 @@ GEM
       mutex_m
       representable (~> 3.0)
       retriable (>= 2.0, < 4.a)
-    google-apis-gmail_v1 (0.42.0)
+    google-apis-gmail_v1 (0.43.0)
       google-apis-core (>= 0.15.0, < 2.a)
-    google-cloud-env (2.2.2)
+    google-cloud-env (2.3.0)
       base64 (~> 0.2)
       faraday (>= 1.0, < 3.a)
-    google-logging-utils (0.1.0)
+    google-logging-utils (0.2.0)
     googleauth (1.14.0)
       faraday (>= 1.0, < 3.a)
       google-cloud-env (~> 2.2)
@@ -216,7 +216,7 @@ GEM
     jbuilder (2.13.0)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
-    json (2.10.2)
+    json (2.11.3)
     jwt (2.10.1)
       base64
     language_server-protocol (3.17.0.4)
@@ -318,7 +318,7 @@ GEM
     psych (5.2.3)
       date
       stringio
-    public_suffix (6.0.1)
+    public_suffix (6.0.2)
     puma (6.6.0)
       nio4r (~> 2.0)
     raabro (1.4.0)
@@ -427,7 +427,7 @@ GEM
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
     shellany (0.0.1)
-    signet (0.19.0)
+    signet (0.20.0)
       addressable (~> 2.8)
       faraday (>= 0.17.5, < 3.a)
       jwt (>= 1.5, < 3.0)
@@ -515,7 +515,7 @@ DEPENDENCIES
   faker
   font-awesome-sass
   good_job
-  google-apis-gmail_v1 (~> 0.42.0)
+  google-apis-gmail_v1 (~> 0.43.0)
   guard-livereload (~> 2.5)
   honeybadger (~> 5.28)
   importmap-rails
