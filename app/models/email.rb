@@ -1,17 +1,24 @@
 class Email
-  attr_accessor :protected
-  attr_reader :vendor_id, :sender, :date, :subject, :snippet, :label_ids
-
-  def initialize(vendor_id:, sender:, date:, subject:, snippet:, label_ids:)
-    @vendor_id = vendor_id
-    @sender = sender
-    @date = date
-    @subject = subject
-    @snippet = snippet
-    @label_ids = label_ids
-  end
-
   class << self
+    def protect_all!(user, vendor_ids)
+      protected_email_attributes = vendor_ids.map { |vendor_id| { user_id: user.id, vendor_id: vendor_id } }
+      ProtectedEmail.upsert_all(protected_email_attributes, unique_by: %i[user_id vendor_id])
+    end
+
+    def unprotect_all!(user, vendor_ids)
+      ProtectedEmail.where(user: user, vendor_id: vendor_ids).delete_all
+    end
+
+    def dispose_all!(user, vendor_ids:)
+      archive = user.option.archive
+      vendor_ids.each_slice(1000) do |vendor_ids_batch|
+        disposal_attributes = vendor_ids_batch.map { |vendor_id| { user_id: user.id, vendor_id: vendor_id, archive: archive } }
+        PendingEmailDisposal.insert_all(disposal_attributes, unique_by: %i[user_id vendor_id])
+      end
+
+      DisposeEmailsJob.perform_later(user)
+    end
+
     # Converts a `Google::Apis::GmailV1::Thread` object into an `Email` object.
     #
     # @param thread [Google::Apis::GmailV1::Thread] The Gmail thread to convert.
@@ -39,14 +46,12 @@ class Email
       headers.find { |header| header.name.downcase == name.downcase }&.value
     end
 
-    def bulk_dispose(user, vendor_ids:)
-      archive = user.option.archive
-      vendor_ids.each_slice(1000) do |vendor_ids_batch|
-        disposal_attributes = vendor_ids_batch.map { |vendor_id| { user_id: user.id, vendor_id: vendor_id, archive: archive } }
-        PendingEmailDisposal.insert_all(disposal_attributes, unique_by: %i[user_id vendor_id])
-      end
+    def fetch_from_cache(sender_id)
+      Rails.cache.read(cache_key(sender_id))
+    end
 
-      DisposeEmailsJob.perform_later(user)
+    def write_to_cache(sender_id, emails)
+      Rails.cache.write(cache_key(sender_id), emails, expires_in: 5.minutes)
     end
 
     private
@@ -58,6 +63,22 @@ class Email
         .gsub("&quot;", '"') # Replace HTML-escaped quotes with a ".
         .gsub(/&#(\d+);/) { |match| match.to_i.chr } # Replace HTML-escaped characters with actual chars.
     end
+
+    def cache_key(sender_id)
+      "sender_emails/#{sender_id}"
+    end
+  end
+
+  attr_accessor :protected
+  attr_reader :vendor_id, :sender, :date, :subject, :snippet, :label_ids
+
+  def initialize(vendor_id:, sender:, date:, subject:, snippet:, label_ids:)
+    @vendor_id = vendor_id
+    @sender = sender
+    @date = date
+    @subject = subject
+    @snippet = snippet
+    @label_ids = label_ids
   end
 
   def sender

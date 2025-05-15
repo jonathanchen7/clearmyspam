@@ -117,7 +117,7 @@ export default class extends Controller {
     makeTurboStreamRequest(
       `senders/${this.senderIdValue}/update_page`,
       "POST",
-      { page: this.pageValue - 1 },
+      { drawer_options: { enabled: true, page: this.pageValue - 1 } },
       this.previousPageButtonTarget
     );
   }
@@ -126,7 +126,7 @@ export default class extends Controller {
     makeTurboStreamRequest(
       `senders/${this.senderIdValue}/update_page`,
       "POST",
-      { page: this.pageValue + 1 },
+      { drawer_options: { enabled: true, page: this.pageValue + 1 } },
       this.nextPageButtonTarget
     );
   }
@@ -162,8 +162,11 @@ export default class extends Controller {
   toggleProtection(event) {
     event.stopPropagation();
     const isProtected = event.params.protected === true;
+
     makeTurboStreamRequest(
-      isProtected ? "emails/unprotect" : "emails/protect",
+      isProtected
+        ? `senders/${this.senderIdValue}/unprotect`
+        : `senders/${this.senderIdValue}/protect`,
       "POST",
       this.#turboRequestBody([event.params.emailId]),
       event.target.closest("button")
@@ -173,7 +176,7 @@ export default class extends Controller {
   dispose(event) {
     event.stopPropagation();
     makeTurboStreamRequest(
-      "emails/dispose",
+      `senders/${this.senderIdValue}/dispose`,
       "POST",
       this.#turboRequestBody([event.params.emailId]),
       event.target.closest("button")
@@ -182,7 +185,7 @@ export default class extends Controller {
 
   protectSelected() {
     makeTurboStreamRequest(
-      "/emails/protect",
+      `senders/${this.senderIdValue}/protect`,
       "POST",
       this.#turboRequestBody(),
       this.protectIconButtonTarget
@@ -191,7 +194,7 @@ export default class extends Controller {
 
   unprotectSelected() {
     makeTurboStreamRequest(
-      "/emails/unprotect",
+      `senders/${this.senderIdValue}/unprotect`,
       "POST",
       this.#turboRequestBody(this.#selectedEmailIds),
       this.unprotectIconButtonTarget
@@ -200,7 +203,7 @@ export default class extends Controller {
 
   disposeSelected() {
     makeTurboStreamRequest(
-      "/emails/dispose",
+      `senders/${this.senderIdValue}/dispose`,
       "POST",
       this.#turboRequestBody(),
       this.disposeIconButtonTarget
@@ -215,11 +218,9 @@ export default class extends Controller {
 
   #turboRequestBody(emailIds = this.#selectedEmailIds) {
     let result = {
-      drawer_options: {
-        enabled: true,
-        sender_id: this.senderIdValue,
-      },
+      drawer_options: { enabled: true, page: this.pageValue },
     };
+
     if (emailIds.length === this.emailCheckboxTargets.length) {
       result["sender_ids"] = [this.senderIdValue];
     } else {

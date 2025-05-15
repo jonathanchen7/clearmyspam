@@ -65,7 +65,7 @@ class EmailsController < AuthenticatedController
         archive? ? inbox.archive!(emails) : inbox.trash!(emails)
 
         if dispose_async
-          Email.bulk_dispose(current_user, vendor_ids: emails.map(&:vendor_id))
+          Email.dispose_all!(current_user, vendor_ids: emails.map(&:vendor_id))
           toast.info I18n.t("toasts.dispose.async.title", count: email_count, email: emails_noun, disposing: present_participle_dispose_verb)
         else
           vendor_ids = emails.map(&:vendor_id)
@@ -129,7 +129,7 @@ class EmailsController < AuthenticatedController
     actionable_email_ids = ProtectedEmail.actionable_email_ids(current_user, email_ids)
     actionable_email_ids = actionable_email_ids.first(current_user.remaining_disposal_count) if current_user.unpaid?
 
-    Email.bulk_dispose(current_user, vendor_ids: actionable_email_ids)
+    Email.dispose_all!(current_user, vendor_ids: actionable_email_ids)
 
     respond_to do |format|
       format.turbo_stream do

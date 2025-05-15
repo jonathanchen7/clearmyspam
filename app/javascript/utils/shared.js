@@ -3,7 +3,7 @@ export function makeTurboStreamRequest(
   method,
   body,
   disableTarget = null,
-  targetsToDisable = [],
+  targetsToDisable = []
 ) {
   if (disableTarget) disableTarget.disabled = true;
   if (targetsToDisable.length > 0) {
