@@ -25,4 +25,8 @@ module DashboardHelper
 
     stream
   end
+
+  def render_toast(toast)
+    render turbo_stream: turbo_stream.prepend("notifications", toast)
+  end
 end

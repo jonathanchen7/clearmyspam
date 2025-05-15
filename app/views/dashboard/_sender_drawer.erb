@@ -85,7 +85,7 @@
                       <% total_count = sender.email_count || 0 %>
                       <% emails_per_page = Rails.configuration.sender_emails_per_page %>
                       <% start_index = ((page - 1) * emails_per_page) + 1 %>
-                      <% end_index = start_index + emails_per_page - 1 %>
+                      <% end_index = [start_index + emails_per_page - 1, total_count].min %>
                       <p class="text-xs sm:text-sm text-gray-600">
                         <%= "#{start_index}-#{end_index} of #{total_count}" %>
                       </p>

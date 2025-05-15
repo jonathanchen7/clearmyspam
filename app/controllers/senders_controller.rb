@@ -15,26 +15,16 @@ class SendersController < AuthenticatedController
 
   def show
     sender.get_email_count!(current_user)
-    respond_to do |format|
-      format.turbo_stream do
-        render turbo_stream: turbo_stream.append("inbox",
-                                                 partial: "dashboard/sender_drawer",
-                                                 locals: {
-                                                  sender: sender,
-                                                  emails: emails
-                                                })
-      end
-    end
+
+    render turbo_stream: turbo_stream.append("inbox", partial: "dashboard/sender_drawer", locals: { sender:, emails: })
   end
 
   def update_page
-    render turbo_stream: turbo_stream.replace("sender_drawer",
-                                              partial: "dashboard/sender_drawer",
-                                              locals: {
-                                              sender: sender,
-                                              emails: emails,
-                                              page: params[:page]
-                                            })
+    render turbo_stream: turbo_stream.replace(
+      "sender_drawer",
+      partial: "dashboard/sender_drawer",
+      locals: { sender:, emails:, page: params[:page] }
+    )
   end
 
   def unsubscribe
