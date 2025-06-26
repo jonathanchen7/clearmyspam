@@ -75,7 +75,7 @@ module Gmail
     # @param unread_only [Boolean] Whether to only return unread threads.
     # @param query [String, nil] The query to filter the threads by.
     # @return [Array<String>, String>] A list of Gmail thread IDs and the next page token.
-    def list_emails!(max_results: 20, page_token: nil, label_ids: ["INBOX"], unread_only: false, query: nil)
+    def list_emails!(max_results: Rails.configuration.sender_dispose_all_max, page_token: nil, label_ids: ["INBOX"], unread_only: false, query: nil)
       set_client_authorization
 
       label_ids << "UNREAD" if unread_only
@@ -122,11 +122,13 @@ module Gmail
         sender = Sender.from_gmail_thread(t)
         next unless sender.present?
 
-        sender.email_count = get_thread_count!(query: "from:#{sender.email}")
+        sender.email_count = get_thread_count!(query: sender.query_string)
         hash[sender.id] = sender if !hash.key?(sender.id) || sender.newer_than?(hash[sender.id])
       end
 
-      # TODO: Mark protected senders.
+      user.protected_senders.where(sender_id: senders.keys).each do |protected_sender|
+        senders[protected_sender.sender_id].protected = true
+      end
 
       [senders.values, response.next_page_token]
     end

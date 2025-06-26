@@ -1,12 +1,9 @@
 <div>
   <div class="flex flex-row gap-x-1.5 items-center">
+    <%= icon("fa-solid", "lock", class: "text-success text-xs") if @sender.protected %>
     <p class="font-medium text-sm"><%= @sender.name %></p>
     <div class="flex flex-row gap-x-2 items-center text-xs font-medium text-gray-500">
-      <% unless @sender.email_count.nil? %>
-        <p><%= @sender.email_count %></p>
-      <% else %>
-        <p><%= @email_count %></p>
-      <% end %>
+      <%= @sender.email_count %>
     </div>
   </div>
   <div class="mt-0.5 flex flex-row gap-I-1 text-xs text-gray-500">

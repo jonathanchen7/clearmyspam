@@ -1,31 +1,15 @@
 <div class="absolute right-3 sm:right-4 hidden sm:flex flex-row gap-x-2 invisible group-hover:visible">
   <%=
-    button_to @final_page_fetched ? I18n.t("buttons.all_emails_loaded") : I18n.t("buttons.load_more"),
-              dashboard_load_more_path(sender_id: @sender.id),
-              disabled: @final_page_fetched,
-              class: "sender-load-more-button bg-primary rounded-full px-3 py-1 text-white text-xs font-medium hover:enabled:brightness-95 disabled:opacity-50",
-              title: @final_page_fetched ? "All emails from #{@sender.email} have been loaded" : "Load more emails from #{@sender.email}",
-              data: Views::StimulusData.new(
-                actions: { "click" => %w[inbox#handleClickSenderAction toast#notify] },
-                params: {
-                  "toast" => {
-                    "title" => "Loading more emails from #{@sender.name}...",
-                    "text" => "This may take up to 30 seconds."
-                  }
-                }
-              ).erb_attributes
-  %>
-  <%=
     button_to protect_button_text,
               protect_button_path,
               params: { sender_ids: [@sender.id] },
               class: "sender-protect-all-button bg-white outline outline-1 outline-gray-400 rounded-full px-3 py-1 text-black text-xs font-medium hover:enabled:brightness-95 disabled:opacity-50",
               data: { action: "click->inbox#handleClickSenderAction" }
   %>
-  <% if @has_actionable_emails %>
+  <% unless @sender.protected %>
     <%=
       button_to dispose_button_text,
-                emails_dispose_path,
+                senders_dispose_all_path,
                 params: { sender_ids: [@sender.id] },
                 class: "sender-dispose-all-button bg-danger rounded-full px-3 py-1 text-white text-xs font-medium hover:enabled:brightness-95 disabled:opacity-50",
                 data: { action: "click->inbox#handleClickSenderAction" }

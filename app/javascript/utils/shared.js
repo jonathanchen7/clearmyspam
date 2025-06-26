@@ -17,7 +17,7 @@ export function makeTurboStreamRequest(
       "X-CSRF-Token": csrfToken(),
       Accept: "text/vnd.turbo-stream.html",
     },
-    body: JSON.stringify(body),
+    body: body ? JSON.stringify(body) : null,
   })
     .then((response) => {
       if (!response.ok) throw new Error(response.statusText);

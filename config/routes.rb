@@ -53,16 +53,17 @@ Rails.application.routes.draw do
     post :protect
     post :unprotect
     post :dispose
+  end
+
+  namespace :senders do
+    post :protect
+    post :unprotect
     post :dispose_all
   end
 
   # Sender actions.
   get "senders/:sender_id", to: "senders#show", as: :senders_show
   post "senders/:sender_id/unsubscribe", to: "senders#unsubscribe", as: :senders_unsubscribe
-  post "senders/:sender_id/update_page", to: "senders#update_page", as: :senders_update_page
-  post "senders/:sender_id/protect", to: "senders#protect", as: :senders_protect
-  post "senders/:sender_id/unprotect", to: "senders#unprotect", as: :senders_unprotect
-  post "senders/:sender_id/dispose", to: "senders#dispose", as: :senders_dispose
 
   root "home#index"
 end

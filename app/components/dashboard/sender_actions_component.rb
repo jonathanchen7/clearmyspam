@@ -1,17 +1,15 @@
 module Dashboard
   class SenderActionsComponent < ViewComponent::Base
-    def initialize(sender, has_actionable_emails:, final_page_fetched:)
+    def initialize(sender)
       @sender = sender
-      @has_actionable_emails = has_actionable_emails
-      @final_page_fetched = final_page_fetched
     end
 
     def protect_button_text
-      @has_actionable_emails ? I18n.t("buttons.protect_all") : I18n.t("buttons.unprotect_all")
+      @sender.protected ? I18n.t("buttons.unprotect_sender") : I18n.t("buttons.protect_sender")
     end
 
     def protect_button_path
-      @has_actionable_emails ? emails_protect_path : emails_unprotect_path
+      @sender.protected ? senders_unprotect_path(sender_ids: [@sender.id]) : senders_protect_path(sender_ids: [@sender.id])
     end
 
     def dispose_button_text

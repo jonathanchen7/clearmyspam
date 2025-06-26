@@ -39,12 +39,9 @@ class AuthenticatedController < ApplicationController
   def new_inbox
     inbox = Inbox.new(current_user.id)
 
-    emails, next_page_token = Gmail::Client.new(current_user).get_emails!(
-      max_results: Rails.configuration.sync_fetch_count,
-      unread_only: current_user.option.unread_only,
-    )
+    senders, next_page_token = Gmail::Client.new(current_user).get_unique_senders!(max_results: Rails.configuration.sync_fetch_count)
 
-    inbox.populate(emails, page_token: next_page_token)
+    inbox.populate(senders, page_token: next_page_token)
     inbox.metrics.sync!(current_user)
 
     inbox

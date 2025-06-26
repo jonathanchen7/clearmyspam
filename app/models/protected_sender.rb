@@ -14,4 +14,11 @@
 #
 class ProtectedSender < ApplicationRecord
   belongs_to :user
+
+  class << self
+    def actionable_sender_ids(user, sender_ids)
+      protected_sender_ids = where(user: user, sender_id: sender_ids).pluck(:sender_id)
+      sender_ids - protected_sender_ids
+    end
+  end
 end

@@ -28,6 +28,7 @@ class User < ApplicationRecord
   has_many :email_threads
   has_many :pending_email_disposals
   has_many :protected_emails
+  has_many :protected_senders
   attribute :google_access_token, :string
   attribute :google_access_token_expires_at, :datetime
 

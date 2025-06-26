@@ -31,29 +31,22 @@ export default class extends Controller {
     this.#disableInboxActions([event.params.enable]);
   }
 
-  disposeSelected() {
+  protectSenders() {
     this.#disableInboxActions();
-    makeTurboStreamRequest("/emails/dispose", "POST", {
+    makeTurboStreamRequest("/senders/protect", "POST", {
       sender_ids: this.selectedSenders,
     });
   }
 
-  disposeAllFromSenders(event) {
-    makeTurboStreamRequest("/emails/dispose_all", "POST", {
-      sender_emails: event.params.senderEmails,
-    });
-  }
-
-  protectSelected() {
+  unprotectSenders() {
     this.#disableInboxActions();
-    makeTurboStreamRequest("/emails/protect", "POST", {
+    makeTurboStreamRequest("/senders/unprotect", "POST", {
       sender_ids: this.selectedSenders,
     });
   }
 
-  unprotectSelected() {
-    this.#disableInboxActions();
-    makeTurboStreamRequest("/emails/unprotect", "POST", {
+  disposeAllFromSenders() {
+    makeTurboStreamRequest("/senders/dispose_all", "POST", {
       sender_ids: this.selectedSenders,
     });
   }

@@ -62,33 +62,33 @@ class PageTokensTest < ActiveSupport::TestCase
     assert page_tokens.final_page_fetched?(sender_id: "sender1")
   end
 
-  test "next_page_token returns the next inbox page token" do
+  test "#next returns the next inbox page token" do
     page_tokens = PageTokens.new
 
     page_tokens.add("token1")
-    assert page_tokens.next_page_token == "token1"
+    assert page_tokens.next == "token1"
 
     page_tokens.add("token2")
-    assert page_tokens.next_page_token == "token2"
+    assert page_tokens.next == "token2"
 
     page_tokens.add(nil)
     assert_raises ArgumentError, "Final page has already been fetched" do
-      page_tokens.next_page_token
+      page_tokens.next
     end
   end
 
-  test "next_page_token returns the next sender page token" do
+  test "#next returns the next sender page token" do
     page_tokens = PageTokens.new
 
     page_tokens.add("token1", sender_id: "sender1")
-    assert page_tokens.next_page_token(sender_id: "sender1") == "token1"
+    assert page_tokens.next(sender_id: "sender1") == "token1"
 
     page_tokens.add("token2", sender_id: "sender1")
-    assert page_tokens.next_page_token(sender_id: "sender1") == "token2"
+    assert page_tokens.next(sender_id: "sender1") == "token2"
 
     page_tokens.add(nil, sender_id: "sender1")
     assert_raises ArgumentError, "Final page has already been fetched" do
-      page_tokens.next_page_token(sender_id: "sender1")
+      page_tokens.next(sender_id: "sender1")
     end
   end
 

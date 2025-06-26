@@ -2,16 +2,10 @@
 
 module Dashboard
   class SenderRowComponent < ViewComponent::Base
-    attr_reader :sender, :sender_emails
+    attr_reader :sender
 
-    def initialize(sender, sender_emails:, final_page_fetched:)
+    def initialize(sender)
       @sender = sender
-      @sender_emails = sender_emails
-      @final_page_fetched = final_page_fetched
-    end
-
-    def actionable_thread_count
-      sender_emails.select(&:actionable?).count
     end
 
     def last_email_date

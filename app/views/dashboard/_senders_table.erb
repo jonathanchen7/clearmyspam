@@ -4,12 +4,8 @@
     <div id="notifications" class="absolute"></div>
     <% if @inbox.present? %>
       <div class="flex flex-col divide-y border-b" data-turbo-prefetch="false" data-inbox-target="sendersTable">
-        <% @inbox.emails_by_sender(hide_personal: Current.options.hide_personal).each do |sender, sender_email_threads| %>
-          <%= render Dashboard::SenderRowComponent.new(
-            sender,
-            sender_emails: sender_email_threads,
-            final_page_fetched: @inbox.final_page_fetched?(sender_id: sender.id),
-          ) %>
+        <% @inbox.senders.values.sort.each do |sender| %>
+          <%= render Dashboard::SenderRowComponent.new(sender) %>
         <% end %>
       </div>
     <% end %>

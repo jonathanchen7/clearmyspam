@@ -8,22 +8,30 @@ module DashboardHelper
     TEXT = "text"
   end
 
-  def build_turbo_stream(senders_table: true, toolbar: true, toast: nil, drawer_options: {})
+  def build_turbo_stream(senders_table: true, toolbar: true, toast: nil)
     stream = []
 
     stream << turbo_stream.replace("senders_table", partial: "dashboard/senders_table") if senders_table
     stream << turbo_stream.replace("toolbar", partial: "dashboard/toolbar") if toolbar
     stream << turbo_stream.prepend("notifications", toast) if toast.present? && toast.title.present?
 
-    if drawer_options.present? && drawer_options[:enabled]
+    if drawer_enabled?
       stream << turbo_stream.replace(
         "sender_drawer",
         partial: "dashboard/sender_drawer",
-        locals: { sender: @inbox.sender_lookup(drawer_options[:sender_id]) }
+        locals: { sender: @drawer_sender, emails: @drawer_emails, page: @drawer_page }
       )
     end
 
     stream
+  end
+
+  def archive?
+    current_user.option.archive
+  end
+
+  def drawer_enabled?
+    @drawer_enabled ||= params.dig(:drawer_options, :enabled).presence || (params[:controller] == "senders" && params[:action] == "show")
   end
 
   def toast_stream(toast)

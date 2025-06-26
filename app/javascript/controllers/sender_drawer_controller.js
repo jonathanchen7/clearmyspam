@@ -62,14 +62,20 @@ export default class extends Controller {
       this.closeButtonTarget.contains(e.target) ||
       (!this.drawerTarget.contains(e.target) && !e.target.closest(".toast"))
     ) {
-      this.drawerContainerTarget.remove();
+      this.#closeDrawer();
     }
   }
 
   #handleKeydown(e) {
     if (e.key === "Escape") {
-      this.drawerContainerTarget.remove();
+      this.#closeDrawer();
     }
+  }
+
+  #closeDrawer() {
+    const emptyDrawer = document.createElement("div");
+    emptyDrawer.id = "sender_drawer";
+    this.drawerContainerTarget.replaceWith(emptyDrawer);
   }
 
   // ------------------ SELECTING ------------------
@@ -115,18 +121,18 @@ export default class extends Controller {
 
   previousPage() {
     makeTurboStreamRequest(
-      `senders/${this.senderIdValue}/update_page`,
-      "POST",
-      { drawer_options: { enabled: true, page: this.pageValue - 1 } },
+      `senders/${this.senderIdValue}?page=${this.pageValue - 1}`,
+      "GET",
+      null,
       this.previousPageButtonTarget
     );
   }
 
   nextPage() {
     makeTurboStreamRequest(
-      `senders/${this.senderIdValue}/update_page`,
-      "POST",
-      { drawer_options: { enabled: true, page: this.pageValue + 1 } },
+      `senders/${this.senderIdValue}?page=${this.pageValue + 1}`,
+      "GET",
+      null,
       this.nextPageButtonTarget
     );
   }
@@ -164,9 +170,7 @@ export default class extends Controller {
     const isProtected = event.params.protected === true;
 
     makeTurboStreamRequest(
-      isProtected
-        ? `senders/${this.senderIdValue}/unprotect`
-        : `senders/${this.senderIdValue}/protect`,
+      isProtected ? `emails/unprotect` : `emails/protect`,
       "POST",
       this.#turboRequestBody([event.params.emailId]),
       event.target.closest("button")
@@ -176,7 +180,7 @@ export default class extends Controller {
   dispose(event) {
     event.stopPropagation();
     makeTurboStreamRequest(
-      `senders/${this.senderIdValue}/dispose`,
+      `emails/dispose`,
       "POST",
       this.#turboRequestBody([event.params.emailId]),
       event.target.closest("button")
@@ -185,7 +189,7 @@ export default class extends Controller {
 
   protectSelected() {
     makeTurboStreamRequest(
-      `senders/${this.senderIdValue}/protect`,
+      `emails/protect`,
       "POST",
       this.#turboRequestBody(),
       this.protectIconButtonTarget
@@ -194,16 +198,16 @@ export default class extends Controller {
 
   unprotectSelected() {
     makeTurboStreamRequest(
-      `senders/${this.senderIdValue}/unprotect`,
+      `emails/unprotect`,
       "POST",
-      this.#turboRequestBody(this.#selectedEmailIds),
+      this.#turboRequestBody(),
       this.unprotectIconButtonTarget
     );
   }
 
   disposeSelected() {
     makeTurboStreamRequest(
-      `senders/${this.senderIdValue}/dispose`,
+      `emails/dispose`,
       "POST",
       this.#turboRequestBody(),
       this.disposeIconButtonTarget
@@ -217,16 +221,13 @@ export default class extends Controller {
   }
 
   #turboRequestBody(emailIds = this.#selectedEmailIds) {
-    let result = {
-      drawer_options: { enabled: true, page: this.pageValue },
+    return {
+      email_ids: emailIds,
+      drawer_options: {
+        enabled: true,
+        page: this.pageValue,
+        sender_id: this.senderIdValue,
+      },
     };
-
-    if (emailIds.length === this.emailCheckboxTargets.length) {
-      result["sender_ids"] = [this.senderIdValue];
-    } else {
-      result["email_ids"] = emailIds;
-    }
-
-    return result;
   }
 }

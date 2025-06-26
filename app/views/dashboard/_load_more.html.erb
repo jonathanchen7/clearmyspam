@@ -1,7 +1,7 @@
 <%= turbo_frame_tag "load_more" do %>
   <div class="flex flex-row items-center gap-x-2">
     <p class="text-xs text-gray-500">
-      <%= @inbox&.size || 0 %> emails
+      <%= @inbox&.email_count || 0 %> emails
     </p>
     <%= button_to dashboard_load_more_path,
                   title: "Load More Emails",

@@ -28,10 +28,6 @@ class PageTokens
   end
 
   def next(sender_id: nil)
-    next_page_token(sender_id: sender_id)
-  end
-
-  def next_page_token(sender_id: nil)
     raise ArgumentError, "Final page has already been fetched" if final_page_fetched?(sender_id: sender_id)
 
     if sender_id.present?
@@ -41,7 +37,7 @@ class PageTokens
     end
   end
 
-  def for(page: 1, sender_id: nil)
+  def for(sender_id: nil, page: 1)
     if sender_id.present?
       sender_page_tokens[sender_id]&.[](page - 1)
     else

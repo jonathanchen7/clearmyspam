@@ -39,7 +39,7 @@
     >
       <%= toggle_protection_button_icon %>
     </button>
-    <% if email.actionable? %>
+  <% if email.actionable? && !email.sender.protected %>
       <button
         class="flex items-center justify-center h-8 w-8 rounded-full hover:enabled:bg-gray-100 hover:duration-200 disabled:opacity-50"
         data-action="click->sender-drawer#dispose"

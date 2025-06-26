@@ -2,12 +2,12 @@
 
 class DashboardController < AuthenticatedController
   include DashboardHelper
+  include VerbTenseHelper
 
   rate_limit to: 20, within: 1.minute, by: -> { current_user.id }
 
   before_action :set_or_refresh_google_auth, except: [:index, :logout]
   before_action :set_cached_inbox, only: [:load_more]
-  before_action :set_sender, if: -> { params[:sender_id].present? }
 
   after_action -> { inbox.cache! }, only: [:resync, :load_more]
 
@@ -28,7 +28,7 @@ class DashboardController < AuthenticatedController
 
   def resync
     reset_inbox
-    toast.success I18n.t("toasts.resync.success.title", count: inbox.size)
+    toast.success I18n.t("toasts.resync.success.title", count: inbox.email_count)
 
     respond_to do |format|
       format.turbo_stream do
@@ -38,43 +38,26 @@ class DashboardController < AuthenticatedController
   end
 
   def load_more
-    if inbox.size > Inbox::MAX_CAPACITY
+    if inbox.email_count > Inbox::MAX_CAPACITY
       toast.error(
         I18n.t("toasts.load_more.max_capacity.title"),
-        text: I18n.t("toasts.load_more.max_capacity.text", dispose: Current.options.archive ? "archive" : "delete")
+        text: I18n.t("toasts.load_more.max_capacity.text", dispose: dispose_verb)
       )
-    elsif sender.present? && inbox.final_page_fetched?(sender_id: sender.id)
-      toast.error I18n.t("toasts.load_more.no_more.title", sender: " from #{sender.name}")
-    elsif sender.blank? && inbox.final_page_fetched?
-      toast.error I18n.t("toasts.load_more.no_more.title", sender: nil)
+    elsif inbox.final_page_fetched?
+      toast.error I18n.t("toasts.load_more.no_more.title")
     else
-      gmail_client = Gmail::Client.new(current_user)
-      email_threads, page_token = gmail_client.get_emails!(
-        query: sender.present? ? "from:#{sender.email}" : nil,
+      senders, next_page_token = Gmail::Client.new(current_user).get_unique_senders!(
         max_results: Rails.configuration.sync_fetch_count,
-        unread_only: Current.options.unread_only,
-        page_token: inbox.page_tokens.next(sender_id: sender&.id)
+        page_token: inbox.page_tokens.next
       )
 
-      set_cached_inbox # Fetch the inbox from the cache again to ensure we have the latest data.
-      new_emails_count = inbox.populate(email_threads, page_token: page_token, sender_id: sender&.id)
-
-      if new_emails_count.positive?
-        toast.success I18n.t("toasts.load_more.success.title",
-                             count: new_emails_count,
-                             sender: sender.present? ? " from #{sender.name}" : nil)
-      else
-        toast.info I18n.t("toasts.load_more.no_more.title", sender: sender.present? ? " from #{sender.name}" : nil)
-      end
-
+      inbox.populate(senders, page_token: next_page_token)
       sync_inbox_metrics!
+
+      toast.success I18n.t("toasts.load_more.success.title", count: senders.size)
     end
 
-    respond_to do |format|
-      format.turbo_stream do
-        render turbo_stream: build_turbo_stream(toast: toast, drawer_options: params[:drawer_options])
-      end
-    end
+    render turbo_stream: build_turbo_stream(toast: toast)
   end
 
   def help

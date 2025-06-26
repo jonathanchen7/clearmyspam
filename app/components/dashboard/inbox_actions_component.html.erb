@@ -18,7 +18,7 @@
     tooltip: "#{Current.options.archive ? "Archive" : "Delete"} Selected",
     stimulus_data: Views::StimulusData.new(
       targets: { "inbox" => "disposeIconButton" },
-      actions: { "click" => "inbox#disposeSelected" }
+      actions: { "click" => "inbox#disposeAllFromSenders" }
     )
   ) %>
   <%= render IconButtonComponent.new(
@@ -28,7 +28,7 @@
     tooltip: "Protect Selected",
     stimulus_data: Views::StimulusData.new(
       targets: { "inbox" => "protectIconButton" },
-      actions: { "click" => "inbox#protectSelected" }
+      actions: { "click" => "inbox#protectSenders" }
     )
   ) %>
   <%= render IconButtonComponent.new(
@@ -38,7 +38,7 @@
     tooltip: "Unprotect Selected",
     stimulus_data: Views::StimulusData.new(
       targets: { "inbox" => "unprotectIconButton" },
-      actions: { "click" => "inbox#unprotectSelected" }
+      actions: { "click" => "inbox#unprotectSenders" }
     )
   ) %>
 </div>

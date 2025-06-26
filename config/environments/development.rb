@@ -79,5 +79,5 @@ Rails.application.configure do
   config.async_dispose_threshold = 1
   config.sender_dispose_all_max = 100
   config.trial_thread_disposal_limit = 10
-  config.sender_emails_per_page = 10
+  config.sender_emails_per_page = 5
 end

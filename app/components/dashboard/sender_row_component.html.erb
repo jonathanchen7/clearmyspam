@@ -1,7 +1,7 @@
 <%= link_to senders_show_path(@sender.id),
             data: { turbo_stream: true },
             class: "sender-row group relative flex flex-row items-center justify-between p-2 sm:p-3 duration-200 hover:rounded-md hover:bg-gray-300" do %>
-  <div class="flex flex-row items-center gap-x-3 sm:gap-x-4">
+  <div class="flex flex-row items-center gap-x-3">
     <%= check_box_tag(
           @sender.id,
           class: "h-4 w-4 rounded",
@@ -11,15 +11,7 @@
           ).erb_attributes
         ) %>
     <%= render Dashboard::SenderPictureComponent.new(@sender) %>
-    <%= render Dashboard::SenderDetailsComponent.new(
-      @sender,
-      email_count: @sender_emails.count,
-      last_email_date: last_email_date
-    ) %>
+    <%= render Dashboard::SenderDetailsComponent.new(@sender, last_email_date: last_email_date) %>
   </div>
-  <%= render Dashboard::SenderActionsComponent.new(
-    @sender,
-    has_actionable_emails: @sender_emails.count.positive?,
-    final_page_fetched: @final_page_fetched
-  ) %>
+  <%= render Dashboard::SenderActionsComponent.new(@sender) %>
 <% end %>

@@ -38,42 +38,60 @@ en:
         title: "%{count} emails loaded"
     load_more:
       success:
-        title: "%{count} more emails loaded%{sender}"
+        title: "Loaded more emails from %{count} senders"
       no_more:
-        title: "No more emails%{sender}"
+        title: "No more emails"
       max_capacity:
         title: "Inbox is at max capacity"
         text: "Please %{dispose} some emails to make room for more."
     protect:
       success:
-        title: "%{count} %{email} protected"
+        title: "%{count} email(s) protected"
+    protect_senders:
+      success:
+        zero: "No senders protected"
+        one: '<span class="text-primary">%{sender}</span> protected'
+        other: '<span class="text-primary">%{count}</span> senders protected'
     unprotect:
       success:
-        title: "%{count} %{email} unprotected"
+        title: "%{count} email(s) unprotected"
+    unprotect_senders:
+      success:
+        zero: "No senders unprotected"
+        one: '<span class="text-primary">%{sender}</span> unprotected'
+        other: '<span class="text-primary">%{count}</span> senders unprotected'
+    dispose_all_from_senders:
+      success:
+        title: "%{disposing}..."
+        text:
+          one: '%{disposing} <span class="text-primary">%{disposed_count}</span> emails from <span class="text-primary">%{sender}</span>.'
+          other: '%{disposing} <span class="text-primary">%{disposed_count}</span> emails across <span class="text-primary">%{count}</span> senders.'
     dispose:
       no_emails:
         title: "No emails to %{dispose}"
       success:
-        title: "%{count} %{email} %{disposed}"
+        title: "%{count} email(s) %{disposed}"
       async:
-        title: "%{count} %{email} %{disposing} in the background..."
+        title: "%{count} email(s) %{disposing} in the background..."
       free_trial_limit:
         title: "Free trial limit reached"
         text: "You have reached the free trial %{dispose} limit. Upgrade your account to unlock unlimited access!"
         cta: "Go Pro →"
       delete_all_from_sender:
-        text: "We found <b class=\"text-primary\">%{remaining_count}</b> remaining%{unread} emails in your inbox from <b class=\"text-primary\">%{senders}</b>. Would you like to %{dispose} them? Protected emails will not be %{disposed}."
+        text: 'We found <b class="text-primary">%{remaining_count}</b> remaining%{unread} emails in your inbox from <b class="text-primary">%{senders}</b>. Would you like to %{dispose} them? Protected emails will not be %{disposed}.'
         cta: "%{dispose} All"
     dispose_all:
       async:
         title: "%{disposing}..."
-        text: "%{disposing}%{unread} emails from <b class=\"text-primary\">%{senders}</b> in the background."
+        text: '%{disposing}%{unread} emails from <b class="text-primary">%{senders}</b> in the background.'
     gmail_rate_limit:
       title: "Error"
       text: "Gmail needs a moment to catch up. Please try again in 10 seconds."
   buttons:
     load_more: "Load more"
     all_emails_loaded: "All emails loaded"
+    protect_sender: "Protect"
+    unprotect_sender: "Unprotect"
     protect_all: "Protect all"
     unprotect_all: "Unprotect all"
     archive_all: "Archive all"

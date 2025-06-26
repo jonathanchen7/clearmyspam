@@ -7,7 +7,7 @@ class Sender
   FORMATTED_EMAIL_REGEX = /<#{EMAIL_REGEX.source}>/
   NAME_REGEX = /"?([^"]*)"? <.*>/
 
-  attr_accessor :email_count
+  attr_accessor :email_count, :protected
   attr_reader :email, :name, :as_of_date
 
   class << self
@@ -22,6 +22,14 @@ class Sender
       Honeybadger.notify(e)
       nil
     end
+
+    def protect_all!(user, sender_ids)
+      user.protected_senders.upsert_all(sender_ids.map { |sender_id| { sender_id: } }, unique_by: %i[user_id sender_id])
+    end
+
+    def unprotect_all!(user, sender_ids)
+      user.protected_senders.where(sender_id: sender_ids).delete_all
+    end
   end
 
   def initialize(raw_sender, as_of_date:)
@@ -33,15 +41,27 @@ class Sender
   end
 
   def get_email_count!(user)
-    @email_count = Gmail::Client.new(user).get_thread_count!(query: "from:#{email}")
+    @email_count = Gmail::Client.new(user).get_thread_count!(query: query_string, unread_only: user.option.unread_only)
   end
 
-  def get_emails!(user, page_token: nil)
-    @emails = Gmail::Client.new(user).get_emails!(
+  def list_emails!(user, max_results: Rails.configuration.sender_dispose_all_max)
+    Gmail::Client.new(user).list_emails!(query: query_string, unread_only: user.option.unread_only, max_results:)
+  end
+
+  def fetch_emails!(user, inbox, page: 1)
+    page_token = page == 1 ? nil : inbox.page_tokens.for(page: page - 1, sender_id: id)
+    emails, next_page_token = Gmail::Client.new(user).get_emails!(
       max_results: Rails.configuration.sender_emails_per_page,
-      query: "from:#{email}",
+      query: query_string,
       page_token: page_token
     )
+    inbox.page_tokens.add(next_page_token, sender_id: id)
+
+    emails.sort
+  end
+
+  def query_string
+    "from:#{email}"
   end
 
   def id
@@ -60,6 +80,10 @@ class Sender
     raise ArgumentError, "Senders should have the same emails" unless email == other.email
 
     as_of_date > other.as_of_date
+  end
+
+  def <=>(other)
+    other.email_count <=> email_count
   end
 
   # #hash, #==, and #eql? are necessary for different instances of the same sender to be considered equal.

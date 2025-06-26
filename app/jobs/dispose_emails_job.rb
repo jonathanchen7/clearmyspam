@@ -1,7 +1,7 @@
 class DisposeEmailsJob < ApplicationJob
   queue_as :default
 
-  attr_reader :user, :archive
+  attr_reader :user
 
   retry_on StandardError, attempts: 8, wait: ->(attempt) {
     # This calculates an exponential backoff delay in seconds between retry attempts
@@ -13,7 +13,6 @@ class DisposeEmailsJob < ApplicationJob
 
   def perform(user)
     Honeybadger.context(user)
-
     @user = user
 
     ApplicationRecord.transaction do
@@ -44,7 +43,7 @@ class DisposeEmailsJob < ApplicationJob
   private
 
   def acquire_advisory_lock
-    lock_key = "dispose_emails:#{user.id}:#{archive}"
+    lock_key = "dispose_emails:#{user.id}"
     ApplicationRecord.sanitize_sql_for_conditions(["pg_try_advisory_xact_lock(?)", Zlib.crc32(lock_key)])
   end
 

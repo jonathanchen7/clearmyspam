@@ -1,19 +1,19 @@
 class Email
   class << self
     def protect_all!(user, vendor_ids)
-      protected_email_attributes = vendor_ids.map { |vendor_id| { user_id: user.id, vendor_id: vendor_id } }
-      ProtectedEmail.upsert_all(protected_email_attributes, unique_by: %i[user_id vendor_id])
+      protected_email_attributes = vendor_ids.map { |vendor_id| { vendor_id: vendor_id } }
+      user.protected_emails.upsert_all(protected_email_attributes, unique_by: %i[user_id vendor_id])
     end
 
     def unprotect_all!(user, vendor_ids)
-      ProtectedEmail.where(user: user, vendor_id: vendor_ids).delete_all
+      user.protected_emails.where(vendor_id: vendor_ids).delete_all
     end
 
     def dispose_all!(user, vendor_ids:)
       archive = user.option.archive
       vendor_ids.each_slice(1000) do |vendor_ids_batch|
-        disposal_attributes = vendor_ids_batch.map { |vendor_id| { user_id: user.id, vendor_id: vendor_id, archive: archive } }
-        PendingEmailDisposal.insert_all(disposal_attributes, unique_by: %i[user_id vendor_id])
+        disposal_attributes = vendor_ids_batch.map { |vendor_id| { vendor_id: vendor_id, archive: archive } }
+        user.pending_email_disposals.upsert_all(disposal_attributes, unique_by: %i[user_id vendor_id])
       end
 
       DisposeEmailsJob.perform_later(user)
