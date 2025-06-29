@@ -45,6 +45,13 @@ export default class extends Controller {
     window.addEventListener("toast:ctaClick", this.boundHandleToastCtaClick);
 
     document.body.classList.add("overflow-hidden");
+
+    if (this.emailTargets.length === 0) {
+      makeTurboStreamRequest(
+        `senders/${this.senderIdValue}/emails?page=${this.pageValue}`,
+        "GET"
+      );
+    }
   }
 
   disconnect() {

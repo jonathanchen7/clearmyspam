@@ -1,4 +1,4 @@
-<%# locals: (sender:, emails: [], page: 1) %>
+<%# locals: (sender:, page: 1, emails: nil) %>
 <%= turbo_frame_tag "sender_drawer",
                     data: Views::StimulusData.new(
                       include_controller: true,
@@ -39,7 +39,6 @@
                       <div class="flex items-center gap-x-2">
                         <%= check_box_tag(false,
                                           class: "h-3.5 w-3.5 rounded disabled:opacity-50",
-                                          disabled: emails.empty?,
                                           data: {
                                             action: "change->sender-drawer#toggleSelectAll",
                                             "sender-drawer-target": "selectAllCheckbox"
@@ -108,7 +107,7 @@
                       </div>
                       <%= render PillButtonComponent.new(
                         type: DashboardHelper::ButtonTypes::TEXT,
-                        disabled: emails.empty?,
+                        disabled: emails.blank?,
                         stimulus_data: Views::StimulusData.new(
                           controllers: "sender-drawer",
                           actions: { "click" => "sender-drawer#unsubscribe" },
@@ -120,15 +119,23 @@
                     </div>
                   </div>
                 </div>
-                <% if emails.any? %>
-                  <div class="relative flex-1 divide-y mb-2">
-                    <%= render Dashboard::EmailComponent.with_collection(emails) %>
-                  </div>
-                <% else %>
-                  <div class="flex flex-col items-center justify-center text-gray-500 text-sm mt-4">
-                    No emails!
-                  </div>
-                <% end %>
+                <div id="emails-table">
+                  <% if emails.blank? %>
+                    <div class="flex flex-col divide-y">
+                      <% Rails.configuration.sender_emails_per_page.times do %>
+                        <div class="w-full flex flex-row items-center gap-x-3 sm:gap-x-4 p-2.5 sm:px-4">
+                          <div class="h-3.5 w-3.5 rounded bg-loading"></div>
+                          <div class="flex flex-col w-full">
+                            <div class="w-32 sm:w-48 h-3 bg-loading rounded-md"></div>
+                            <div class="mt-2 w-48 sm:w-96 h-3 bg-loading rounded-md"></div>
+                          </div>
+                        </div>
+                      <% end %>
+                    </div>
+                  <% else %>
+                    <%= render Dashboard::EmailsTableComponent.new(emails: emails) %>
+                  <% end %>
+                </div>
               </div>
             </div>
           </div>

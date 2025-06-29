@@ -1,6 +1,7 @@
 <div
-  class="email group relative w-full flex flex-row items-center gap-x-3 sm:gap-x-4 overflow-hidden p-2 sm:px-4 hover:bg-gray-200 duration-200 "
+  class="email group relative w-full flex flex-row items-center gap-x-3 sm:gap-x-4 overflow-hidden p-2 sm:px-4 hover:bg-gray-200 duration-200"
   data-sender-drawer-email-id-param="<%= email.vendor_id %>"
+  data-sender-drawer-target="email"
   data-email-id-value="<%= email.vendor_id %>"
   data-protected-value="<%= email.protected? %>"
   data-action="click->sender-drawer#selectEmail"

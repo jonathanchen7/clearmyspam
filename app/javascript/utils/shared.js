@@ -1,7 +1,7 @@
 export function makeTurboStreamRequest(
   url,
   method,
-  body,
+  body = null,
   disableTarget = null,
   targetsToDisable = []
 ) {

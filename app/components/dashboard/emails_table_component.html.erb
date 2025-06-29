@@ -1,0 +1,9 @@
+<% if @emails.any? %>
+  <div class="relative flex-1 divide-y mb-2">
+    <%= render Dashboard::EmailComponent.with_collection(@emails) %>
+  </div>
+<% else %>
+  <div class="flex flex-col items-center justify-center text-gray-500 text-sm mt-4">
+    No emails!
+  </div>
+<% end %>

@@ -8,24 +8,29 @@ class SendersController < AuthenticatedController
 
   before_action :set_cached_inbox
 
-  before_action :set_sender, only: [:show, :unsubscribe]
+  before_action :set_sender, only: [:show, :emails, :unsubscribe]
 
   before_action :set_senders, only: [:protect, :unprotect, :dispose_all]
   before_action :set_or_refresh_google_auth, only: [:unsubscribe]
 
   after_action -> { inbox.cache! }, only: [:show, :protect, :unprotect, :dispose_all]
-  after_action -> { Email.write_to_cache(@drawer_sender.id, @drawer_emails) }, only: [:show]
+  after_action -> { Email.write_to_cache(@drawer_sender.id, @drawer_emails) }, only: [:show, :emails]
 
   attr_reader :sender, :senders, :inbox
 
   def show
     @drawer_page = params[:page]&.to_i || 1
     @drawer_sender = sender
-    @drawer_emails = sender.fetch_emails!(current_user, inbox, page: @drawer_page)
-
-    sender.get_email_count!(current_user)
 
     render turbo_stream: build_turbo_stream
+  end
+
+  def emails
+    @drawer_page = params[:page]&.to_i || 1
+    @drawer_sender = sender
+    @drawer_emails = sender.fetch_emails!(current_user, inbox, page: @drawer_page)
+
+    render turbo_stream: turbo_stream.update("emails-table", Dashboard::EmailsTableComponent.new(emails: @drawer_emails))
   end
 
   def unsubscribe
