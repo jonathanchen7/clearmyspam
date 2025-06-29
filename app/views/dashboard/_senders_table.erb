@@ -4,7 +4,7 @@
     <div id="notifications" class="absolute"></div>
     <% if @inbox.present? %>
       <div class="flex flex-col divide-y border-b" data-turbo-prefetch="false" data-inbox-target="sendersTable">
-        <% @inbox.senders.values.sort.each do |sender| %>
+        <% (current_user.option.hide_personal ? @inbox.senders.values.reject(&:personal?) : @inbox.senders.values).sort.each do |sender| %>
           <%= render Dashboard::SenderRowComponent.new(sender) %>
         <% end %>
       </div>
