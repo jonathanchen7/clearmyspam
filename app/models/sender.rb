@@ -54,6 +54,17 @@ class Sender
     Gmail::Client.new(user).list_emails!(query: query_string, unread_only: user.option.unread_only, max_results:)
   end
 
+  def fetch_actionable_email_ids!(user)
+    email_ids, _page_token = list_emails!(user)
+    actionable_email_ids = ProtectedEmail.actionable_email_ids(user, email_ids)
+    actionable_email_ids = actionable_email_ids.first(user.remaining_disposal_count) if user.unpaid?
+
+    actionable_email_ids
+  rescue => e
+    Honeybadger.notify(e)
+    []
+  end
+
   def fetch_emails!(user, inbox, page: 1)
     page_token = page == 1 ? nil : inbox.page_tokens.for(page: page - 1, sender_id: id)
     emails, next_page_token = Gmail::Client.new(user).get_emails!(
@@ -92,11 +103,11 @@ class Sender
 
   # #hash, #==, and #eql? are necessary for different instances of the same sender to be considered equal.
   def hash
-    id
+    email.hash
   end
 
   def ==(other)
-    email == other.email
+    id == other.id
   end
 
   def eql?(other)

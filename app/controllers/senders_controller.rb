@@ -64,43 +64,24 @@ class SendersController < AuthenticatedController
     render turbo_stream: build_turbo_stream(toast: toast)
   end
 
-  # TODO: Refactor this into a model!
   def dispose_all
     raise "User #{current_user.id} attempted to dispose emails but is disabled." if current_user.disable_dispose?
 
     actionable_sender_ids = ProtectedSender.actionable_sender_ids(current_user, senders.map(&:id))
     actionable_senders = inbox.senders_lookup(actionable_sender_ids)
+    return if actionable_senders.blank?
 
-    all_actionable_email_ids = []
-    fully_disposed_sender_ids = []
-    partially_disposed_senders = {}
+    result = Gmail::SenderDisposer.new(current_user, actionable_senders).dispose_all!
 
-    actionable_senders.each do |sender|
-      email_ids, _page_token = sender.list_emails!(current_user)
+    disposed_senders = inbox.remove_senders(result.fully_disposed_sender_ids)
+    result.partially_disposed_senders.each { |sender, count| inbox.decrease_sender_email_count(sender.id, count) }
 
-      actionable_email_ids = ProtectedEmail.actionable_email_ids(current_user, email_ids)
-      actionable_email_ids = actionable_email_ids.first(current_user.remaining_disposal_count) if current_user.unpaid?
-
-      all_actionable_email_ids.concat(actionable_email_ids)
-
-      if actionable_email_ids.count >= sender.email_count
-        fully_disposed_sender_ids << sender.id
-      elsif actionable_email_ids.count > 0
-        partially_disposed_senders[sender] = actionable_email_ids.count
-      end
-    end
-
-    Email.dispose_all!(current_user, vendor_ids: all_actionable_email_ids)
-
-    disposed_senders = inbox.remove_senders(fully_disposed_sender_ids)
-    partially_disposed_senders.each { |sender, count| inbox.decrease_sender_email_count(sender.id, count) }
-
-    toast_title = I18n.t("toasts.dispose_all_from_senders.success.title", disposing: disposing_verb.capitalize, disposed_count: all_actionable_email_ids.count)
+    toast_title = I18n.t("toasts.dispose_all_from_senders.success.title", disposing: disposing_verb.capitalize, disposed_count: result.disposed_email_ids.count)
     toast_text = I18n.t("toasts.dispose_all_from_senders.success.text",
                         disposing: disposing_verb.capitalize,
-                        disposed_count: all_actionable_email_ids.count,
-                        sender: (disposed_senders.first || partially_disposed_senders.first.first).email,
-                        count: disposed_senders.size + partially_disposed_senders.size).html_safe
+                        disposed_count: result.disposed_email_ids.count,
+                        sender: (disposed_senders.first || result.partially_disposed_senders.first.first).email,
+                        count: disposed_senders.size + result.partially_disposed_senders.size).html_safe
     toast.success(toast_title, text: toast_text)
 
     render turbo_stream: build_turbo_stream(toast: toast)
