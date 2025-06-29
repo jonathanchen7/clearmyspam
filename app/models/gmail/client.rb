@@ -165,7 +165,7 @@ module Gmail
       # If the count is 500, make more requests to get the exact count.
       senders_to_fetch_exact_count = senders.select { |sender| sender_thread_counts[sender.id] == 500 }
       senders_to_fetch_exact_count.each_with_index do |sender, index|
-        sleep(.5) unless index.zero?
+        sleep(0.5) unless index.zero?
         sender_thread_counts[sender.id] = get_thread_count!(query: sender.query_string, label_ids: label_ids, unread_only:)
       end
 
