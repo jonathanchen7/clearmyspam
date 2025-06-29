@@ -109,7 +109,6 @@ module Gmail
       set_client_authorization
 
       response = client.list_user_threads("me", label_ids: ["INBOX"], max_results:, page_token:)
-
       return [] unless response.threads.any?
 
       gmail_thread_ids = response.threads.map(&:id)
@@ -137,6 +136,7 @@ module Gmail
       [senders.values, response.next_page_token]
     end
 
+    # TODO: Refactor this into a model!
     def get_thread_counts_for!(senders: [], label_ids: ["INBOX"], unread_only: false)
       set_client_authorization
 
@@ -160,6 +160,13 @@ module Gmail
             end
           end
         end
+      end
+
+      # If the count is 500, make more requests to get the exact count.
+      senders_to_fetch_exact_count = senders.select { |sender| sender_thread_counts[sender.id] == 500 }
+      senders_to_fetch_exact_count.each_with_index do |sender, index|
+        sleep(.5) unless index.zero?
+        sender_thread_counts[sender.id] = get_thread_count!(query: sender.query_string, label_ids: label_ids, unread_only:)
       end
 
       sender_thread_counts
@@ -194,12 +201,6 @@ module Gmail
 
     private
 
-    def set_client_authorization
-      user.refresh_google_auth!
-
-      client.authorization = user.google_access_token
-    end
-
     def get_threads_batch_request(gmail_thread_ids)
       Rails.logger.info("Fetching batch of #{gmail_thread_ids.size} threads")
       gmail_threads = []
@@ -220,6 +221,12 @@ module Gmail
       end
 
       gmail_threads
+    end
+
+    def set_client_authorization
+      user.refresh_google_auth!
+
+      client.authorization = user.google_access_token
     end
   end
 end
