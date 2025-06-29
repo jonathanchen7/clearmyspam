@@ -91,9 +91,7 @@ Rails.application.configure do
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 
   # App settings
-  config.sync_fetch_count = 100
-  config.sender_fetch_count = 150
-  config.async_dispose_threshold = 1
+  config.sync_fetch_count = 50
   config.sender_dispose_all_max = 500
   config.trial_thread_disposal_limit = 1000
   config.sender_emails_per_page = 20

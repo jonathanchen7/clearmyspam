@@ -122,8 +122,12 @@ module Gmail
         sender = Sender.from_gmail_thread(t)
         next unless sender.present?
 
-        sender.email_count = get_thread_count!(query: sender.query_string)
         hash[sender.id] = sender if !hash.key?(sender.id) || sender.newer_than?(hash[sender.id])
+      end
+
+      sender_thread_counts = get_thread_counts_for!(senders: senders.values)
+      senders.each do |sender_id, sender|
+        sender.email_count = sender_thread_counts[sender_id] || 0
       end
 
       user.protected_senders.where(sender_id: senders.keys).each do |protected_sender|
@@ -131,6 +135,34 @@ module Gmail
       end
 
       [senders.values, response.next_page_token]
+    end
+
+    def get_thread_counts_for!(senders: [], label_ids: ["INBOX"], unread_only: false)
+      set_client_authorization
+
+      label_ids << "UNREAD" if unread_only
+      return [] if senders.blank?
+
+      sender_thread_counts = {}
+      client.batch do |gmail|
+        senders.each_slice(THREAD_DETAILS_BATCH_SIZE).each_with_index do |sender_batch, index|
+          sleep(1) unless index.zero?
+
+          sender_batch.each do |sender|
+            gmail.list_user_threads("me", max_results: 500, label_ids: label_ids, q: sender.query_string) do |result, error|
+              if error
+                Rails.logger.error("Error fetching thread count for sender #{sender.id}: #{error}".on_red)
+                sender_thread_counts[sender.id] = 0
+              else
+                count = result.threads&.size || 0
+                sender_thread_counts[sender.id] = count
+              end
+            end
+          end
+        end
+      end
+
+      sender_thread_counts
     end
 
     # Returns the number of Gmail threads that match the provided query.

@@ -74,9 +74,7 @@ Rails.application.configure do
   config.middleware.insert_after ActionDispatch::Static, Rack::LiveReload
 
   # App settings
-  config.sync_fetch_count = 10
-  config.sender_fetch_count = 20
-  config.async_dispose_threshold = 1
+  config.sync_fetch_count = 50
   config.sender_dispose_all_max = 100
   config.trial_thread_disposal_limit = 10
   config.sender_emails_per_page = 5
