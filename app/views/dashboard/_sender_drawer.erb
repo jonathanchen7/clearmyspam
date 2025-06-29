@@ -107,7 +107,6 @@
                       </div>
                       <%= render PillButtonComponent.new(
                         type: DashboardHelper::ButtonTypes::TEXT,
-                        disabled: emails.blank?,
                         stimulus_data: Views::StimulusData.new(
                           controllers: "sender-drawer",
                           actions: { "click" => "sender-drawer#unsubscribe" },
@@ -122,7 +121,7 @@
                 <div id="emails-table">
                   <% if emails.blank? %>
                     <div class="flex flex-col divide-y">
-                      <% Rails.configuration.sender_emails_per_page.times do %>
+                      <% [sender.email_count, Rails.configuration.sender_emails_per_page].min.times do %>
                         <div class="w-full flex flex-row items-center gap-x-3 sm:gap-x-4 p-2.5 sm:px-4">
                           <div class="h-3.5 w-3.5 rounded bg-loading"></div>
                           <div class="flex flex-col w-full">
