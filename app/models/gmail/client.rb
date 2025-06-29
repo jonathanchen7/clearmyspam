@@ -11,85 +11,45 @@ module Gmail
 
     attr_reader :user
 
-    class << self
-      def get_inbox_metrics!(user)
-        set_client_authorization(user)
-
-        response = client.get_user_label("me", "INBOX")
-
-        [response.threads_total, response.threads_unread]
-      end
-
-      def archive_threads!(user, *gmail_thread_ids)
-        set_client_authorization(user)
-
-        client.batch do |gmail|
-          gmail_thread_ids.each do |thread_id|
-            gmail.modify_thread(
-              "me",
-              thread_id,
-              Google::Apis::GmailV1::ModifyThreadRequest.new(remove_label_ids: ["INBOX"])
-            ) do |_res, error|
-              if error
-                Rails.logger.error("Error archiving thread #{thread_id}: #{error}".on_red)
-                raise error
-              end
-            end
-          end
-        end
-      end
-
-      def trash_threads!(user, *gmail_thread_ids)
-        set_client_authorization(user)
-
-        client.batch do |gmail|
-          gmail_thread_ids.each do |thread_id|
-            gmail.trash_user_thread("me", thread_id) do |_res, error|
-              if error
-                Rails.logger.error("Error deleting thread #{thread_id}: #{error}".on_red)
-                raise error
-              end
-            end
-          end
-        end
-      end
-
-      private
-
-      def set_client_authorization(user)
-        user.refresh_google_auth!
-
-        client.authorization = user.google_access_token
-      end
-    end
-
     def initialize(user)
       @user = user
+    end
+
+    # Returns the total number of threads and unread threads in the user's inbox.
+    #
+    # @return [Array<Integer>] An array containing [total_threads, unread_threads].
+    def get_inbox_metrics!
+      set_client_authorization
+
+      response = client.get_user_label("me", "INBOX")
+
+      [response.threads_total, response.threads_unread]
     end
 
     # Returns a list of Gmail thread IDs that match the provided query.
     #
     # @param max_results [Integer] The maximum number of threads to return.
     # @param page_token [String, nil] The page token to use for pagination.
-    # @param label_ids [Array<String>] The label IDs to filter the threads by.
-    # @param unread_only [Boolean] Whether to only return unread threads.
     # @param query [String, nil] The query to filter the threads by.
     # @return [Array<String>, String>] A list of Gmail thread IDs and the next page token.
-    def list_emails!(max_results: Rails.configuration.sender_dispose_all_max, page_token: nil, label_ids: ["INBOX"], unread_only: false, query: nil)
+    def list_emails!(max_results: Rails.configuration.sender_dispose_all_max, page_token: nil, query: nil)
       set_client_authorization
 
-      label_ids << "UNREAD" if unread_only
       response = client.list_user_threads("me", max_results:, page_token:, label_ids:, q: query)
       return [[], nil] if response.threads.blank?
 
       [response.threads.map(&:id), response.next_page_token]
     end
 
-    def get_emails!(max_results: 20, page_token: nil, label_ids: ["INBOX"], unread_only: false, query: nil)
+    # Returns a list of Email objects with full thread details that match the provided query.
+    #
+    # @param max_results [Integer] The maximum number of threads to return (default: 20).
+    # @param page_token [String, nil] The page token to use for pagination.
+    # @param query [String, nil] The query to filter the threads by.
+    # @return [Array<Email>, String>] A list of Email objects and the next page token.
+    def get_emails!(max_results: Rails.configuration.sender_emails_per_page, page_token: nil, query: nil)
       set_client_authorization
 
-      label_ids << "UNREAD" if unread_only
-      # threads.list uses 10 quota units. The max allowed value is 500.
       response = client.list_user_threads("me", max_results:, page_token:, label_ids:, q: query)
       return [[], nil] if response.threads.blank?
 
@@ -105,10 +65,15 @@ module Gmail
       [emails, response.next_page_token]
     end
 
+    # Returns a list of unique Sender objects with their email counts from the user's inbox.
+    #
+    # @param max_results [Integer] The maximum number of threads to process (default: sync_fetch_count).
+    # @param page_token [String, nil] The page token to use for pagination.
+    # @return [Array<Sender>, String>] A list of Sender objects and the next page token.
     def get_unique_senders!(max_results: Rails.configuration.sync_fetch_count, page_token: nil)
       set_client_authorization
 
-      response = client.list_user_threads("me", label_ids: ["INBOX"], max_results:, page_token:)
+      response = client.list_user_threads("me", label_ids:, max_results:, page_token:)
       return [] unless response.threads.any?
 
       gmail_thread_ids = response.threads.map(&:id)
@@ -136,11 +101,13 @@ module Gmail
       [senders.values, response.next_page_token]
     end
 
-    # TODO: Refactor this into a model!
-    def get_thread_counts_for!(senders: [], label_ids: ["INBOX"], unread_only: false)
+    # Returns a hash mapping sender IDs to their thread counts in the user's inbox.
+    #
+    # @param senders [Array<Sender>] The list of senders to get thread counts for.
+    # @return [Hash<String, Integer>] A hash mapping sender IDs to their thread counts.
+    def get_thread_counts_for!(senders: [])
       set_client_authorization
 
-      label_ids << "UNREAD" if unread_only
       return [] if senders.blank?
 
       sender_thread_counts = {}
@@ -149,7 +116,7 @@ module Gmail
           sleep(1) unless index.zero?
 
           sender_batch.each do |sender|
-            gmail.list_user_threads("me", max_results: 500, label_ids: label_ids, q: sender.query_string) do |result, error|
+            gmail.list_user_threads("me", max_results: 500, q: sender.query_string, label_ids:) do |result, error|
               if error
                 Rails.logger.error("Error fetching thread count for sender #{sender.id}: #{error}".on_red)
                 sender_thread_counts[sender.id] = 0
@@ -166,7 +133,7 @@ module Gmail
       senders_to_fetch_exact_count = senders.select { |sender| sender_thread_counts[sender.id] == 500 }
       senders_to_fetch_exact_count.each_with_index do |sender, index|
         sleep(0.5) unless index.zero?
-        sender_thread_counts[sender.id] = get_thread_count!(query: sender.query_string, label_ids: label_ids, unread_only:)
+        sender_thread_counts[sender.id] = get_thread_count!(query: sender.query_string, label_ids:)
       end
 
       sender_thread_counts
@@ -176,16 +143,15 @@ module Gmail
     #
     # @param query [String, nil] An optional query string to filter the threads.
     # @return [Integer] The count of threads matching the query (max 2500).
-    def get_thread_count!(query:, label_ids: ["INBOX"], unread_only: false)
+    def get_thread_count!(query:)
       set_client_authorization
 
-      label_ids << "UNREAD" if unread_only
-      response = client.list_user_threads("me", max_results: 500, label_ids: label_ids, q: query)
+      response = client.list_user_threads("me", max_results: 500, q: query, label_ids:)
       return 0 unless response.threads&.any?
 
       total_count = response.threads.size
       while response.next_page_token && total_count < 2500
-        response = client.list_user_threads("me", max_results: 500, label_ids: label_ids, q: query, page_token: response.next_page_token)
+        response = client.list_user_threads("me", max_results: 500, q: query, page_token: response.next_page_token, label_ids:)
         break unless response.threads&.any?
         total_count += response.threads.size
       end
@@ -193,14 +159,67 @@ module Gmail
       total_count
     end
 
+    # Returns the full details of a specific Gmail thread.
+    #
+    # @param thread_id [String] The ID of the thread to retrieve.
+    # @return [Google::Apis::GmailV1::Thread] The full thread details.
     def get_thread_details!(thread_id:)
       set_client_authorization
 
       client.get_user_thread("me", thread_id, format: "full")
     end
 
+    # Archives multiple Gmail threads by removing them from the INBOX label.
+    #
+    # @param thread_ids [Array<String>] The list of thread IDs to archive.
+    # @return [void]
+    # @raise [Google::Apis::Error] If any thread fails to archive.
+    def archive_threads!(thread_ids)
+      set_client_authorization
+
+      client.batch do |gmail|
+        thread_ids.each do |thread_id|
+          gmail.modify_thread(
+            "me",
+            thread_id,
+            Google::Apis::GmailV1::ModifyThreadRequest.new(remove_label_ids: ["INBOX"])
+          ) do |_res, error|
+            if error
+              Rails.logger.error("Error archiving thread #{thread_id}: #{error}".on_red)
+              raise error
+            end
+          end
+        end
+      end
+    end
+
+    # Moves multiple Gmail threads to the trash.
+    #
+    # @param thread_ids [Array<String>] The list of thread IDs to trash.
+    # @return [void]
+    # @raise [Google::Apis::Error] If any thread fails to trash.
+    def trash_threads!(thread_ids)
+      set_client_authorization
+
+      client.batch do |gmail|
+        thread_ids.each do |thread_id|
+          gmail.trash_user_thread("me", thread_id) do |_res, error|
+            if error
+              Rails.logger.error("Error deleting thread #{thread_id}: #{error}".on_red)
+              raise error
+            end
+          end
+        end
+      end
+    end
+
     private
 
+    # Fetches a batch of Gmail threads with metadata headers.
+    #
+    # @param gmail_thread_ids [Array<String>] The list of thread IDs to fetch.
+    # @return [Array<Google::Apis::GmailV1::Thread>] The fetched thread objects.
+    # @raise [Google::Apis::Error] If any thread fails to fetch.
     def get_threads_batch_request(gmail_thread_ids)
       Rails.logger.info("Fetching batch of #{gmail_thread_ids.size} threads")
       gmail_threads = []
@@ -223,6 +242,19 @@ module Gmail
       gmail_threads
     end
 
+    # Returns the label IDs to use for Gmail API requests based on user preferences.
+    #
+    # @return [Array<String>] The list of label IDs to include in requests.
+    def label_ids
+      label_ids = ["INBOX"]
+      label_ids << "UNREAD" if user.option.unread_only?
+
+      label_ids
+    end
+
+    # Sets up the Gmail client authorization using the user's Google access token.
+    #
+    # @return [void]
     def set_client_authorization
       user.refresh_google_auth!
 

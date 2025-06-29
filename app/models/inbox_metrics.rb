@@ -20,7 +20,7 @@ class InboxMetrics
   end
 
   def sync!(user)
-    threads_total, threads_unread = Gmail::Client.get_inbox_metrics!(user)
+    threads_total, threads_unread = Gmail::Client.new(user).get_inbox_metrics!
     @total = threads_total
     @unread = threads_unread
 

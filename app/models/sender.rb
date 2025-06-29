@@ -47,11 +47,11 @@ class Sender
   end
 
   def get_email_count!(user)
-    @email_count = Gmail::Client.new(user).get_thread_count!(query: query_string, unread_only: user.option.unread_only)
+    @email_count = Gmail::Client.new(user).get_thread_count!(query: query_string)
   end
 
   def list_emails!(user, max_results: Rails.configuration.sender_dispose_all_max)
-    Gmail::Client.new(user).list_emails!(query: query_string, unread_only: user.option.unread_only, max_results:)
+    Gmail::Client.new(user).list_emails!(query: query_string, max_results:)
   end
 
   def fetch_actionable_email_ids!(user)
@@ -67,11 +67,7 @@ class Sender
 
   def fetch_emails!(user, inbox, page: 1)
     page_token = page == 1 ? nil : inbox.page_tokens.for(page: page - 1, sender_id: id)
-    emails, next_page_token = Gmail::Client.new(user).get_emails!(
-      max_results: Rails.configuration.sender_emails_per_page,
-      query: query_string,
-      page_token: page_token
-    )
+    emails, next_page_token = Gmail::Client.new(user).get_emails!(query: query_string, page_token: page_token)
     inbox.page_tokens.add(next_page_token, sender_id: id)
 
     emails.sort
