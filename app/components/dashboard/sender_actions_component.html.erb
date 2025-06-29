@@ -1,4 +1,12 @@
 <div class="absolute right-3 sm:right-4 hidden sm:flex flex-row gap-x-2 invisible group-hover:visible">
+    <button
+      class="bg-primary rounded-full px-3 py-1 text-white text-xs font-medium hover:enabled:brightness-95 disabled:opacity-50"
+      data-action="click->inbox#unsubscribeFromSender"
+      data-inbox-sender-id-param="<%= @sender.id %>"
+      data-inbox-sender-email-param="<%= @sender.email %>"
+    >
+      Unsubscribe
+    </button>
   <%=
     button_to protect_button_text,
               protect_button_path,

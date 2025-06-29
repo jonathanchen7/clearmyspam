@@ -38,7 +38,7 @@ export function makeTurboStreamRequest(
     });
 }
 
-export function makeRequest(url, method, body) {
+export function makeRequest(url, method, body = null) {
   return fetch(url, {
     method: method,
     headers: {

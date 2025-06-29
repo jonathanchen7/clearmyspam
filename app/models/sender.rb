@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "digest"
+
 class Sender
   PERSONAL_DOMAINS = %w[gmail.com yahoo.com hotmail.com outlook.com aol.com icloud.com].freeze
 
@@ -40,6 +42,10 @@ class Sender
     @as_of_date = as_of_date
   end
 
+  def id
+    @id ||= Digest::MD5.hexdigest(email)
+  end
+
   def get_email_count!(user)
     @email_count = Gmail::Client.new(user).get_thread_count!(query: query_string, unread_only: user.option.unread_only)
   end
@@ -64,10 +70,6 @@ class Sender
     "from:#{email}"
   end
 
-  def id
-    hash.to_s
-  end
-
   def domain
     @domain ||= email.split("@").last
   end
@@ -82,13 +84,15 @@ class Sender
     as_of_date > other.as_of_date
   end
 
+  private
+
   def <=>(other)
     other.email_count <=> email_count
   end
 
   # #hash, #==, and #eql? are necessary for different instances of the same sender to be considered equal.
   def hash
-    email.hash
+    id
   end
 
   def ==(other)

@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus";
 import { makeTurboStreamRequest } from "utils/shared"; // Connects to data-controller="inbox"
+import { unsubscribeFromSender } from "../utils/unsubscribe";
 
 // Connects to data-controller="inbox"
 export default class extends Controller {
@@ -49,6 +50,17 @@ export default class extends Controller {
     makeTurboStreamRequest("/senders/dispose_all", "POST", {
       sender_ids: this.selectedSenders,
     });
+  }
+
+  unsubscribeFromSender(event) {
+    event.preventDefault();
+    const params = event.params;
+    const unsubscribeButton = event.target;
+    unsubscribeFromSender(
+      params.senderId,
+      params.senderEmail,
+      unsubscribeButton
+    );
   }
 
   handleClickSenderAction(event) {

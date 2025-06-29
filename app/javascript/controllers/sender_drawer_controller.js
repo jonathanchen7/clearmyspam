@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus";
-import { makeRequest, makeTurboStreamRequest } from "utils/shared"; // Connects to data-controller="sender-drawer"
+import { makeTurboStreamRequest } from "utils/shared";
+import { unsubscribeFromSender } from "../utils/unsubscribe";
 
-// Connects to data-controller="sender-drawer"
 export default class extends Controller {
   static targets = [
     "drawerContainer",
@@ -145,22 +145,11 @@ export default class extends Controller {
   }
 
   unsubscribe() {
-    this.unsubscribeButtonTarget.disabled = true;
-
-    const showUnsubscribeError = () =>
-      alert(
-        `We couldn't find any links to unsubscribe from ${this.senderEmailValue}.`
-      );
-
-    makeRequest(`/senders/${this.senderIdValue}/unsubscribe`, "POST")
-      .then((response) => {
-        if (response.success && response.url) {
-          window.open(response.url, "_blank");
-        } else {
-          showUnsubscribeError();
-        }
-      })
-      .catch(() => showUnsubscribeError());
+    unsubscribeFromSender(
+      this.senderIdValue,
+      this.senderEmailValue,
+      this.unsubscribeButtonTarget
+    );
   }
 
   disableActions(_) {
