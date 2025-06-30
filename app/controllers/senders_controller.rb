@@ -4,7 +4,7 @@ class SendersController < AuthenticatedController
   include DashboardHelper
   include VerbTenseHelper
 
-  rate_limit to: 30, within: 1.minute, by: -> { current_user.id }
+  set_rate_limit to: 30
 
   before_action :set_cached_inbox
 

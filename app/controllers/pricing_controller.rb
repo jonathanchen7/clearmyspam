@@ -1,7 +1,7 @@
 require "stripe"
 
 class PricingController < ApplicationController
-  rate_limit to: 5, within: 1.minute, only: [:checkout, :billing_portal], by: -> { current_user.id }
+  set_rate_limit to: 5, only: [:checkout, :billing_portal]
 
   before_action :authenticate_user!, only: [:checkout, :billing_portal]
   before_action :set_stripe_api_key, only: [:checkout, :billing_portal]

@@ -1,5 +1,5 @@
 class OptionsController < AuthenticatedController
-  rate_limit to: 20, within: 1.minute, by: -> { current_user.id }
+  set_rate_limit to: 20
 
   before_action :set_cached_inbox
   before_action :set_or_refresh_google_auth, if: -> { params.dig(:options, :unread_only).present? }

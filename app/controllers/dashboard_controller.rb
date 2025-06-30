@@ -4,7 +4,7 @@ class DashboardController < AuthenticatedController
   include DashboardHelper
   include VerbTenseHelper
 
-  rate_limit to: 20, within: 1.minute, by: -> { current_user.id }
+  set_rate_limit to: 20
 
   before_action :set_or_refresh_google_auth, except: [:index, :logout]
   before_action :set_cached_inbox, only: [:load_more]
