@@ -10,8 +10,8 @@ class UnsubscribeLinkFinder
   LINK_REGEX = /https?:\/\/[\w.-]+\.[a-z]{2,6}\b[\w\/?&=%.~#-]*/i
 
   class << self
-    def find_link!(user, email_thread)
-      thread_details = email_thread.fetch_gmail_details!(user)
+    def find_link!(user, email)
+      thread_details = email.fetch_gmail_details!(user)
 
       thread_details.messages.each do |message|
         link = check_headers_for_unsubscribe_link(message.payload.headers)

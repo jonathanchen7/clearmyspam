@@ -25,7 +25,6 @@ class User < ApplicationRecord
   has_one :active_account_plan, -> { order(created_at: :desc) }, class_name: "AccountPlan"
   has_one :option, autosave: true
   has_one :metrics
-  has_many :email_threads
   has_many :pending_email_disposals
   has_many :protected_emails
   has_many :protected_senders
@@ -96,7 +95,7 @@ class User < ApplicationRecord
     elsif inactive_pro?
       true
     elsif unpaid?
-      email_threads.disposed.count >= active_account_plan.thread_disposal_limit
+      metrics.disposed_count >= active_account_plan.thread_disposal_limit
     else
       true
     end
@@ -106,7 +105,7 @@ class User < ApplicationRecord
     if active_pro?
       nil
     elsif unpaid?
-      [active_account_plan.thread_disposal_limit - email_threads.disposed.count, 0].max
+      [active_account_plan.thread_disposal_limit - metrics.disposed_count, 0].max
     else
       0
     end

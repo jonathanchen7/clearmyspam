@@ -19,4 +19,8 @@
 #
 class Metrics < ApplicationRecord
   belongs_to :user
+
+  def disposed_count
+    archived_count + trashed_count
+  end
 end
