@@ -66,7 +66,7 @@ class Sender
   end
 
   def fetch_emails!(user, inbox, page: 1)
-    page_token = page == 1 ? nil : inbox.page_tokens.for(page: page - 1, sender_id: id)
+    page_token = page == 1 ? nil : inbox.page_tokens.for(sender_id: id, page: page - 1)
     emails, next_page_token = Gmail::Client.new(user).get_emails!(query: query_string, page_token: page_token)
     inbox.page_tokens.add(next_page_token, sender_id: id)
 

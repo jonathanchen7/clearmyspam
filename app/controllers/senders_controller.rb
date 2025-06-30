@@ -9,11 +9,11 @@ class SendersController < AuthenticatedController
   before_action :set_cached_inbox
 
   before_action :set_sender, if: -> { params[:sender_id].present? || drawer_enabled? }
-  before_action :set_drawer_details, if: -> { drawer_enabled? }
+  before_action :set_drawer_details, only: [:protect, :unprotect, :dispose_all], if: :drawer_enabled?
   before_action :set_senders, only: [:protect, :unprotect, :dispose_all]
   before_action :set_or_refresh_google_auth, only: [:unsubscribe]
 
-  after_action -> { inbox.cache! }, only: [:show, :protect, :unprotect, :dispose_all]
+  after_action -> { inbox.cache! }, only: [:show, :emails, :protect, :unprotect, :dispose_all]
   after_action -> { Email.write_to_cache(@drawer_sender.id, @drawer_emails) }, only: [:show, :emails]
 
   attr_reader :sender, :senders, :inbox
@@ -29,7 +29,6 @@ class SendersController < AuthenticatedController
     @drawer_page = params[:page]&.to_i || 1
     @drawer_sender = sender
     @drawer_emails = sender.fetch_emails!(current_user, inbox, page: @drawer_page)
-
     render turbo_stream: turbo_stream.update("emails-table", Dashboard::EmailsTableComponent.new(emails: @drawer_emails))
   end
 

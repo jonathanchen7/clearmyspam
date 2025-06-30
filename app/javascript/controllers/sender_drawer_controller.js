@@ -112,7 +112,7 @@ export default class extends Controller {
 
   toggleSelectAllFromSender(event) {
     if (this.selectAllFromSender) {
-      this.selectAllFromSenderBannerTextTarget.innerHTML = `All <b class="text-primary">${event.params.emailsOnPage}</b> emails on this page are selected.`;
+      this.selectAllFromSenderBannerTextTarget.innerHTML = `All <b class="text-primary">${event.params.emailsOnPage}</b> email(s) on this page are selected.`;
       this.selectAllFromSenderButtonTarget.textContent = `Select all ${event.params.senderCount} from ${event.params.senderEmail}`;
       this.selectAllFromSender = false;
     } else {

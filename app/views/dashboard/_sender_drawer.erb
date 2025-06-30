@@ -91,6 +91,7 @@
                       <% emails_per_page = Rails.configuration.sender_emails_per_page %>
                       <% start_index = ((page - 1) * emails_per_page) + 1 %>
                       <% end_index = [start_index + emails_per_page - 1, total_count].min %>
+                      <% emails_on_page = end_index - start_index + 1 %>
                       <p class="text-xs sm:text-sm text-gray-600">
                         <%= "#{start_index}-#{end_index} of #{total_count}" %>
                       </p>
@@ -129,8 +130,7 @@
                 </div>
                 <div data-sender-drawer-target="selectAllFromSenderBanner" class="hidden">
                   <div class="flex flex-col sm:flex-row items-center justify-center gap-2 w-full text-center text-sm bg-gray-100 py-3 px-2">
-                    <% emails_on_page = [sender.email_count, Rails.configuration.sender_emails_per_page].min %>
-                    <span data-sender-drawer-target="selectAllFromSenderBannerText">All <b class="text-primary"><%= emails_on_page %></b> emails on this page are selected.</span>
+                    <span data-sender-drawer-target="selectAllFromSenderBannerText">All <b class="text-primary"><%= emails_on_page %></b> email(s) on this page are selected.</span>
                     <button class="text-primary bg-white outline outline-1 outline-gray-400 duration-200 rounded-full px-3 py-1 text-xs font-medium hover:enabled:brightness-95 disabled:opacity-50"
                             data-action="click->sender-drawer#toggleSelectAllFromSender"
                             data-sender-drawer-target="selectAllFromSenderButton"
