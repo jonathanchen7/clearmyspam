@@ -4,7 +4,16 @@
                       include_controller: true,
                       controllers: "sender-drawer",
                       targets: { "sender-drawer" => "drawerContainer" },
-                      values: { "sender-drawer" => { "sender-id" => sender.id.to_s, "sender-email" => sender.email, "page" => page } }
+                      values: {
+                        "sender-drawer" => {
+                          "sender-id" => sender.id,
+                          "sender-email" => sender.email,
+                          "page" => page,
+                          "email-count" => sender.email_count,
+                          "emails-per-page" => Rails.configuration.sender_emails_per_page,
+                          "emails-on-page" => [sender.email_count, Rails.configuration.sender_emails_per_page].min
+                        }
+                      }
                     ).erb_attributes do %>
   <div class="relative" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
     <div class="fixed inset-0 z-20 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
@@ -116,6 +125,20 @@
                         Unsubscribe
                       <% end %>
                     </div>
+                  </div>
+                </div>
+                <div data-sender-drawer-target="selectAllFromSenderBanner" class="hidden">
+                  <div class="flex flex-col sm:flex-row items-center justify-center gap-2 w-full text-center text-sm bg-gray-100 py-3 px-2">
+                    <% emails_on_page = [sender.email_count, Rails.configuration.sender_emails_per_page].min %>
+                    <span data-sender-drawer-target="selectAllFromSenderBannerText">All <b class="text-primary"><%= emails_on_page %></b> emails on this page are selected.</span>
+                    <button class="text-primary bg-white outline outline-1 outline-gray-400 duration-200 rounded-full px-3 py-1 text-xs font-medium hover:enabled:brightness-95 disabled:opacity-50"
+                            data-action="click->sender-drawer#toggleSelectAllFromSender"
+                            data-sender-drawer-target="selectAllFromSenderButton"
+                            data-sender-drawer-sender-email-param="<%= sender.email %>"
+                            data-sender-drawer-sender-count-param="<%= sender.email_count %>"
+                            data-sender-drawer-emails-on-page-param="<%= emails_on_page %>">
+                      Select all <%= sender.email_count %> from <%= sender.email %>
+                    </button>
                   </div>
                 </div>
                 <div id="emails-table">

@@ -8,6 +8,9 @@ export default class extends Controller {
     "drawer",
     "closeButton",
     "selectAllCheckbox",
+    "selectAllFromSenderBanner",
+    "selectAllFromSenderBannerText",
+    "selectAllFromSenderButton",
     "email",
     "emailCheckbox",
     "disposeIconButton",
@@ -22,6 +25,8 @@ export default class extends Controller {
     senderId: String,
     senderEmail: String,
     page: Number,
+    emailCount: Number,
+    emailsPerPage: Number,
   };
 
   // ------------------ GETTERS ------------------
@@ -92,13 +97,29 @@ export default class extends Controller {
       this.emailCheckboxTargets.forEach((checkbox) => {
         checkbox.checked = true;
       });
+
+      this.#showSelectAllBanner();
     } else {
       this.emailCheckboxTargets.forEach((checkbox) => {
         checkbox.checked = false;
       });
+
+      this.#hideSelectAllBanner();
     }
 
     this.updateIconButtonsState();
+  }
+
+  toggleSelectAllFromSender(event) {
+    if (this.selectAllFromSender) {
+      this.selectAllFromSenderBannerTextTarget.innerHTML = `All <b class="text-primary">${event.params.emailsOnPage}</b> emails on this page are selected.`;
+      this.selectAllFromSenderButtonTarget.textContent = `Select all ${event.params.senderCount} from ${event.params.senderEmail}`;
+      this.selectAllFromSender = false;
+    } else {
+      this.selectAllFromSenderBannerTextTarget.innerHTML = `All <b class="text-primary">${event.params.senderCount}</b> emails from <span class="text-primary">${event.params.senderEmail}</span> are selected.`;
+      this.selectAllFromSenderButtonTarget.textContent = "Clear selection";
+      this.selectAllFromSender = true;
+    }
   }
 
   selectEmail(e) {
@@ -114,6 +135,12 @@ export default class extends Controller {
     this.selectAllCheckboxTarget.checked =
       this.#selectedEmailIds.length === this.emailCheckboxTargets.length;
 
+    if (this.#selectedEmailIds.length === this.emailCheckboxTargets.length) {
+      this.#showSelectAllBanner();
+    } else {
+      this.#hideSelectAllBanner();
+    }
+
     this.updateIconButtonsState();
   }
 
@@ -122,6 +149,18 @@ export default class extends Controller {
     this.protectIconButtonTarget.disabled = selectedEmailCount === 0;
     this.unprotectIconButtonTarget.disabled = selectedEmailCount === 0;
     this.disposeIconButtonTarget.disabled = selectedEmailCount === 0;
+  }
+
+  #showSelectAllBanner() {
+    if (this.emailCountValue > this.emailsPerPageValue) {
+      this.selectAllFromSenderBannerTarget.classList.remove("hidden");
+    }
+  }
+
+  #hideSelectAllBanner() {
+    if (this.emailCountValue > this.emailsPerPageValue) {
+      this.selectAllFromSenderBannerTarget.classList.add("hidden");
+    }
   }
 
   // ------------------ ACTIONS ------------------
@@ -168,7 +207,7 @@ export default class extends Controller {
     makeTurboStreamRequest(
       isProtected ? `emails/unprotect` : `emails/protect`,
       "POST",
-      this.#turboRequestBody([event.params.emailId]),
+      this.#turboRequestBody({ email_ids: [event.params.emailId] }),
       event.target.closest("button")
     );
   }
@@ -178,36 +217,63 @@ export default class extends Controller {
     makeTurboStreamRequest(
       `emails/dispose`,
       "POST",
-      this.#turboRequestBody([event.params.emailId]),
+      this.#turboRequestBody({ email_ids: [event.params.emailId] }),
       event.target.closest("button")
     );
   }
 
   protectSelected() {
-    makeTurboStreamRequest(
-      `emails/protect`,
-      "POST",
-      this.#turboRequestBody(),
-      this.protectIconButtonTarget
-    );
+    if (this.selectAllFromSender) {
+      makeTurboStreamRequest(
+        `senders/protect`,
+        "POST",
+        this.#turboRequestBody({ sender_ids: [this.senderIdValue] }),
+        this.protectIconButtonTarget
+      );
+    } else {
+      makeTurboStreamRequest(
+        `emails/protect`,
+        "POST",
+        this.#turboRequestBody({ email_ids: this.#selectedEmailIds }),
+        this.protectIconButtonTarget
+      );
+    }
   }
 
   unprotectSelected() {
-    makeTurboStreamRequest(
-      `emails/unprotect`,
-      "POST",
-      this.#turboRequestBody(),
-      this.unprotectIconButtonTarget
-    );
+    if (this.selectAllFromSender) {
+      makeTurboStreamRequest(
+        `senders/unprotect`,
+        "POST",
+        this.#turboRequestBody({ sender_ids: [this.senderIdValue] }),
+        this.unprotectIconButtonTarget
+      );
+    } else {
+      makeTurboStreamRequest(
+        `emails/unprotect`,
+        "POST",
+        this.#turboRequestBody({ email_ids: this.#selectedEmailIds }),
+        this.unprotectIconButtonTarget
+      );
+    }
   }
 
   disposeSelected() {
-    makeTurboStreamRequest(
-      `emails/dispose`,
-      "POST",
-      this.#turboRequestBody(),
-      this.disposeIconButtonTarget
-    );
+    if (this.selectAllFromSender) {
+      makeTurboStreamRequest(
+        `senders/dispose`,
+        "POST",
+        this.#turboRequestBody({ sender_ids: [this.senderIdValue] }),
+        this.disposeIconButtonTarget
+      );
+    } else {
+      makeTurboStreamRequest(
+        `emails/dispose`,
+        "POST",
+        this.#turboRequestBody({ email_ids: this.#selectedEmailIds }),
+        this.disposeIconButtonTarget
+      );
+    }
   }
 
   #handleToastCtaClick(event) {
@@ -216,9 +282,9 @@ export default class extends Controller {
     }
   }
 
-  #turboRequestBody(emailIds = this.#selectedEmailIds) {
+  #turboRequestBody(body = {}) {
     return {
-      email_ids: emailIds,
+      ...body,
       drawer_options: {
         enabled: true,
         page: this.pageValue,

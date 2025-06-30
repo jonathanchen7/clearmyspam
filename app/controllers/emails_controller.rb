@@ -4,8 +4,6 @@ class EmailsController < AuthenticatedController
 
   rate_limit to: 30, within: 1.minute, by: -> { current_user.id }
 
-  before_action :validate_drawer_options
-
   before_action :set_cached_inbox
   before_action :set_drawer_details, if: :drawer_enabled?
 
@@ -69,15 +67,11 @@ class EmailsController < AuthenticatedController
 
   attr_reader :inbox
 
-  def validate_drawer_options
-    if params.dig(:drawer_options, :enabled).presence && params.dig(:drawer_options, :sender_id).blank?
-      raise ArgumentError, "A sender must be provided for drawer actions."
-    end
-  end
-
   def set_drawer_details
     @drawer_sender = @inbox.sender_lookup(params.dig(:drawer_options, :sender_id))
     @drawer_emails = Email.fetch_from_cache(@drawer_sender.id)
     @drawer_page = params.dig(:drawer_options, :page)
+
+    raise ArgumentError, "Invalid sender ID: #{params.dig(:drawer_options, :sender_id)}" if @drawer_sender.blank?
   end
 end

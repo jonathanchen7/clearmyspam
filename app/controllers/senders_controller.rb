@@ -8,8 +8,8 @@ class SendersController < AuthenticatedController
 
   before_action :set_cached_inbox
 
-  before_action :set_sender, only: [:show, :emails, :unsubscribe]
-
+  before_action :set_sender, if: -> { params[:sender_id].present? || drawer_enabled? }
+  before_action :set_drawer_details, if: -> { drawer_enabled? }
   before_action :set_senders, only: [:protect, :unprotect, :dispose_all]
   before_action :set_or_refresh_google_auth, only: [:unsubscribe]
 
@@ -90,12 +90,18 @@ class SendersController < AuthenticatedController
   private
 
   def set_sender
-    sender_id = params.require(:sender_id)
+    sender_id = params[:sender_id] || params.dig(:drawer_options, :sender_id)
     @sender = inbox.sender_lookup(sender_id)
   end
 
   def set_senders
     sender_ids = params.require(:sender_ids)
     @senders = inbox.senders_lookup(sender_ids)
+  end
+
+  def set_drawer_details
+    @drawer_sender = sender
+    @drawer_emails = Email.fetch_from_cache(@drawer_sender.id)
+    @drawer_page = params.dig(:drawer_options, :page) || 1
   end
 end
