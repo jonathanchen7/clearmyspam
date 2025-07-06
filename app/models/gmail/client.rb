@@ -142,8 +142,9 @@ module Gmail
     # Returns the number of Gmail threads that match the provided query.
     #
     # @param query [String, nil] An optional query string to filter the threads.
+    # @param label_ids [Array<String>] An optional list of label IDs to filter the threads.
     # @return [Integer] The count of threads matching the query (max 2500).
-    def get_thread_count!(query:)
+    def get_thread_count!(query:, label_ids:)
       set_client_authorization
 
       response = client.list_user_threads("me", max_results: 500, q: query, label_ids:)
