@@ -54,7 +54,7 @@ class EmailsController < AuthenticatedController
         toast.info I18n.t("toasts.dispose.no_emails.title", dispose: dispose_verb)
       else
         Email.dispose_all!(current_user, vendor_ids: actionable_email_ids)
-        @drawer_emails.reject! { |email| actionable_email_ids.include?(email.vendor_id) }
+        @drawer_emails&.reject! { |email| actionable_email_ids.include?(email.vendor_id) }
         inbox.decrease_sender_email_count(@drawer_sender.id, actionable_email_ids.count)
         toast.success I18n.t("toasts.dispose.success.title", count: actionable_email_ids.count, disposed: disposed_verb)
       end
