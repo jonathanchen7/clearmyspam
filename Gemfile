@@ -29,7 +29,7 @@ gem "devise"
 gem "omniauth-google-oauth2"
 gem "omniauth-rails_csrf_protection"
 
-gem "google-apis-gmail_v1", "~> 0.44.0"
+gem "google-apis-gmail_v1", "~> 0.45.0"
 gem "font-awesome-sass"
 gem "good_job"
 gem "stripe"
