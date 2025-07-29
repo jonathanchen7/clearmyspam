@@ -18,6 +18,11 @@ class DisposeEmailsJob < ApplicationJob
     ApplicationRecord.transaction do
       return unless acquire_advisory_lock && pending_email_disposals.exists?
 
+      if user.disable_dispose?
+        user.pending_email_disposals.delete_all
+        return
+      end
+
       user.refresh_google_auth!
 
       pending_email_disposals.group_by(&:archive).each do |archive, emails|
