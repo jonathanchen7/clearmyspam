@@ -1,4 +1,4 @@
-require "faker"
+require "faker" unless Rails.env.production?
 
 include FactoryBot::Syntax::Methods
 
@@ -13,6 +13,8 @@ module Gmail
     NUM_SENDERS_PER_PAGE = 10
 
     def initialize
+      raise "Faker is not available in production" if Rails.env.production?
+
       @next_page_token = nil
       @emails_cache = {}
     end
