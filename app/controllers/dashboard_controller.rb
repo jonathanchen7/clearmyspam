@@ -38,7 +38,7 @@ class DashboardController < AuthenticatedController
   end
 
   def load_more
-    if inbox.email_count > Inbox::MAX_CAPACITY
+    if inbox.sender_count > Inbox::MAX_SENDERS
       toast.error(
         I18n.t("toasts.load_more.max_capacity.title"),
         text: I18n.t("toasts.load_more.max_capacity.text", dispose: dispose_verb)

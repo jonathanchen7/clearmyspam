@@ -14,7 +14,7 @@ class Inbox
 
   delegate :final_page_fetched?, :next_page_token, to: :page_tokens
 
-  MAX_CAPACITY = 5000
+  MAX_SENDERS = 1000
 
   class << self
     def fetch_from_cache(user, &block)
