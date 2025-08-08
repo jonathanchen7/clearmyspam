@@ -4,7 +4,7 @@ require "google/apis/gmail_v1"
 
 module Gmail
   class Client
-    class_attribute :client, default: Google::Apis::GmailV1::GmailService.new
+    class_attribute :client, default: Rails.configuration.sandbox_mode ? SandboxGmailService.new : Google::Apis::GmailV1::GmailService.new
 
     THREAD_DETAILS_BATCH_SIZE = 20
     DISPOSE_BATCH_SIZE = 15

@@ -3,9 +3,7 @@ require "faker"
 FactoryBot.define do
   factory :email do
     transient do
-      sender_name { Faker::Name.name }
-      sender_email { Faker::Internet.email }
-      raw_sender { "#{sender_name} <#{sender_email}>" }
+      sender { build(:sender) }
       date { Date.today }
     end
 
@@ -34,7 +32,7 @@ FactoryBot.define do
     initialize_with do
       new(
         vendor_id: vendor_id,
-        sender: Sender.new(raw_sender, as_of_date: date),
+        sender:,
         date: date,
         subject: subject,
         snippet: snippet,

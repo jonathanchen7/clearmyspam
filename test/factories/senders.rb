@@ -17,7 +17,15 @@ FactoryBot.define do
 
     trait :business do
       transient do
-        email { Faker::Internet.email(domain: "clearymspam.com") }
+        email { Sender::DUMMY_BUSINESS_SENDERS.keys.sample(random: Faker::Config.random) }
+        name { Sender::DUMMY_BUSINESS_SENDERS[email] }
+        raw_sender { "#{name} <#{email}>" }
+      end
+
+      before(:build) do |_sender, evaluator|
+        unless Sender::DUMMY_BUSINESS_SENDERS.key?(evaluator.email)
+          raise ArgumentError, "Invalid business email: #{evaluator.email}"
+        end
       end
     end
 

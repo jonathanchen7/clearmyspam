@@ -3,6 +3,38 @@
 require "digest"
 
 class Sender
+  DUMMY_BUSINESS_SENDERS = {
+    "info@google.com" => "Google",
+    "marketing@stripe.com" => "Stripe",
+    "newsletter@amazon.com" => "Amazon",
+    "updates@apple.com" => "Apple",
+    "hello@meta.com" => "Meta",
+    "sales@salesforce.com" => "Salesforce",
+    "press@netflix.com" => "Netflix",
+    "hello@openai.com" => "OpenAI",
+    "offers@ubereats.com" => "Uber Eats",
+    "news@nytimes.com" => "NYTimes",
+    "deals@bestbuy.com" => "Best Buy",
+    "promotions@airbnb.com" => "Airbnb",
+    "team@slack.com" => "Slack",
+    "updates@github.com" => "GitHub",
+    "hello@notion.so" => "Notion",
+    "marketing@dropbox.com" => "Dropbox",
+    "contact@zoom.us" => "Zoom",
+    "info@shopify.com" => "Shopify",
+    "finance@adobe.com" => "Adobe",
+    "hello@figma.com" => "Figma",
+    "info@doordash.com" => "DoorDash",
+    "newsletter@robinhood.com" => "Robinhood",
+    "support@spotify.com" => "Spotify",
+    "hello@asana.com" => "Asana",
+    "updates@linkedin.com" => "LinkedIn",
+    "news@bloomberg.com" => "Bloomberg",
+    "offers@expedia.com" => "Expedia",
+    "hello@canva.com" => "Canva",
+    "promotions@hulu.com" => "Hulu",
+    "info@twilio.com" => "Twilio"
+  }.freeze
   PERSONAL_DOMAINS = %w[gmail.com yahoo.com hotmail.com outlook.com aol.com icloud.com].freeze
 
   EMAIL_REGEX = /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,20})/

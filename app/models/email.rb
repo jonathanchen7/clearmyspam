@@ -81,10 +81,6 @@ class Email
     @label_ids = label_ids
   end
 
-  def sender
-    @sender ||= Sender.new(raw_sender, as_of_date: date)
-  end
-
   def fetch_gmail_details!(user)
     Gmail::Client.new(user).get_thread_details!(thread_id: vendor_id)
   end
