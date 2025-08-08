@@ -1,6 +1,6 @@
 require "faker" unless Rails.env.production?
 
-include FactoryBot::Syntax::Methods
+include FactoryBot::Syntax::Methods unless Rails.env.production?
 
 module Gmail
   class SandboxGmailService
