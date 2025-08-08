@@ -1,5 +1,7 @@
 module Dashboard
   class InboxMetricsPillComponent < ViewComponent::Base
+    include ActionView::Helpers::NumberHelper
+
     def initialize(value, icon:, suffix:)
       @value = value || 0
       @icon = icon
@@ -7,7 +9,7 @@ module Dashboard
     end
 
     def text
-      "#{@value} #{@suffix}"
+      "#{number_with_delimiter(@value)} #{@suffix}"
     end
   end
 end
