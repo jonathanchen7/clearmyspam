@@ -10,7 +10,7 @@ class Sender
   NAME_REGEX = /"?([^"]*)"? <.*>/
 
   attr_accessor :email_count, :protected
-  attr_reader :email, :name, :as_of_date
+  attr_reader :email, :name, :as_of_date, :raw_sender
 
   class << self
     def from_gmail_thread(gmail_thread)
@@ -40,6 +40,7 @@ class Sender
 
     @name = raw_sender[NAME_REGEX, 1] || email
     @as_of_date = as_of_date
+    @raw_sender = raw_sender
   end
 
   def id

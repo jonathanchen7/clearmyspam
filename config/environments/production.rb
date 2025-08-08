@@ -95,4 +95,5 @@ Rails.application.configure do
   config.sender_dispose_all_max = 500
   config.trial_thread_disposal_limit = 1000
   config.sender_emails_per_page = 20
+  config.sandbox_mode = false
 end
