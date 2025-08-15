@@ -15,9 +15,9 @@
 
                   <%= button_to helpers.onboarding_step_path(step: steps.index(step)), class: class_names("relative flex size-6 md:size-8 items-center justify-center rounded-full", circle_styling(step)) do %>
                     <% if completed?(step) %>
-                      <%= icon("fa-solid", "check", class: "text-white") %>
+                      <%= helpers.icon("fa-solid", "check", class: "text-white") %>
                     <% else %>
-                      <%= icon("fa-solid", "circle", class: class_names("text-xs", in_progress?(step) ? "text-primary" : "text-gray-300 invisible group-hover:visible")) %>
+                      <%= helpers.icon("fa-solid", "circle", class: class_names("text-xs", in_progress?(step) ? "text-primary" : "text-gray-300 invisible group-hover:visible")) %>
                     <% end %>
                   <% end %>
                   <div class="<%= circle_text_styling(step) %>"><%= step.title %></div>

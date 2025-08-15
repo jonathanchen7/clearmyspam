@@ -9,7 +9,7 @@
           <%= stimulus_data %>
           class="w-full sm:w-auto rounded-full outline outline-1 outline-gray-300 text-xs text-gray-500 px-3 py-0.5 text-center disabled:opacity-75">
     Options
-    <%= icon("fa-solid", "chevron-down", class: "text-2xs", "data-options-target" => "caretIcon") %>
+    <%= helpers.icon("fa-solid", "chevron-down", class: "text-2xs", "data-options-target" => "caretIcon") %>
   </button>
   <div data-options-target="dropdownContainer" class="hidden z-10 absolute w-56 text-xs text-gray-500 p-3 rounded bg-white mt-2 outline outline-1 outline-gray-300 shadow">
     <%= render "dashboard/options_dropdown" %>

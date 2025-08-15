@@ -9,7 +9,7 @@
          data-toast-target="toast">
       <div class="grid grid-cols-12 gap-x-2 gap-y-1.5 p-4">
         <div class="flex items-center justify-center">
-          <%= icon("fa-solid", icon_name, class: class_names(icon_color, "text-lg")) %>
+          <%= helpers.icon("fa-solid", icon_name, class: class_names(icon_color, "text-lg")) %>
         </div>
         <div class="col-span-10 flex items-center">
           <p class="toast-title text-sm font-medium text-gray-900"><%= @title %></p>
@@ -18,7 +18,7 @@
           <button class="inline-flex rounded-md bg-white text-gray-400 hover:text-gray-500"
                   data-action="click->toast#dismiss">
             <span class="sr-only">Close</span>
-            <%= icon("fa-solid", "xmark") %>
+            <%= helpers.icon("fa-solid", "xmark") %>
           </button>
         </div>
         <div class="toast-text-row hidden col-start-2 col-span-10">

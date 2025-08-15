@@ -6,5 +6,5 @@
               current_page?(path) ? "bg-gray-200 font-semibold" : "font-normal",
             ) do %>
   <%= text %>
-  <%= icon('fa-solid', icon, class: "text-xs") if icon.present? %>
+  <%= helpers.icon('fa-solid', icon, class: "text-xs") if icon.present? %>
 <% end %>
