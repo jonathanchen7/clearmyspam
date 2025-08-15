@@ -35,6 +35,10 @@ class Sender
     "promotions@hulu.com" => "Hulu",
     "info@twilio.com" => "Twilio"
   }.freeze
+
+  HASHED_DUMMY_BUSINESS_SENDERS = DUMMY_BUSINESS_SENDERS.keys.index_by { |email| Digest::MD5.hexdigest(email) }
+  HASHED_DUMMY_BUSINESS_SENDER_NAMES = DUMMY_BUSINESS_SENDERS.transform_keys { |email| Digest::MD5.hexdigest(email) }
+
   PERSONAL_DOMAINS = %w[gmail.com yahoo.com hotmail.com outlook.com aol.com icloud.com].freeze
 
   EMAIL_REGEX = /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,20})/

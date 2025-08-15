@@ -261,7 +261,7 @@ export default class extends Controller {
   disposeSelected() {
     if (this.selectAllFromSender) {
       makeTurboStreamRequest(
-        `senders/dispose`,
+        `senders/dispose_all`,
         "POST",
         this.#turboRequestBody({ sender_ids: [this.senderIdValue] }),
         this.disposeIconButtonTarget

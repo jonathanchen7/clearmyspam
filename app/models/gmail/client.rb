@@ -222,7 +222,6 @@ module Gmail
     # @return [Array<Google::Apis::GmailV1::Thread>] The fetched thread objects.
     # @raise [Google::Apis::Error] If any thread fails to fetch.
     def get_threads_batch_request(gmail_thread_ids)
-      Rails.logger.info("Fetching batch of #{gmail_thread_ids.size} threads")
       gmail_threads = []
       client.batch do |gmail|
         gmail_thread_ids.each do |tid|

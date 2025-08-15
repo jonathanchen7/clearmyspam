@@ -10,6 +10,7 @@ module Gmail
 
     TOTAL_THREAD_COUNT_RANGE = 10_000..20_000
     UNREAD_THREAD_COUNT_RANGE = 1000..8000
+    NUM_EMAILS_PER_SENDER_RANGE = 1..500
     NUM_SENDERS_PER_PAGE = 10
 
     def initialize
@@ -33,8 +34,8 @@ module Gmail
     ListThread = Struct.new(:id, keyword_init: true)
     def list_user_threads(user_id, max_results:, page_token: nil, label_ids: nil, q: nil, &block)
       Faker::Config.random = Random.new(BASE_SEED + q.hash + page_token.hash + label_ids.hash)
-      num_threads = if specific_sender_query?(q)
-                      max_results == Rails.configuration.sender_emails_per_page ? max_results : Faker::Number.between(from: 1, to: max_results)
+      num_threads = if specific_sender_query?(q) && max_results != Rails.configuration.sender_emails_per_page
+                      Faker::Number.between(from: NUM_EMAILS_PER_SENDER_RANGE.min, to: NUM_EMAILS_PER_SENDER_RANGE.max)
                     else
                       max_results
                     end
@@ -42,7 +43,7 @@ module Gmail
       sender_email = q[5..] if specific_sender_query?(q)
       threads = num_threads.times.map do
         thread_id = Faker::Alphanumeric.alphanumeric(number: 16)
-        thread_id = "#{sender_email}-#{thread_id}" if sender_email.present?
+        thread_id = "#{Digest::MD5.hexdigest(sender_email)}-#{thread_id}" if sender_email.present?
         ListThread.new(id: thread_id)
       end
 
@@ -63,8 +64,8 @@ module Gmail
       Faker::Config.random = Random.new(BASE_SEED + thread_id.hash)
 
       if specific_sender_thread_id?(thread_id)
-        sender_email = thread_id.split("-").first
-        sender = build(:sender, :business, email: sender_email)
+        hashed_sender_email = thread_id.split("-").first
+        sender = build(:sender, :business, email: Sender::HASHED_DUMMY_BUSINESS_SENDERS[hashed_sender_email])
       else
         sender = build(:sender, :business)
       end
@@ -103,11 +104,11 @@ module Gmail
     private
 
     def specific_sender_query?(q)
-      q&.start_with?("from:") && Sender::DUMMY_BUSINESS_SENDERS.key?(q[5..])
+      q&.start_with?("from:") && Sender::HASHED_DUMMY_BUSINESS_SENDERS.key?(Digest::MD5.hexdigest(q[5..]))
     end
 
     def specific_sender_thread_id?(thread_id)
-      thread_id.include?("-") && thread_id.split("-").first.in?(Sender::DUMMY_BUSINESS_SENDERS.keys)
+      thread_id.include?("-") && Sender::HASHED_DUMMY_BUSINESS_SENDERS.key?(thread_id.split("-").first)
     end
   end
 end
