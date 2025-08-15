@@ -1,5 +1,5 @@
 class WizardComponent < ViewComponent::Base
-  Step = Struct.new(:title, :description, :desktop_image, :mobile_image)
+  Step = Struct.new(:title, :description, :desktop_video, :mobile_video)
 
   def initialize(id, steps:, current_step: 0)
     raise ArgumentError, "steps must be an array of at least one step." unless steps.is_a?(Array) && steps.size > 0
@@ -11,6 +11,14 @@ class WizardComponent < ViewComponent::Base
 
   def current_step
     steps[@current_step]
+  end
+
+  def current_desktop_video_path
+    "/videos/onboarding/#{current_step.desktop_video}"
+  end
+
+  def current_mobile_video_path
+    "/videos/onboarding/#{current_step.mobile_video}"
   end
 
   def final_step?
