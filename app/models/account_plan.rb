@@ -22,6 +22,7 @@ class AccountPlan < ApplicationRecord
 
   MONTHLY_PRICE_ID = Rails.application.credentials.dig(:stripe, :monthly_price_id)
   WEEKLY_PRICE_ID = Rails.application.credentials.dig(:stripe, :weekly_price_id)
+  YEARLY_PRICE_ID = Rails.application.credentials.dig(:stripe, :yearly_price_id)
 
   DEFAULT_THREAD_DISPOSAL_LIMIT = Rails.configuration.trial_thread_disposal_limit
 
@@ -39,6 +40,8 @@ class AccountPlan < ApplicationRecord
         WEEKLY_PRICE_ID
       when "monthly"
         MONTHLY_PRICE_ID
+      when "yearly"
+        YEARLY_PRICE_ID
       else
         raise "Invalid plan type"
       end
@@ -50,6 +53,8 @@ class AccountPlan < ApplicationRecord
         "weekly"
       when MONTHLY_PRICE_ID
         "monthly"
+      when YEARLY_PRICE_ID
+        "yearly"
       else
         raise "Invalid price ID"
       end

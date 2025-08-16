@@ -15,7 +15,7 @@
   ) %>
   <%= render Pricing::PriceCardComponent.new(
     name: "Pro",
-    tag: "Best Value",
+    tag: "Most Popular",
     price: 8,
     term: "month",
     subtitle: "Unlimited access to all features.",
@@ -31,16 +31,16 @@
     featured: true
   ) %>
   <%= render Pricing::PriceCardComponent.new(
-    name: "Pay As You Go",
-    price: 3,
-    term: "week",
-    subtitle: "Extra flexibility for the extra motivated.",
+    name: "Annual",
+    tag: "Best Value",
+    price: 20,
+    term: "year",
+    subtitle: "Yearly access at a hefty discount.",
     features: [
       "Full access to pro features",
-      "Cancel anytime",
       "Priority support",
     ],
-    cta: "Start Weekly Plan",
-    plan_type: "weekly"
+    cta: "Start Annual Plan",
+    plan_type: "yearly"
   ) %>
 </div>
