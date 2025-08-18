@@ -12,11 +12,9 @@
                 data: { "turbo-prefetch": false },
                 class: "font-medium text-sm bg-primary text-white py-1 px-3 rounded-full hover:bg-primary-hover cursor-pointer duration-200" %>
   <% else %>
-    <%= button_to "Get started →",
-                  user_google_oauth2_omniauth_authorize_path,
-                  form_class: "contents",
-                  data: { turbo: false },
-                  class: "font-medium text-sm bg-primary text-white py-1 px-3 rounded-full hover:bg-primary-hover cursor-pointer duration-200" %>
+    <%= link_to "Get started →",
+                start_path,
+                class: "font-medium text-sm bg-primary text-white py-1 px-3 rounded-full hover:bg-primary-hover cursor-pointer duration-200" %>
   <% end %>
   <%= link_to "FAQs",
               faq_path,
@@ -29,5 +27,5 @@
     <img src="<%= asset_path('mobile_mockup.png') %>" alt="Clear My Spam screenshot"/>
     <div class="absolute top-48 inset-0 bg-gradient-to-b from-transparent via-white to-white"></div>
   </div>
-  <img class="hidden sm:block sm:max-w-2xl sm:max-w-3xl lg:max-w-5xl mx-4 my-16 rounded-2xl shadow-2xl border" src="<%= asset_path('desktop_mockup.png') %>" alt="Clear My Spam screenshot"/>
+  <img class="hidden sm:block sm:max-w-2xl lg:max-w-5xl mx-4 my-16 rounded-2xl shadow-2xl border" src="<%= asset_path('desktop_mockup.png') %>" alt="Clear My Spam screenshot"/>
 </div>

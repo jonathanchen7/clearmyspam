@@ -38,12 +38,13 @@
       <%= render partial: "profile_chip", locals: { user: current_user } %>
     <% else %>
       <%=
-        button_to "Log in →",
-                  user_google_oauth2_omniauth_authorize_path,
+        button_to user_google_oauth2_omniauth_authorize_path,
                   data: { turbo: false },
                   form_class: "contents",
-                  class: "font-medium text-xs sm:text-sm ring-1 ring-gray-300 py-1 px-3 rounded-full hover:bg-gray-50 cursor-pointer"
-      %>
+                  class: "font-medium text-xs sm:text-sm ring-1 ring-gray-300 py-1 px-3 rounded-full hover:bg-gray-50 cursor-pointer flex flex-row items-center gap-2" do %>
+        <%= image_tag "icons/google.webp", class: "w-4 h-4", alt: "Google" %>
+        <span class="text-xs font-medium">Sign in →</span>
+      <% end %>
     <% end %>
   </div>
 </div>

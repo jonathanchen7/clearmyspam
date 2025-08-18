@@ -10,10 +10,9 @@ Rails.application.routes.draw do
     mount GoodJob::Engine => "good_job"
   end
 
-  # Marketing
-  get "f5bot", to: "home#index"
   get "home/index"
   get "faq", to: "faq#index"
+  get "start", to: "start#index"
 
   get "pricing", to: "pricing#index"
   namespace :pricing do

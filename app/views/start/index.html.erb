@@ -1,0 +1,21 @@
+<div class="flex-1 flex h-full w-full items-center justify-center">
+  <div class="flex flex-col items-center justify-center gap-4 w-full sm:w-1/3 p-8">
+    <div class="text-center">
+      <h2 class="text-lg font-medium">Get Started</h2>
+      <p class="text-sm text-gray-500">
+        Reach inbox zero in minutes.
+      </p>
+    </div>
+    <%= button_to user_google_oauth2_omniauth_authorize_path,
+                  data: { turbo: false },
+                  class: "outline-none text-black px-6 py-2 rounded-md flex flex-row items-center gap-2 bg-gray-100 border border-gray-300 hover:bg-gray-200 duration-200" do %>
+      <%= image_tag "icons/google.webp", class: "w-5 h-5", alt: "Google" %>
+      <span class="text-xs font-medium">Sign in with Google</span>
+    <% end %>
+    <div class="flex flex-col gap-2 text-center mt-4">
+      <p class="text-xs text-gray-500 leading-relaxed">
+        Clear My Spam does not store any email data, will <b>never</b> sell your personal information, and strictly adheres to <%= link_to "Google's User Data Policy", "https://developers.google.com/terms/api-services-user-data-policy", class: "text-primary", target: "_blank" %>.
+      </p>
+    </div>
+  </div>
+</div>
