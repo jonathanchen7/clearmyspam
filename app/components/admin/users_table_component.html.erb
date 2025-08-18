@@ -1,0 +1,50 @@
+<div class="bg-white rounded-lg shadow border border-gray-200">
+  <div class="px-6 py-4 border-b border-gray-200">
+    <h3 class="text-lg font-semibold text-gray-900"><%= title %></h3>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <% columns.each do |column| %>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <%= column[:header] %>
+            </th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% users.each do |user| %>
+          <tr>
+            <% columns.each do |column| %>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <% case column[:type] %>
+                <% when :user_info %>
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-10 w-10">
+                      <%= user_avatar(user) %>
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900"><%= user.name %></div>
+                      <div class="text-sm text-gray-500"><%= user.email %></div>
+                    </div>
+                  </div>
+                <% when :text %>
+                  <div class="text-sm text-gray-900"><%= user.send(column[:field]) %></div>
+                <% when :date %>
+                  <div class="text-sm text-gray-900"><%= user.send(column[:field]).strftime("%b %d, %Y") %></div>
+                <% when :plan_badge %>
+                  <%= user_plan_badge(user) %>
+                <% when :onboarding_badge %>
+                  <%= onboarding_status_badge(user) %>
+                <% when :custom %>
+                  <%= column[:render].call(user) %>
+                <% end %>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
