@@ -2,7 +2,15 @@
                   @on_dashboard && !current_user.active_pro? && "mb-20 md:mb-0",
                   "w-full p-4 flex flex-col gap-y-2 sm:flex-row sm:justify-between items-center text-xs text-gray-400"
                 ) %>">
-  <div>jonathanchen.dev</div>
+  <div class="flex flex-row items-center gap-x-4">
+    <div>jonathanchen.dev</div>
+    <%= link_to "https://www.instagram.com/clearmyspam/", target: "_blank" do %>
+      <%= icon("fa-brands", "instagram", class: "text-lg text-gray-400 hover:text-primary duration-200") %>
+    <% end %>
+    <%= link_to "https://github.com/jonathanchen7/clearmyspam", target: "_blank" do %>
+      <%= icon("fa-brands", "github", class: "text-lg text-gray-400 hover:text-primary duration-200") %>
+    <% end %>
+  </div>
   <div class="flex flex-row items-center gap-x-4">
     <% if @on_dashboard %>
       <%= link_to "Report a Bug",
