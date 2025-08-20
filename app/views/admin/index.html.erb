@@ -103,10 +103,11 @@
         columns: [
           { header: "User", type: :user_info },
           { header: "Last Login", type: :date, field: :last_login_at },
-          { header: "Created", type: :date, field: :created_at },
           { header: "Emails Disposed", type: :custom, render: ->(user) { user.metrics&.disposed_count || 0 } },
           { header: "Initial Total Emails", type: :custom, render: ->(user) { user.metrics&.initial_total_threads || 0 } },
           { header: "Initial Unread Emails", type: :custom, render: ->(user) { user.metrics&.initial_unread_threads || 0 } },
+          { header: "Total Emails", type: :custom, render: ->(user) { user.metrics&.total_threads || 0 } },
+          { header: "Unread Emails", type: :custom, render: ->(user) { user.metrics&.unread_threads || 0 } },
           { header: "Plan", type: :plan_badge }
         ]
       ) %>
