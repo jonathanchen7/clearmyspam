@@ -1,4 +1,4 @@
-<% base_styles = "text-xs rounded-full px-1 sm:px-2 py-1 disabled:opacity-50 hover:enabled:brightness-90" %>
+<% base_styles = "text-xs rounded-full px-2 sm:px-2 py-0.5 sm:py-1 disabled:opacity-50 hover:enabled:brightness-90 flex items-center w-auto" %>
 <% if @path.present? %>
   <%= button_to @path,
                 data: @stimulus_data&.erb_attributes,

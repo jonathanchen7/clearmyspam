@@ -6,6 +6,7 @@ module DashboardHelper
     SECONDARY = "secondary"
     DANGER = "danger"
     TEXT = "text"
+    OUTLINE = "outline"
   end
 
   def build_turbo_stream(senders_table: true, toolbar: true, toast: nil)

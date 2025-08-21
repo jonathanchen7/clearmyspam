@@ -16,6 +16,8 @@ class PillButtonComponent < ViewComponent::Base
       "bg-white text-black ring-1 ring-gray-300"
     when DashboardHelper::ButtonTypes::DANGER
       "bg-danger text-white"
+    when DashboardHelper::ButtonTypes::OUTLINE
+      "bg-white text-primary ring-1 ring-primary"
     when DashboardHelper::ButtonTypes::TEXT
       "text-primary bg-white hover:enabled:backdrop-brightness-75"
     else

@@ -25,10 +25,26 @@
               <div class="px-2">
                 <div class="sticky top-0 bg-white z-30">
                   <div class="flex justify-between pt-4 sm:pt-5 mb-2 px-2">
-                    <div class="flex flex-col sm:flex-row gap-y-2 gap-x-4">
-                      <div class="flex flex-row gap-x-3 items-center">
-                        <%= render Dashboard::SenderPictureComponent.new(sender) %>
-                        <%= render Dashboard::SenderDetailsComponent.new(sender) %>
+                    <div class="flex flex-col gap-y-2">
+                      <div class="grid grid-cols-[auto_1fr] sm:grid-cols-[auto_1fr_auto] gap-y-2 gap-x-3 items-center">
+                        <div class="flex items-center justify-center">
+                          <%= render Dashboard::SenderPictureComponent.new(sender) %>
+                        </div>
+                        <div>
+                          <%= render Dashboard::SenderDetailsComponent.new(sender) %>
+                        </div>
+                        <div class="col-start-2 sm:col-start-3">
+                          <%= render PillButtonComponent.new(
+                            type: DashboardHelper::ButtonTypes::OUTLINE,
+                            stimulus_data: Views::StimulusData.new(
+                              controllers: "sender-drawer",
+                              actions: { "click" => "sender-drawer#unsubscribe" },
+                              targets: { "sender-drawer" => "unsubscribeButton" }
+                            )
+                          ) do %>
+                            Unsubscribe
+                          <% end %>
+                        </div>
                       </div>
                     </div>
                     <div class="ml-3 flex h-7 items-center">
@@ -113,16 +129,6 @@
                             )
                           ) %>
                       </div>
-                      <%= render PillButtonComponent.new(
-                        type: DashboardHelper::ButtonTypes::TEXT,
-                        stimulus_data: Views::StimulusData.new(
-                          controllers: "sender-drawer",
-                          actions: { "click" => "sender-drawer#unsubscribe" },
-                          targets: { "sender-drawer" => "unsubscribeButton" }
-                        )
-                      ) do %>
-                        Unsubscribe
-                      <% end %>
                     </div>
                   </div>
                 </div>
