@@ -21,7 +21,9 @@ class ProcessEmailTasksJob < ApplicationJob
       return unless acquire_advisory_lock && email_tasks.exists?
 
       EmailTask.process_all!(user, email_tasks)
-      email_tasks.delete_all
+      processed_count = email_tasks.delete_all
+
+      ProcessEmailTasksJob.set(wait: 1.second).perform_later(user) if processed_count == TASK_PROCESSING_BATCH_SIZE
     end
   end
 

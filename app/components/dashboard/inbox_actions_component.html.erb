@@ -41,5 +41,14 @@
       actions: { "click" => "inbox#unprotectSenders" }
     )
   ) %>
+  <%= render IconButtonComponent.new(
+    icon: "folder",
+    color: "text-primary",
+    disabled: true,
+    tooltip: "Move Selected to Label",
+    stimulus_data: Views::StimulusData.new(
+      targets: { "inbox" => "moveIconButton" },
+      actions: { "click" => "inbox#showLabelsModal" }
+    )
+  ) %>
 </div>
-
