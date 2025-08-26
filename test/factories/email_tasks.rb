@@ -5,17 +5,17 @@ FactoryBot.define do
     attempts { 0 }
 
     trait :archive do
-      type { "archive" }
+      task_type { "archive" }
       payload { nil }
     end
 
     trait :trash do
-      type { "trash" }
+      task_type { "trash" }
       payload { nil }
     end
 
     trait :move do
-      type { "move" }
+      task_type { "move" }
       payload { { "label_id" => Faker::Alphanumeric.alphanumeric(number: 8) } }
     end
 
