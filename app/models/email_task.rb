@@ -31,7 +31,7 @@ class EmailTask < ApplicationRecord
     private
 
     def process_archive_tasks!(user, tasks)
-      return if tasks.empty?
+      return if tasks.empty? || user.disable_dispose?
 
       vendor_ids = tasks.map(&:vendor_id)
       user.gmail_client.archive_threads!(vendor_ids)
@@ -40,7 +40,7 @@ class EmailTask < ApplicationRecord
     end
 
     def process_trash_tasks!(user, tasks)
-      return if tasks.empty?
+      return if tasks.empty? || user.disable_dispose?
 
       vendor_ids = tasks.map(&:vendor_id)
       user.gmail_client.trash_threads!(vendor_ids)
