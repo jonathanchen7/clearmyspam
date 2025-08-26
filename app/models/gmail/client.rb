@@ -214,6 +214,35 @@ module Gmail
       end
     end
 
+    # Returns a list of custom labels in the user's Gmail account.
+    #
+    # @return [Array<Label>] The list of custom labels.
+    def list_labels!
+      set_client_authorization
+
+      response = client.list_user_labels("me")
+      response.labels.map { |label| Label.from_gmail_label(label) }.select(&:custom_label?)
+    end
+
+    # Moves multiple Gmail threads to a custom label.
+    #
+    # @param thread_ids [Array<String>] The list of thread IDs to move.
+    # @param label [Label] The label to move the threads to.
+    def move_threads!(thread_ids:, label:)
+      set_client_authorization
+
+      client.batch do |gmail|
+        thread_ids.each do |thread_id|
+          gmail.modify_thread("me", thread_id, Google::Apis::GmailV1::ModifyThreadRequest.new(add_label_ids: [label.id], remove_label_ids: ["INBOX"])) do |_res, error|
+            if error
+              Rails.logger.error("gmail.move_threads", error: error.message, user_id: user.id, label_id: label.id)
+              raise error
+            end
+          end
+        end
+      end
+    end
+
     private
 
     # Fetches a batch of Gmail threads with metadata headers.

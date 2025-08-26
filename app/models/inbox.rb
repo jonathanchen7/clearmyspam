@@ -11,6 +11,7 @@ class Inbox
   class CachingError < StandardError; end
 
   attr_reader :user_id, :senders, :page_tokens, :metrics
+  attr_accessor :labels
 
   delegate :final_page_fetched?, :next_page_token, to: :page_tokens
 
@@ -35,6 +36,7 @@ class Inbox
     @senders = {}
     @page_tokens = PageTokens.new
     @metrics = InboxMetrics.new
+    @labels = []
   end
 
   # ------------------ MUTATIONS ------------------
