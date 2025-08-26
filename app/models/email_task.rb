@@ -53,7 +53,7 @@ class EmailTask < ApplicationRecord
 
       tasks.group_by { |task| task.payload["label_id"] }.each do |label_id, tasks_for_label|
         vendor_ids = tasks_for_label.map(&:vendor_id)
-        user.gmail_client.move_threads!(thread_ids: vendor_ids, label: label_id)
+        user.gmail_client.move_threads!(thread_ids: vendor_ids, label_id: label_id)
       end
     end
   end
@@ -65,17 +65,17 @@ class EmailTask < ApplicationRecord
     when "trash"
       user.gmail_client.trash_threads!([vendor_id])
     when "move"
-      user.gmail_client.move_threads!(thread_ids: [vendor_id], label: payload["label_id"])
+      user.gmail_client.move_threads!(thread_ids: [vendor_id], label_id: payload["label_id"])
     end
   end
 
   private
 
   def validate_payload_for_type
-    case type
+    case task_type
     when "archive", "trash"
       if payload.present?
-        errors.add(:payload, "must be null for type '#{type}'")
+        errors.add(:payload, "must be null for type '#{task_type}'")
       end
     when "move"
       unless payload.is_a?(Hash) && payload.key?("label_id")

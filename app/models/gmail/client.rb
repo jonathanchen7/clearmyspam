@@ -227,16 +227,14 @@ module Gmail
     # Moves multiple Gmail threads to a custom label.
     #
     # @param thread_ids [Array<String>] The list of thread IDs to move.
-    # @param label [Label] The label to move the threads to.
-    def move_threads!(thread_ids:, label:)
+    # @param label_id [String] The ID of the label to move the threads to.
+    def move_threads!(thread_ids:, label_id:)
       set_client_authorization
 
       client.batch do |gmail|
         thread_ids.each do |thread_id|
-          gmail.modify_thread("me", thread_id, Google::Apis::GmailV1::ModifyThreadRequest.new(add_label_ids: [label.id], remove_label_ids: ["INBOX"])) do |_res, error|
-            if error
-              raise error
-            end
+          gmail.modify_thread("me", thread_id, Google::Apis::GmailV1::ModifyThreadRequest.new(add_label_ids: [label_id], remove_label_ids: ["INBOX"])) do |_res, error|
+            raise error if error
           end
         end
       end

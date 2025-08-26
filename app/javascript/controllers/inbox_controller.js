@@ -11,6 +11,7 @@ export default class extends Controller {
     "disposeIconButton",
     "protectIconButton",
     "unprotectIconButton",
+    "moveIconButton",
     "sendersTable",
     "loadingSendersTable",
     "senderCheckbox",
@@ -71,6 +72,21 @@ export default class extends Controller {
     }, 10);
   }
 
+  showLabelsModal(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    let senderIds = event.params.senderId
+      ? [event.params.senderId]
+      : this.selectedSenders;
+    if (senderIds.length === 0) return;
+
+    const url = new URL("/senders/labels_modal", window.location.origin);
+    url.searchParams.set("sender_ids", JSON.stringify(senderIds));
+
+    makeTurboStreamRequest(url.toString(), "GET");
+  }
+
   handleClickSenderCheckbox(event) {
     event.stopPropagation();
 
@@ -78,6 +94,7 @@ export default class extends Controller {
       this.disposeIconButtonTarget,
       this.protectIconButtonTarget,
       this.unprotectIconButtonTarget,
+      this.moveIconButtonTarget,
     ];
     if (this.selectedSenders.length > 0) {
       buttons.forEach((button) => (button.disabled = false));
@@ -93,6 +110,7 @@ export default class extends Controller {
       this.disposeIconButtonTarget,
       this.protectIconButtonTarget,
       this.unprotectIconButtonTarget,
+      this.moveIconButtonTarget,
     ];
 
     setTimeout(() => {

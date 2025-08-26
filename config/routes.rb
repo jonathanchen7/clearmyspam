@@ -59,7 +59,11 @@ Rails.application.routes.draw do
     post :protect
     post :unprotect
     post :dispose_all
+    post :move_all
   end
+
+  # Labels modal
+  get "senders/labels_modal", to: "senders#labels_modal", as: :senders_labels_modal
 
   # Sender actions.
   get "senders/:sender_id", to: "senders#show", as: :senders_show

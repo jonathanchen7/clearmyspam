@@ -13,7 +13,7 @@ class SendersController < AuthenticatedController
   before_action :set_senders, only: [:protect, :unprotect, :dispose_all]
   before_action :set_or_refresh_google_auth, only: [:unsubscribe]
 
-  after_action -> { inbox.cache! }, only: [:show, :emails, :protect, :unprotect, :dispose_all]
+  after_action -> { inbox.cache! }, only: [:show, :emails, :protect, :unprotect, :dispose_all, :move_all]
   after_action -> { Email.write_to_cache(@drawer_sender.id, @drawer_emails) }, only: [:show, :emails]
 
   attr_reader :sender, :senders, :inbox
@@ -43,6 +43,13 @@ class SendersController < AuthenticatedController
     end
 
     render json: { success: true, url: url }
+  end
+
+  def labels_modal
+    @sender_ids = params[:sender_ids].present? ? JSON.parse(params[:sender_ids]) : []
+    @labels = inbox.labels.sort_by(&:name)
+
+    render turbo_stream: turbo_stream.replace("labels_modal", partial: "dashboard/labels_modal")
   end
 
   def protect
@@ -82,6 +89,57 @@ class SendersController < AuthenticatedController
                         sender: (disposed_senders.first || result.partially_disposed_senders.first&.first).email,
                         count: disposed_senders.size + result.partially_disposed_senders.size).html_safe
     toast.success(toast_title, text: toast_text)
+
+    render turbo_stream: build_turbo_stream(toast: toast)
+  end
+
+  def move_all
+    sender_ids = params.require(:sender_ids)
+    label_id = params.require(:label_id)
+
+    label = inbox.labels.find { |l| l.id == label_id }
+    if label.blank?
+      toast.error("Label not found.")
+      render turbo_stream: build_turbo_stream(toast: toast)
+      return
+    end
+
+    senders_to_move = inbox.senders_lookup(sender_ids)
+    if senders_to_move.blank?
+      toast.error("No senders found.")
+      render turbo_stream: build_turbo_stream(toast: toast)
+      return
+    end
+
+    thread_ids_to_move = senders_to_move.flat_map do |sender|
+      Gmail::Client.new(current_user).list_emails!(query: sender.query_string).first
+    end
+
+    if thread_ids_to_move.any?
+      thread_ids_to_move.each_slice(1000) do |thread_ids_batch|
+        email_task_attributes = thread_ids_batch.map do |thread_id|
+          {
+            vendor_id: thread_id,
+            task_type: "move",
+            payload: { label_id: label.id, label_name: label.name }
+          }
+        end
+        current_user.email_tasks.upsert_all(email_task_attributes, unique_by: %i[user_id vendor_id])
+      end
+
+      ProcessEmailTasksJob.perform_later(current_user)
+      inbox.remove_senders(senders_to_move.map(&:id))
+
+      toast.success(I18n.t("toasts.move_all_from_senders.success",
+                          sender: senders_to_move.first.email,
+                          count: senders_to_move.size,
+                          emails_count: thread_ids_to_move.size,
+                          label: label.name).html_safe)
+    else
+      toast.error(I18n.t("toasts.move_all_from_senders.no_emails",
+                        sender: senders_to_move.first.email,
+                        count: senders_to_move.size).html_safe)
+    end
 
     render turbo_stream: build_turbo_stream(toast: toast)
   end

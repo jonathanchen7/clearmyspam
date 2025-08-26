@@ -1,0 +1,44 @@
+<div id="labels-modal" class="relative z-30" aria-labelledby="modal-title" role="dialog" aria-modal="true" data-controller="labels-modal" data-sender-ids='<%= @sender_ids.to_json %>'>
+  <div class="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true" data-action="click->labels-modal#close"></div>
+  <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+    <div class="flex min-h-full items-end justify-center p-2 sm:p-6 md:p-12 text-center sm:items-center">
+      <div class="rounded-xl bg-white shadow-xl w-full md:max-w-lg lg:max-w-xl">
+        <div class="w-full pt-4 pb-4 px-4 flex flex-col items-center gap-y-4 justify-center">
+          <div class="w-full">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-primary text-md font-medium">Move emails to label</h2>
+              <button 
+                type="button" 
+                class="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                data-action="click->labels-modal#close"
+                aria-label="Close modal"
+                >
+                <%= icon("fa-solid", "xmark", class: "w-6 h-6") %>
+              </button>
+            </div>
+            <div data-labels-modal-target="labelsList" class="space-y-2 max-h-96 sm:max-h-[800px] overflow-y-auto">
+              <% if @labels.any? %>
+                <% @labels.each do |label| %>
+                  <button
+                    type="button"
+                    class="w-full text-left p-2 rounded-lg border border-gray-200 hover:border-primary hover:bg-primary/5 transition-colors duration-200"
+                    data-action="click->labels-modal#selectLabel"
+                    data-label-id="<%= label.id %>" >
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-medium text-gray-900"><%= label.name %></span>
+                      <%= icon("fa-solid", "chevron-right", class: "text-2xs") %>
+                    </div>
+                  </button>
+                <% end %>
+              <% else %>
+                <div class="text-center py-8 text-gray-500">
+                  <p>No custom labels found.</p>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
