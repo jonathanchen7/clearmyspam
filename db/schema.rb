@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_26_053401) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_26_061116) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,7 +40,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_26_053401) do
   create_table "email_tasks", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
     t.string "vendor_id", null: false
-    t.string "type", null: false
+    t.string "task_type", null: false
     t.integer "attempts", default: 0, null: false
     t.jsonb "payload"
     t.datetime "created_at", null: false

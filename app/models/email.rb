@@ -10,13 +10,13 @@ class Email
     end
 
     def dispose_all!(user, vendor_ids:)
-      archive = user.option.archive
+      task_type = user.option.archive ? "archive" : "trash"
       vendor_ids.each_slice(1000) do |vendor_ids_batch|
-        disposal_attributes = vendor_ids_batch.map { |vendor_id| { vendor_id: vendor_id, archive: archive } }
-        user.pending_email_disposals.upsert_all(disposal_attributes, unique_by: %i[user_id vendor_id])
+        email_task_attributes = vendor_ids_batch.map { |vendor_id| { vendor_id: vendor_id, task_type: task_type } }
+        user.email_tasks.upsert_all(email_task_attributes, unique_by: %i[user_id vendor_id])
       end
 
-      DisposeEmailsJob.perform_later(user)
+      ProcessEmailTasksJob.perform_later(user)
     end
 
     # Converts a `Google::Apis::GmailV1::Thread` object into an `Email` object.

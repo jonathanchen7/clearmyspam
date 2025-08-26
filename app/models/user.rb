@@ -25,6 +25,7 @@ class User < ApplicationRecord
   has_one :active_account_plan, -> { order(created_at: :desc) }, class_name: "AccountPlan"
   has_one :option, autosave: true
   has_one :metrics
+  has_many :email_tasks
   has_many :pending_email_disposals
   has_many :protected_emails
   has_many :protected_senders
@@ -117,6 +118,10 @@ class User < ApplicationRecord
 
   def to_honeybadger_context
     { user_id: id, user_email: email }
+  end
+
+  def gmail_client
+    @gmail_client ||= Gmail::Client.new(self)
   end
 
   private

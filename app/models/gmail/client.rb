@@ -235,7 +235,6 @@ module Gmail
         thread_ids.each do |thread_id|
           gmail.modify_thread("me", thread_id, Google::Apis::GmailV1::ModifyThreadRequest.new(add_label_ids: [label.id], remove_label_ids: ["INBOX"])) do |_res, error|
             if error
-              Rails.logger.error("gmail.move_threads", error: error.message, user_id: user.id, label_id: label.id)
               raise error
             end
           end
