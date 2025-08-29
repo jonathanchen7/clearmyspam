@@ -42,7 +42,7 @@ module Facebook
       @fbp = fbp
     end
 
-    def track_event(event_type, base_data: {}, additional_user_data: nil, custom_data: nil)
+    def track_event(event_type, base_data: {}, additional_user_data: {}, custom_data: {})
       return unless Rails.configuration.enable_facebook_pixel
 
       unless EventType::ALL.include?(event_type)
