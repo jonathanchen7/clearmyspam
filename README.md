@@ -55,3 +55,4 @@ simplicity, usability, and security.
    ```
 
 7. Run tests with `rails test`.
+8. Use `mailcatcher` to test email sending locally.
