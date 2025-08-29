@@ -39,7 +39,11 @@ class SendersController < AuthenticatedController
     url = nil
     sender_emails.each do |email|
       url = UnsubscribeLinkFinder.find_link!(current_user, email)
-      break if url.present?
+      if url.present?
+        current_user.metrics.unsubscribe_count += 1
+        current_user.metrics.save!
+        break
+      end
     end
 
     render json: { success: true, url: url }

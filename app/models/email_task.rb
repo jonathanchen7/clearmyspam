@@ -55,6 +55,9 @@ class EmailTask < ApplicationRecord
         vendor_ids = tasks_for_label.map(&:vendor_id)
         user.gmail_client.move_threads!(thread_ids: vendor_ids, label_id: label_id)
       end
+
+      user.metrics.moved_count += tasks.count
+      user.metrics.save!
     end
   end
 
