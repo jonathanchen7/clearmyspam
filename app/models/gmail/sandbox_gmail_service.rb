@@ -94,6 +94,19 @@ module Gmail
       yield nil, nil
     end
 
+    ListLabelsResponse = Struct.new(:labels, keyword_init: true)
+    Label = Struct.new(:id, :name, keyword_init: true)
+    def list_user_labels(user_id, &block)
+      Faker::Config.random = Random.new(BASE_SEED)
+      num_labels = Faker::Number.between(from: 5, to: 10)
+      labels = num_labels.times.map do
+        Label.new(id: "label_#{Faker::Alphanumeric.alphanumeric(number: 8)}", name: Faker::Lorem.word.capitalize)
+      end
+      result = ListLabelsResponse.new(labels:)
+
+      block_given? ? yield(result, nil) : result
+    end
+
     # Mirrors Google::Apis::GmailV1::GmailService#batch
     def batch
       raise ArgumentError, "Block required for batch calls" unless block_given?

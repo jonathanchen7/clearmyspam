@@ -28,8 +28,7 @@
       </button>
     <% end %>
   <% else %>
-    <%= button_to "Login to get started", user_google_oauth2_omniauth_authorize_path,
-                  data: { turbo: false }, form_class: "contents", class: button_styling %>
+    <%= link_to "Get started for free", start_path, data: { turbo: true }, class: button_styling %>
   <% end %>
 
   <ul role="list" class="mt-8 space-y-3 text-sm/6 text-gray-600 xl:mt-10">

@@ -8,8 +8,8 @@ class PricingControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "buttons show the correct CTAs when user is not logged in" do
+  test "links show the correct CTAs when user is not logged in" do
     get pricing_url
-    assert_select "button", { count: 3, text: "Login to get started" }
+    assert_select "a", { count: 3, text: "Get started for free" }
   end
 end
