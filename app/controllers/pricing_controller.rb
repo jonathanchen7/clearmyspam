@@ -27,9 +27,16 @@ class PricingController < ApplicationController
         mode: "subscription",
         automatic_tax: { enabled: true },
         allow_promotion_codes: true,
-        customer_email: current_user.email
+        customer_email: current_user.email,
+        metadata: {
+          user_id: current_user.id,
+          fbc: request.cookies["_fbc"],
+          fbp: request.cookies["_fbp"]
+        }
       }
     )
+
+    pixel_client.track_event(Facebook::EventType::InitiateCheckout, custom_data: { plan_type: })
 
     render json: { success: true, url: session.url }
   end

@@ -32,11 +32,20 @@ class WebhooksController < ApplicationController
     price_id = Stripe::Subscription.retrieve(subscription_id).items.data.first.price.id
 
     unless user.active_pro?
-      user.account_plans.create!(
+      account_plan = user.account_plans.create!(
         stripe_subscription_id: subscription_id,
         stripe_customer_id: customer_id,
         plan_type: AccountPlan.plan_type_for(price_id)
       )
+
+      pixel_client = pixel_client(user, stripe_object)
+      pixel_client.track_event(Facebook::EventType::Purchase,
+                               base_data: {
+                                 value: stripe_object.dig("amount_total"),
+                                 currency: stripe_object.dig("currency")
+                               },
+                               additional_user_data: additional_user_data(customer),
+                               custom_data: { plan_type: account_plan.plan_type })
     end
 
     render json: { success: true, user_id: user.id }
@@ -56,5 +65,32 @@ class WebhooksController < ApplicationController
 
   def set_stripe_api_key
     Stripe.api_key = Rails.application.credentials.dig(:stripe, :api_key)
+  end
+
+  def pixel_client(user, stripe_object)
+    Facebook::PixelClient.new(user,
+      source_url: "https://clearmyspam.com/pricing",
+      user_agent: request.user_agent,
+      ip_address: request.remote_ip,
+      fbc: stripe_object.dig("metadata", "fbc"),
+      fbp: stripe_object.dig("metadata", "fbp")
+    )
+  end
+
+  def additional_user_data(customer)
+    if customer.address.present?
+      {
+        ct: hash(customer.address.city.downcase),
+        st: hash(customer.address.state.downcase),
+        country: hash(customer.address.country.downcase),
+        zip: hash(customer.address.postal_code.downcase)
+      }
+    else
+      {}
+    end
+  end
+
+  def hash(string)
+    Digest::SHA256.hexdigest(string)
   end
 end

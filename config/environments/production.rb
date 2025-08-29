@@ -96,4 +96,5 @@ Rails.application.configure do
   config.trial_thread_disposal_limit = 1000
   config.sender_emails_per_page = 20
   config.sandbox_mode = false
+  config.enable_facebook_pixel = true
 end

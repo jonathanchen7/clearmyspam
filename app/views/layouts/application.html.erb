@@ -11,7 +11,7 @@
     <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
-    <% unless @on_dashboard %>
+    <% if !@on_dashboard && Rails.configuration.enable_facebook_pixel %>
       <!-- Meta Pixel Code -->
       <script>
         !function(f,b,e,v,n,t,s)

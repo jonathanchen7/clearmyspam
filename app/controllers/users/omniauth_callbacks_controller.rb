@@ -7,6 +7,9 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     session[:google_access_token_expires_at] = Time.at(request.env["omniauth.auth"].credentials.expires_at)
 
     sign_in @user, event: :authentication
+
+    pixel_client.track_event(Facebook::EventType::StartTrial) if @user.previously_new_record?
+
     redirect_to app_path
   end
 
