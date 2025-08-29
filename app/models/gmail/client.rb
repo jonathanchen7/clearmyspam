@@ -74,7 +74,7 @@ module Gmail
       set_client_authorization
 
       response = client.list_user_threads("me", label_ids:, max_results:, page_token:)
-      return [] unless response.threads.any?
+      return [] unless response.threads.present?
 
       gmail_thread_ids = response.threads.map(&:id)
       google_threads = gmail_thread_ids.each_slice(THREAD_DETAILS_BATCH_SIZE).flat_map.with_index do |batch, index|

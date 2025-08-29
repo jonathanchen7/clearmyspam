@@ -71,6 +71,7 @@ en:
       success:
         title: "%{disposing}..."
         text:
+          zero: "No emails to %{disposing}"
           one: '%{disposing} <span class="text-primary">%{disposed_count}</span> emails from <span class="text-primary">%{sender}</span>.'
           other: '%{disposing} <span class="text-primary">%{disposed_count}</span> emails across <span class="text-primary">%{count}</span> senders.'
     dispose:

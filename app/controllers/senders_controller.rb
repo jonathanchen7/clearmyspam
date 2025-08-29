@@ -90,7 +90,7 @@ class SendersController < AuthenticatedController
     toast_text = I18n.t("toasts.dispose_all_from_senders.success.text",
                         disposing: disposing_verb.capitalize,
                         disposed_count: result.disposed_email_ids.count,
-                        sender: (disposed_senders.first || result.partially_disposed_senders.first&.first).email,
+                        sender: (disposed_senders.first || result.partially_disposed_senders.first&.first)&.email,
                         count: disposed_senders.size + result.partially_disposed_senders.size).html_safe
     toast.success(toast_title, text: toast_text)
 
@@ -157,7 +157,7 @@ class SendersController < AuthenticatedController
 
   def set_senders
     sender_ids = params.require(:sender_ids)
-    @senders = inbox.senders_lookup(sender_ids)
+    @senders = inbox.senders_lookup(sender_ids).compact
   end
 
   def set_drawer_details
