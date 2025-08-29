@@ -72,10 +72,6 @@ class AdminMetrics
     (completed_users.to_f / total_users * 100).round(2)
   end
 
-  def pending_disposals_count
-    PendingEmailDisposal.where(created_at: start_date..end_date).count
-  end
-
   def global_metrics
     {
       total_users: User.count,
