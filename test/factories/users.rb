@@ -11,6 +11,7 @@ FactoryBot.define do
     after(:create) do |user|
       create(:account_plan, :free, user: user)
       create(:metrics, user: user)
+      create(:option, user: user)
     end
   end
 end
