@@ -13,8 +13,8 @@
 #
 # Indexes
 #
-#  index_email_tasks_on_user_id_and_created_at  (user_id,created_at)
-#  index_email_tasks_on_user_id_and_vendor_id   (user_id,vendor_id) UNIQUE
+#  index_email_tasks_on_user_id_and_created_at               (user_id,created_at)
+#  index_email_tasks_on_user_id_and_task_type_and_vendor_id  (user_id,task_type,vendor_id) UNIQUE
 #
 class EmailTask < ApplicationRecord
   belongs_to :user
