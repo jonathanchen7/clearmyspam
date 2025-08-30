@@ -7,6 +7,7 @@ class PricingController < ApplicationController
   before_action :set_stripe_api_key, only: [:checkout, :billing_portal]
 
   def index
+    pixel_client.track_event(Facebook::EventType::ViewContent) if pixel_client.present?
   end
 
   def checkout
