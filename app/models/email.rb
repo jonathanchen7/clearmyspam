@@ -13,7 +13,7 @@ class Email
       task_type = user.option.archive ? "archive" : "trash"
       vendor_ids.each_slice(1000) do |vendor_ids_batch|
         email_task_attributes = vendor_ids_batch.map { |vendor_id| { vendor_id: vendor_id, task_type: task_type } }
-        user.email_tasks.upsert_all(email_task_attributes, unique_by: %i[user_id vendor_id])
+        user.email_tasks.upsert_all(email_task_attributes, unique_by: %i[user_id task_type vendor_id])
       end
 
       ProcessEmailTasksJob.perform_later(user)

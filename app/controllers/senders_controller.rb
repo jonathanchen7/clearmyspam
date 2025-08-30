@@ -128,7 +128,7 @@ class SendersController < AuthenticatedController
             payload: { label_id: label.id, label_name: label.name }
           }
         end
-        current_user.email_tasks.upsert_all(email_task_attributes, unique_by: %i[user_id vendor_id])
+        current_user.email_tasks.upsert_all(email_task_attributes, unique_by: %i[user_id task_type vendor_id])
       end
 
       ProcessEmailTasksJob.perform_later(current_user)
