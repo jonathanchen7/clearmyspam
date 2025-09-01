@@ -33,6 +33,12 @@ class SendersController < AuthenticatedController
   end
 
   def unsubscribe
+    if sender.blank?
+      toast.error("Error", text: "We could not find any emails from this sender.")
+      render turbo_stream: build_turbo_stream(toast: toast)
+      return
+    end
+
     client = Gmail::Client.new(current_user)
     sender_emails, _page_token = client.get_emails!(query: sender.query_string, max_results: 3)
 
