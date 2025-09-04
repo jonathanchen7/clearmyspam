@@ -15,7 +15,7 @@ module Facebook
 
   class PixelClient
     FACEBOOK_API_VERSION = "v23.0"
-    FACEBOOK_PIXEL_ID = "1294463738876001"
+    FACEBOOK_PIXEL_ID = "2795626927301766"
 
     CONVERSIONS_API_URL = "https://graph.facebook.com/#{FACEBOOK_API_VERSION}/#{FACEBOOK_PIXEL_ID}/events"
 
