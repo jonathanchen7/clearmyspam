@@ -2,21 +2,24 @@ module Debug
   class DeleteUserDataJob < ApplicationJob
     queue_as :default
 
-    def perform(user, delete_account_plans: true, delete_options: true, delete_user: true)
-      models_to_delete = {
-        AccountPlan => delete_account_plans,
-        Option => delete_options,
-        User => delete_user
-      }
 
-      deleted_data = models_to_delete.each_with_object([]) do |(model, should_delete), data|
-        if should_delete
-          model == User ? user.destroy : model.where(user: user).delete_all
-          data << model.name
-        end
+    MODELS_TO_DELETE = [
+      AccountPlan,
+      Option,
+      EmailTask,
+      ProtectedEmail,
+      ProtectedSender,
+      Metrics
+    ].freeze
+
+    def perform(user)
+      raise "Cannot delete user data for pro user #{user.email}." if user.account_plans.any? { |plan| AccountPlan::PRO_PLAN_TYPES.include?(plan.plan_type) }
+
+      MODELS_TO_DELETE.each do |model|
+        model.where(user: user).delete_all
       end
 
-      Rails.logger.warn "User #{user.id} data deleted: #{deleted_data.join(', ')}."
+      user.destroy
     end
   end
 end

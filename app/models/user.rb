@@ -42,11 +42,13 @@ class User < ApplicationRecord
 
   class << self
     def from_omniauth(auth)
+      current_time = Time.now
       user = where(vendor_id: auth.uid).first_or_create do |user|
         user.vendor_id = auth.uid
         user.email = auth.info.email
         user.name = auth.info.name
         user.image = auth.info.image
+        user.created_at = current_time
 
         user.account_plans.build(
           plan_type: "trial",
@@ -61,7 +63,7 @@ class User < ApplicationRecord
         )
       end
       user.google_refresh_token = auth.credentials.refresh_token if auth.credentials.refresh_token.present?
-      user.last_login_at = Time.now
+      user.last_login_at = current_time
 
       user.save!
 
@@ -122,6 +124,10 @@ class User < ApplicationRecord
 
   def gmail_client
     @gmail_client ||= Gmail::Client.new(self)
+  end
+
+  def brand_new?
+    created_at == last_login_at
   end
 
   private

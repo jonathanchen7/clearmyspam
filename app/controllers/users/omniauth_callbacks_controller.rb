@@ -8,7 +8,10 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
 
     sign_in @user, event: :authentication
 
-    pixel_client.track_event(Facebook::EventType::StartTrial) if @user.previously_new_record?
+    if @user.brand_new?
+      pixel_client = Facebook::PixelClient.from_request(current_user, request)
+      pixel_client.track_event(Facebook::EventType::StartTrial)
+    end
 
     redirect_to app_path
   end
