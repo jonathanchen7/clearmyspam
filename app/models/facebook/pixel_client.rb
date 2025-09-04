@@ -52,9 +52,8 @@ module Facebook
 
       begin
         Rails.logger.info("facebook.pixel_client.track_event: #{event_type}")
-        Rails.logger.info("facebook.pixel_client.fbc_cookie: #{fbc}")
-        Rails.logger.info("facebook.pixel_client.fbp_cookie: #{fbp}")
-        make_request(event_type, base_data, additional_user_data, custom_data)
+        result = make_request(event_type, base_data, additional_user_data, custom_data)
+        Rails.logger.info("facebook.pixel_client.result: #{result.body}")
       rescue => e
         Rails.logger.error("facebook.pixel_client.error: #{e.message}")
       end
