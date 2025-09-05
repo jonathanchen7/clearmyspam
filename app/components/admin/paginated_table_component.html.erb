@@ -118,18 +118,41 @@
               <% end %>
             <% end %>
             
-            <% users.each_page do |page| %>
-              <% if page == users.current_page %>
-                <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-indigo-50 text-sm font-medium text-indigo-600">
-                  <%= page %>
-                </span>
-              <% elsif page == "..." %>
-                <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
-                  ...
-                </span>
-              <% else %>
-                <%= link_to page, 
-                    url_for(pagination_params.merge(page: page)), 
+            <% if users.total_pages > 0 %>
+              <% start_page = [users.current_page - 2, 1].max %>
+              <% end_page = [users.current_page + 2, users.total_pages].min %>
+              
+              <% if start_page > 1 %>
+                <%= link_to 1, 
+                    url_for(pagination_params.merge(page: 1)), 
+                    class: "relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50" %>
+                <% if start_page > 2 %>
+                  <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                    ...
+                  </span>
+                <% end %>
+              <% end %>
+              
+              <% (start_page..end_page).each do |page| %>
+                <% if page == users.current_page %>
+                  <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-indigo-50 text-sm font-medium text-indigo-600">
+                    <%= page %>
+                  </span>
+                <% else %>
+                  <%= link_to page, 
+                      url_for(pagination_params.merge(page: page)), 
+                      class: "relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50" %>
+                <% end %>
+              <% end %>
+              
+              <% if end_page < users.total_pages %>
+                <% if end_page < users.total_pages - 1 %>
+                  <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                    ...
+                  </span>
+                <% end %>
+                <%= link_to users.total_pages, 
+                    url_for(pagination_params.merge(page: users.total_pages)), 
                     class: "relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50" %>
               <% end %>
             <% end %>
