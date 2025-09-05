@@ -36,6 +36,7 @@ gem "stripe"
 gem "view_component"
 gem "redcarpet"
 gem "honeybadger", "~> 6.1"
+gem "kaminari"
 
 gem "colorize"
 gem "amazing_print"

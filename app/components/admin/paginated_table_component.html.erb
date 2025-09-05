@@ -1,0 +1,160 @@
+<div class="bg-white rounded-lg shadow border border-gray-200">
+  <div class="px-6 py-4 border-b border-gray-200">
+    <div class="flex items-center justify-between">
+      <h3 class="text-lg font-semibold text-gray-900"><%= title %></h3>
+      
+      <% if users.respond_to?(:current_page) %>
+        <div class="flex items-center space-x-4">
+          <div class="text-sm text-gray-500">
+            <%= pagination_info %>
+          </div>
+          
+          <div class="flex items-center space-x-2">
+            <label for="page-size" class="text-sm text-gray-500">Show:</label>
+            <select 
+              id="page-size" 
+              class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
+              onchange="changePageSize(this.value)"
+            >
+              <% page_size_options.each do |size| %>
+                <option value="<%= size %>" <%= 'selected' if size == current_page_size %>>
+                  <%= size %>
+                </option>
+              <% end %>
+            </select>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <% columns.each do |column| %>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <%= column[:header] %>
+            </th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% if users.any? %>
+          <% users.each do |user| %>
+            <tr class="hover:bg-gray-50">
+              <% columns.each do |column| %>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <% case column[:type] %>
+                  <% when :user_info %>
+                    <div class="flex items-center">
+                      <div class="flex-shrink-0 h-10 w-10">
+                        <%= user_avatar(user) %>
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900"><%= user.name %></div>
+                        <div class="text-sm text-gray-500"><%= user.email %></div>
+                      </div>
+                    </div>
+                  <% when :text %>
+                    <div class="text-sm text-gray-900"><%= user.send(column[:field]) %></div>
+                  <% when :date %>
+                    <div class="text-sm text-gray-900">
+                      <%= user.send(column[:field])&.strftime("%b %d, %Y at %I:%M %p") %>
+                    </div>
+                  <% when :plan_badge %>
+                    <%= user_plan_badge(user) %>
+                  <% when :onboarding_badge %>
+                    <%= onboarding_status_badge(user) %>
+                  <% when :custom %>
+                    <%= column[:render].call(user) %>
+                  <% end %>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="<%= columns.length %>" class="px-6 py-12 text-center text-sm text-gray-500">
+              No users found
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  
+  <% if users.respond_to?(:current_page) && users.total_pages > 1 %>
+    <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+      <div class="flex-1 flex justify-between sm:hidden">
+        <% if users.prev_page %>
+          <%= link_to "Previous", 
+              url_for(pagination_params.merge(page: users.prev_page)), 
+              class: "relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
+        <% end %>
+        <% if users.next_page %>
+          <%= link_to "Next", 
+              url_for(pagination_params.merge(page: users.next_page)), 
+              class: "ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
+        <% end %>
+      </div>
+      
+      <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+        <div>
+          <p class="text-sm text-gray-700">
+            Showing page <span class="font-medium"><%= users.current_page %></span> of 
+            <span class="font-medium"><%= users.total_pages %></span>
+          </p>
+        </div>
+        <div>
+          <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+            <% if users.prev_page %>
+              <%= link_to url_for(pagination_params.merge(page: users.prev_page)), 
+                  class: "relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50" do %>
+                <span class="sr-only">Previous</span>
+                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+              <% end %>
+            <% end %>
+            
+            <% users.each_page do |page| %>
+              <% if page == users.current_page %>
+                <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-indigo-50 text-sm font-medium text-indigo-600">
+                  <%= page %>
+                </span>
+              <% elsif page == "..." %>
+                <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                  ...
+                </span>
+              <% else %>
+                <%= link_to page, 
+                    url_for(pagination_params.merge(page: page)), 
+                    class: "relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50" %>
+              <% end %>
+            <% end %>
+            
+            <% if users.next_page %>
+              <%= link_to url_for(pagination_params.merge(page: users.next_page)), 
+                  class: "relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50" do %>
+                <span class="sr-only">Next</span>
+                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                </svg>
+              <% end %>
+            <% end %>
+          </nav>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<script>
+  function changePageSize(size) {
+    const url = new URL(window.location);
+    url.searchParams.set('per_page', size);
+    url.searchParams.delete('page'); // Reset to first page
+    window.location.href = url.toString();
+  }
+</script>

@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   authenticate :user, ->(user) { user.admin? } do
     mount GoodJob::Engine => "good_job"
     get "admin", to: "admin#index"
+    get "admin/tab/:tab_id", to: "admin#tab", as: :admin_tab
   end
 
   get "home/index"

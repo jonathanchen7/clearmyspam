@@ -1,0 +1,98 @@
+<!-- Login Analytics Tab -->
+<div class="space-y-8">
+  <!-- Login Metrics Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <% login_metrics = metrics.login_metrics_with_trends %>
+    
+    <%= render Admin::TrendCardComponent.new(
+      title: "Active Users",
+      value: login_metrics[:active_users],
+      icon: "fas fa-users"
+    ) %>
+    
+    <%= render Admin::TrendCardComponent.new(
+      title: "Total Logins",
+      value: login_metrics[:total_logins],
+      icon: "fas fa-sign-in-alt"
+    ) %>
+    
+    <%= render Admin::TrendCardComponent.new(
+      title: "Engagement Rate",
+      value: "#{login_metrics[:average_logins_per_user]}%",
+      icon: "fas fa-chart-pie"
+    ) %>
+    
+    <%= render Admin::TrendCardComponent.new(
+      title: "Total Users",
+      value: User.count,
+      icon: "fas fa-user-friends"
+    ) %>
+  </div>
+
+  <!-- Recently Logged In Users Table -->
+  <div>
+    <%= render Admin::PaginatedTableComponent.new(
+      title: "Recently Logged In Users",
+      users: metrics.recently_logged_in_users,
+      columns: [
+        { header: "User", type: :user_info },
+        { header: "Last Login", type: :date, field: :last_login_at },
+        { header: "Emails Disposed", type: :custom, render: ->(user) { user.metrics&.disposed_count || 0 } },
+        { header: "Plan", type: :plan_badge },
+        { header: "Onboarding", type: :onboarding_badge }
+      ],
+      pagination_params: { date_range: params[:date_range], tab: "logins" }
+    ) %>
+  </div>
+
+  <!-- Login Analytics Insights -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div class="bg-white rounded-lg shadow p-6 border border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">User Engagement</h3>
+      <div class="space-y-4">
+        <div class="flex justify-between">
+          <span class="text-sm text-gray-600">Active vs Total Users</span>
+          <span class="text-sm font-medium text-gray-900">
+            <%= login_metrics[:active_users] %> / <%= User.count %>
+          </span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-3">
+          <% total_users = User.count %>
+          <% if total_users > 0 %>
+            <% active_percentage = (login_metrics[:active_users].to_f / total_users * 100).round(1) %>
+            <div class="bg-green-600 h-3 rounded-full" style="width: <%= active_percentage %>%"></div>
+          <% end %>
+        </div>
+        <div class="flex justify-between text-xs text-gray-500">
+          <span>Inactive</span>
+          <span>Active (<%= active_percentage %>% if total_users > 0 %>)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6 border border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Activity Insights</h3>
+      <div class="space-y-3">
+        <div class="flex justify-between">
+          <span class="text-sm text-gray-600">Logins per Day (Avg)</span>
+          <span class="text-sm font-medium text-gray-900">
+            <% days_in_period = (metrics.end_date - metrics.start_date).to_i %>
+            <%= days_in_period > 0 ? (login_metrics[:total_logins].to_f / days_in_period).round(1) : 0 %>
+          </span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-sm text-gray-600">User Retention</span>
+          <span class="text-sm font-medium text-gray-900">
+            <%= login_metrics[:average_logins_per_user] %>%
+          </span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-sm text-gray-600">Inactive Users</span>
+          <span class="text-sm font-medium text-gray-900">
+            <%= User.count - login_metrics[:active_users] %>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

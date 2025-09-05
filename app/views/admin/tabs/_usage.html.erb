@@ -1,0 +1,93 @@
+<!-- Usage Analytics Tab -->
+<div class="space-y-8">
+  <!-- Usage Metrics Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <% usage_metrics = metrics.usage_metrics_with_trends %>
+    
+    <%= render Admin::TrendCardComponent.new(
+      title: "Total Emails Disposed",
+      value: usage_metrics[:total_emails_disposed],
+      icon: "fas fa-trash"
+    ) %>
+    
+    <%= render Admin::TrendCardComponent.new(
+      title: "Archived Emails",
+      value: usage_metrics[:archived_emails],
+      icon: "fas fa-archive"
+    ) %>
+    
+    <%= render Admin::TrendCardComponent.new(
+      title: "Trashed Emails",
+      value: usage_metrics[:trashed_emails],
+      icon: "fas fa-trash-alt"
+    ) %>
+    
+    <%= render Admin::TrendCardComponent.new(
+      title: "Avg Emails per User",
+      value: usage_metrics[:average_emails_per_user],
+      icon: "fas fa-chart-line"
+    ) %>
+  </div>
+
+  <!-- Top Users by Email Disposal Table -->
+  <div>
+    <%= render Admin::PaginatedTableComponent.new(
+      title: "Top Users by Email Disposal",
+      users: metrics.top_users_by_disposal,
+      columns: [
+        { header: "User", type: :user_info },
+        { header: "Emails Disposed", type: :custom, render: ->(user) { user.total_disposed } },
+        { header: "Archived", type: :custom, render: ->(user) { user.metrics&.archived_count || 0 } },
+        { header: "Trashed", type: :custom, render: ->(user) { user.metrics&.trashed_count || 0 } },
+        { header: "Plan", type: :plan_badge }
+      ],
+      pagination_params: { date_range: params[:date_range], tab: "usage" }
+    ) %>
+  </div>
+
+  <!-- Additional Usage Insights -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div class="bg-white rounded-lg shadow p-6 border border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Disposal Breakdown</h3>
+      <div class="space-y-4">
+        <div class="flex justify-between items-center">
+          <span class="text-sm text-gray-600">Archived vs Trashed Ratio</span>
+          <span class="text-sm font-medium text-gray-900">
+            <%= usage_metrics[:archived_emails] %> : <%= usage_metrics[:trashed_emails] %>
+          </span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <% total = usage_metrics[:total_emails_disposed] %>
+          <% archived_percentage = total > 0 ? (usage_metrics[:archived_emails].to_f / total * 100).round(1) : 0 %>
+          <% if total > 0 %>
+            <div class="bg-blue-600 h-2 rounded-full" style="width: <%= archived_percentage %>%"></div>
+          <% end %>
+        </div>
+        <div class="flex justify-between text-xs text-gray-500">
+          <span>Archived (<%= archived_percentage %>% if total > 0 %>)</span>
+          <span>Trashed (<%= (100 - archived_percentage).round(1) %>% if total > 0 %>)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6 border border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Usage Insights</h3>
+      <div class="space-y-3">
+        <div class="flex justify-between">
+          <span class="text-sm text-gray-600">Total Unsubscribes</span>
+          <span class="text-sm font-medium text-gray-900"><%= usage_metrics[:unsubscribe_count] %></span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-sm text-gray-600">Active Users in Period</span>
+          <span class="text-sm font-medium text-gray-900"><%= metrics.active_user_count %></span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-sm text-gray-600">Avg Disposal per Active User</span>
+          <span class="text-sm font-medium text-gray-900">
+            <%= metrics.active_user_count > 0 ? (usage_metrics[:total_emails_disposed].to_f / metrics.active_user_count).round(1) : 0 %>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

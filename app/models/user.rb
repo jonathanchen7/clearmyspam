@@ -21,6 +21,8 @@
 class User < ApplicationRecord
   devise :omniauthable, omniauth_providers: [:google_oauth2]
 
+  paginates_per 25
+
   has_many :account_plans, autosave: true
   has_one :active_account_plan, -> { order(created_at: :desc) }, class_name: "AccountPlan"
   has_one :option, autosave: true
