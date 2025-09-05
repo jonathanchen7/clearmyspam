@@ -2,11 +2,9 @@
   <div class="border-b border-gray-200">
     <nav class="flex space-x-8 px-6" aria-label="Tabs">
       <% tabs.each do |tab| %>
-        <button 
-          onclick="switchTab('<%= tab[:id] %>')"
-          class="<%= tab_classes(tab[:id]) %>"
-          data-tab="<%= tab[:id] %>"
-        >
+        <%= link_to admin_path(tab: tab[:id], date_range: params[:date_range], page: params[:page], per_page: params[:per_page]), 
+            class: tab_classes(tab[:id]),
+            data: { tab: tab[:id] } do %>
           <div class="flex items-center space-x-2">
             <div class="flex-shrink-0">
               <i class="<%= tab[:icon] %>"></i>
@@ -16,43 +14,15 @@
               <div class="text-xs opacity-75"><%= tab[:description] %></div>
             </div>
           </div>
-        </button>
+        <% end %>
       <% end %>
     </nav>
   </div>
   
   <div class="p-6">
     <div id="tab-content">
-      <!-- Tab content will be loaded here via JavaScript -->
+      <%= render "admin/tabs/#{active_tab}", metrics: metrics %>
     </div>
   </div>
 </div>
 
-<script>
-  function switchTab(tabId) {
-    // Update active tab styling
-    document.querySelectorAll('[data-tab]').forEach(btn => {
-      btn.classList.remove('text-indigo-600', 'border-indigo-600', 'bg-indigo-50');
-      btn.classList.add('text-gray-500', 'border-transparent');
-    });
-    
-    const activeBtn = document.querySelector(`[data-tab="${tabId}"]`);
-    activeBtn.classList.remove('text-gray-500', 'border-transparent');
-    activeBtn.classList.add('text-indigo-600', 'border-indigo-600', 'bg-indigo-50');
-    
-    // Load tab content via AJAX
-    fetch(`/admin/tab/${tabId}?<%= request.query_string %>`)
-      .then(response => response.text())
-      .then(html => {
-        document.getElementById('tab-content').innerHTML = html;
-      })
-      .catch(error => {
-        console.error('Error loading tab content:', error);
-      });
-  }
-  
-  // Load initial tab content
-  document.addEventListener('DOMContentLoaded', function() {
-    switchTab('<%= active_tab %>');
-  });
-</script>

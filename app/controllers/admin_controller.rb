@@ -25,7 +25,10 @@ class AdminController < ApplicationController
     )
     @active_tab = params[:tab_id] || "usage"
 
-    render partial: "admin/tabs/#{@active_tab}", locals: { metrics: @metrics }
+    respond_to do |format|
+      format.html { render partial: "admin/tabs/#{@active_tab}", locals: { metrics: @metrics } }
+      format.turbo_stream { render partial: "admin/tabs/#{@active_tab}", locals: { metrics: @metrics } }
+    end
   end
 
   private

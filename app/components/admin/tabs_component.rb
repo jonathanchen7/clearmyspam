@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
 class Admin::TabsComponent < ViewComponent::Base
-  def initialize(active_tab: "usage")
+  def initialize(active_tab: "usage", metrics: nil)
     @active_tab = active_tab
+    @metrics = metrics
   end
 
   private
 
-  attr_reader :active_tab
+  attr_reader :active_tab, :metrics
 
   def tabs
     [
