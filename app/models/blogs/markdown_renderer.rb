@@ -91,5 +91,33 @@ module Blogs
     def hrule
       %(<hr class="border-gray-300 my-4">)
     end
+
+    def table(header, body)
+      %(<div class="overflow-x-auto my-4">
+        <table class="w-full bg-gray-50 rounded-lg border border-gray-200 shadow-sm">
+          #{header}</b>
+          #{body}
+        </table>
+      </div>)
+    end
+
+    def table_row(content)
+      %(<tr class="border-b border-gray-200">#{content}</tr>)
+    end
+
+    def table_cell(content, alignment, header)
+      alignment_class = case alignment
+                        when :left
+                         "text-left"
+                        when :center
+                         "text-center"
+                        when :right
+                         "text-right"
+                        else
+                         "text-left"
+                        end
+
+      %(<td class="px-3 py-2 text-sm text-gray-700 #{alignment_class}">#{header ? "<b>#{content}</b>" : content}</td>)
+    end
   end
 end

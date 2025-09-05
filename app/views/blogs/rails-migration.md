@@ -80,15 +80,10 @@ the size of the original TypeScript codebase (while being more feature-rich). I 
 app from scratch, and feel confident in my ability to test and extend the app.
 
 To my fellow developers - if you've never written a full stack app from scratch using the same language/framework as your
-company, I would highly recommend trying it out. The easiest way may just be to rewrite one of your personal projects! 
+company, I would highly recommend trying it out. The easiest way may just be to rewrite one of your personal projects!
 Unless you were a founding or early engineer, there are likely tons of setup/configuration bits that you've never had
 to deal with (especially for Rails). Going through the process from scratch forces you to learn about many framework
-and language quirks that you might otherwise not know about or interact with. 
+and language quirks that you might otherwise not know about or interact with.
 
 ![React app lines of code](react-loc.png "Ruby on Rails lines of code")
 ![Ruby on Rails lines of code](rails-loc.png "Ruby on Rails lines of code")
-
-
-
-
-

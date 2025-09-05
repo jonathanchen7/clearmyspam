@@ -42,9 +42,9 @@ below to ensure a smooth contribution process.
    ```
 4. Open a Pull Request on GitHub against the `main` branch.
 5. Ensure your PR follows:
-    - Code style conventions (Rubocop recommended)
-    - Includes tests for new functionality
-    - Provides a clear description of changes
+   - Code style conventions (Rubocop recommended)
+   - Includes tests for new functionality
+   - Provides a clear description of changes
 
 ## Code of Conduct
 
@@ -53,4 +53,3 @@ Please be respectful and follow the [Contributor Covenant Code of Conduct](https
 ## License
 
 By contributing, you agree that your contributions will be licensed under the MIT License.
-
