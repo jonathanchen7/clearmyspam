@@ -13,7 +13,7 @@ class AdminController < ApplicationController
       page: @page,
       per_page: @per_page
     )
-    @active_tab = params[:tab] || "usage"
+    @active_tab = valid_tab(params[:tab]) || "signups"
   end
 
   def tab
@@ -23,11 +23,11 @@ class AdminController < ApplicationController
       page: @page,
       per_page: @per_page
     )
-    @active_tab = params[:tab_id] || "usage"
+    @active_tab = valid_tab(params[:tab_id]) || "signups"
 
     respond_to do |format|
-      format.html { render partial: "admin/tabs/#{@active_tab}", locals: { metrics: @metrics } }
-      format.turbo_stream { render partial: "admin/tabs/#{@active_tab}", locals: { metrics: @metrics } }
+      format.html { render_tab_partial(@active_tab, @metrics) }
+      format.turbo_stream { render_tab_partial(@active_tab, @metrics) }
     end
   end
 
@@ -47,5 +47,23 @@ class AdminController < ApplicationController
   def set_pagination_params
     @page = params[:page] || 1
     @per_page = params[:per_page] || 25
+  end
+
+  def valid_tab(tab_id)
+    allowed_tabs = %w[usage signups logins]
+    allowed_tabs.include?(tab_id) ? tab_id : nil
+  end
+
+  def render_tab_partial(tab_name, metrics)
+    case tab_name
+    when "usage"
+      render partial: "admin/tabs/usage", locals: { metrics: metrics }
+    when "signups"
+      render partial: "admin/tabs/signups", locals: { metrics: metrics }
+    when "logins"
+      render partial: "admin/tabs/logins", locals: { metrics: metrics }
+    else
+      render partial: "admin/tabs/signups", locals: { metrics: metrics }
+    end
   end
 end
