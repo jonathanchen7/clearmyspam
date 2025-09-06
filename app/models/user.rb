@@ -10,6 +10,7 @@
 #  last_login_at           :datetime         not null
 #  name                    :string           not null
 #  onboarding_completed_at :datetime
+#  send_marketing_emails   :boolean          default(TRUE)
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
 #  vendor_id               :string           not null

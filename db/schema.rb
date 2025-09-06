@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_30_000237) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_06_025629) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -197,6 +197,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_30_000237) do
     t.datetime "onboarding_completed_at"
     t.datetime "last_login_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.boolean "admin", default: false
+    t.boolean "send_marketing_emails", default: true
     t.index ["vendor_id"], name: "index_users_on_vendor_id", unique: true
   end
 end
