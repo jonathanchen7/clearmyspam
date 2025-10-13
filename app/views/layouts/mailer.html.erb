@@ -23,6 +23,17 @@
           display: block;
       }
 
+      .text-preview {
+        display: none;
+        font-size: 1px; 
+        color: #ffffff;
+        line-height: 1px;
+        max-height: 0px;
+        max-width: 0px;
+        opacity: 0;
+        overflow: hidden;
+      }
+
       .container {
           width: 100%;
           max-width: 600px;
@@ -30,7 +41,15 @@
       }
 
       .content-section {
-          margin: 36px 0;
+          margin: 24px 0;
+      }
+
+      .callout-section {
+          margin: 12px 0;
+          padding: 12px;
+          background-color: #f8f9fa;
+          border-left: 4px solid #1467c6;
+          border-radius: 4px;
       }
 
       .content-image {
@@ -59,7 +78,7 @@
       .footer-text {
           font-size: 14px;
           color: #808080;
-          padding-bottom: 12px;
+          padding-bottom: 8px;
       }
 
       .footer-links {
@@ -72,9 +91,20 @@
           padding: 0 10px;
       }
 
+      .button {
+          background-color: #1467c6;
+          border-radius: 6px;
+          padding: 10px 20px;
+          text-align: center;
+          color: #ffffff !important;
+          text-decoration: none;
+          font-weight: 600;
+          display: inline-block;
+      }
+
       h1, h2, h3 {
           margin-top: 0;
-          margin-bottom: 6px;
+          margin-bottom: 10px;
           font-weight: 600;
       }
 
@@ -90,14 +120,19 @@
 </head>
 
 <body>
+  <% if @text_preview %>
+    <div class="text-preview">
+      <%= @text_preview %>
+    </div>
+  <% end %>
 <table>
   <tr>
     <td class="main-content">
       <div class="container">
         <div class="content-box">
           <div style="margin-bottom: 12px">
-            <%= image_tag "logo.png", alt: "Clear My Spam logo", style: "margin: 0 0; height: 40px; width: auto; display: inline-block; vertical-align: middle;" %>
-            <span style="font-weight: 500; vertical-align: middle; padding-left: 4px;">clear my spam</span>
+            <%= image_tag "logo.png", alt: "Clear My Spam logo", style: "margin: 0 0; height: 32px; width: auto; display: inline-block; vertical-align: middle;" %>
+            <span style="font-weight: 600; vertical-align: middle; padding-left: 4px;">clear my spam</span>
           </div>
 
           <%= yield %>
@@ -125,6 +160,9 @@
           <a href="https://clearmyspam.com/faq" class="footer-link">FAQ</a>
           <a href="https://clearmyspam.com/terms" class="footer-link">Terms of Service</a>
           <a href="https://clearmyspam.com/privacy" class="footer-link">Privacy Policy</a>
+          <% if @is_marketing_email %>
+            <a href="<%= Rails.application.routes.url_helpers.marketing_unsubscribe_url(email: @user.email, host: 'clearmyspam.com') %>" class="footer-link">Unsubscribe</a>
+          <% end %>
         </div>
       </div>
     </td>

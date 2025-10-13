@@ -10,3 +10,6 @@ Clear My Spam
 FAQ: https://clearmyspam.com/faq
 Terms of Service: https://clearmyspam.com/terms
 Privacy Policy: https://clearmyspam.com/privacy
+<% if @is_marketing_email %>
+  Unsubscribe: <%= Rails.application.routes.url_helpers.marketing_unsubscribe_url(email: @user.email, host: 'clearmyspam.com') %>
+<% end %>
