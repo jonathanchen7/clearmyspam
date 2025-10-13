@@ -31,6 +31,10 @@ Rails.application.routes.draw do
   get "terms", to: "terms#index"
   get "privacy", to: "privacy#index"
 
+  namespace :marketing do
+    match "unsubscribe", to: "unsubscribe#index", via: [:get, :post]
+  end
+
   # Webhooks
   post "webhooks/stripe"
 

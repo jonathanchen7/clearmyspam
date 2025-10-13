@@ -1,0 +1,27 @@
+<%= turbo_frame_tag "unsubscribe_form" do %>
+  <% if @success %>
+    <div class="flex flex-row gap-2 items-center justify-center outline outline-gray-300 rounded-md px-4 py-2 sm:w-full sm:max-w-md">
+      <%= icon("fa-solid", "check-circle", class: "text-sm text-success") %>
+      <h2 class="text-sm text-gray-900">You've successfully unsubscribed.</h2>
+    </div>
+  <% else %>
+    <%= form_with url: marketing_unsubscribe_path, method: :post, local: false, data: { turbo_stream: true } do |form| %>
+      <div class="flex flex-col gap-2">
+        <div class="flex flex-row gap-2 items-center">
+          <%= form.email_field :email, 
+              value: @email, 
+              required: true, 
+              class: "px-3 py-2 border text-sm border-gray-300 rounded-md focus:ring-1 focus:ring-primary focus:border-primary",
+              placeholder: "Email address" %>
+          <%= form.submit "Unsubscribe", 
+              class: "text-xs bg-primary text-white rounded-md hover:bg-primary-hover px-4 py-2 cursor-pointer" %>
+        </div>
+        <% if @error.present? %>
+          <div class="text-xs text-danger">
+            <%= @error %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

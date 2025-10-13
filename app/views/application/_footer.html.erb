@@ -23,6 +23,7 @@
                   class: "hover:text-primary duration-200" %>
       <%= button_to "Help", dashboard_help_path, class: "hover:text-primary duration-200" %>
     <% else %>
+      <%= link_to "Marketing", marketing_unsubscribe_path, class: "hover:text-primary duration-200" %>
       <%= link_to "Terms", terms_path, class: "hover:text-primary duration-200" %>
       <%= link_to "Privacy", privacy_path, class: "hover:text-primary duration-200" %>
     <% end %>
