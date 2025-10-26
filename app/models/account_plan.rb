@@ -17,7 +17,7 @@
 #  index_account_plans_on_user_id  (user_id)
 #
 class AccountPlan < ApplicationRecord
-  PRO_PLAN_TYPES = %w[weekly monthly].freeze
+  PRO_PLAN_TYPES = %w[weekly monthly yearly].freeze
   FREE_PLAN_TYPES = %w[trial].freeze
 
   MONTHLY_PRICE_ID = Rails.application.credentials.dig(:stripe, :monthly_price_id)
