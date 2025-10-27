@@ -22,19 +22,18 @@
     <% else %>
       <button data-controller="pricing"
               data-action="click->pricing#checkout"
-              data-pricing-plan-type-value="<%= @plan_type %>"
-              class="<%= button_styling %>">
+        data-pricing-plan-type-value="<%= @plan_type %>"
+        class="<%= button_styling %>">
         <%= @cta %>
       </button>
     <% end %>
   <% else %>
     <%= link_to "Get started for free", start_path, data: { turbo: true }, class: button_styling %>
   <% end %>
-
   <ul role="list" class="mt-8 space-y-3 text-sm/6 text-gray-600 xl:mt-10">
     <% @features.each do |feature| %>
       <li class="flex gap-x-3 items-center">
-        <%= icon("fa-solid", "check", class: "text-primary text-lg") %>
+        <%= helpers.icon("fa-solid", "check", class: "text-primary text-lg") %>
         <%= feature %>
       </li>
     <% end %>
