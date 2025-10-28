@@ -9,6 +9,6 @@ class IconButtonComponent < ViewComponent::Base
   end
 
   def icon_tag
-    icon("fa-solid", @icon, class: @color)
+    helpers.icon("fa-solid", @icon, class: @color)
   end
 end

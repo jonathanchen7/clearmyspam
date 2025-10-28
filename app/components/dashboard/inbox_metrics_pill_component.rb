@@ -4,7 +4,7 @@ module Dashboard
 
     def initialize(value, icon:, suffix:)
       @value = value || 0
-      @icon = icon
+      @pill_icon = icon
       @suffix = suffix
     end
 
