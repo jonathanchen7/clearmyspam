@@ -5,7 +5,7 @@
   data-email-id-value="<%= email.vendor_id %>"
   data-protected-value="<%= email.protected? %>"
   data-action="click->sender-drawer#selectEmail"
->
+  >
   <div class="min-h-4 min-w-4 sm:min-h-3.5 sm:min-w-3.5 rounded text-primary-400 flex flex-row items-center gap-x-3">
     <%= check_box_tag(email.vendor_id,
                       false,
@@ -17,7 +17,7 @@
     <div class="flex flex-col overflow-hidden">
       <div class="sm:flex items-start gap-x-3">
         <div class="flex items-center gap-x-2 max-w-full">
-          <%= icon("fa-solid", "lock", class: "text-success text-xs") if email.protected? %>
+          <%= helpers.icon("fa-solid", "lock", class: "text-success text-xs") if email.protected? %>
           <p class="text-sm text-gray-900 truncate font-medium"><%= email_subject %></p>
         </div>
       </div>
@@ -37,15 +37,15 @@
       data-action="click->sender-drawer#toggleProtection"
       data-sender-drawer-email-id-param="<%= email.vendor_id %>"
       data-sender-drawer-protected-param="<%= email.protected? %>"
-    >
+      >
       <%= toggle_protection_button_icon %>
     </button>
-  <% if email.actionable? && !email.sender.protected %>
+    <% if email.actionable? && !email.sender.protected %>
       <button
         class="flex items-center justify-center h-8 w-8 rounded-full hover:enabled:bg-gray-100 hover:duration-200 disabled:opacity-50"
         data-action="click->sender-drawer#dispose"
         data-sender-drawer-email-id-param="<%= email.vendor_id %>"
-      >
+        >
         <%= dispose_button_icon %>
       </button>
     <% end %>

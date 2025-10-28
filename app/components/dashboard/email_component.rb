@@ -31,7 +31,7 @@ module Dashboard
     end
 
     def dispose_button_icon
-      icon("fa-solid", Current.options.archive ? "box-archive" : "trash-can", class: "text-danger")
+      helpers.icon("fa-solid", Current.options.archive ? "box-archive" : "trash-can", class: "text-danger")
     end
 
     private
