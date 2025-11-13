@@ -3,32 +3,27 @@
   <!-- Usage Metrics Cards -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
     <% usage_metrics = metrics.usage_metrics_with_trends %>
-    
     <%= render Admin::TrendCardComponent.new(
       title: "Total Emails Disposed",
       value: usage_metrics[:total_emails_disposed],
       icon: "fas fa-trash"
     ) %>
-    
     <%= render Admin::TrendCardComponent.new(
       title: "Archived Emails",
       value: usage_metrics[:archived_emails],
       icon: "fas fa-archive"
     ) %>
-    
     <%= render Admin::TrendCardComponent.new(
       title: "Trashed Emails",
       value: usage_metrics[:trashed_emails],
       icon: "fas fa-trash-alt"
     ) %>
-    
     <%= render Admin::TrendCardComponent.new(
       title: "Avg Emails per User",
       value: usage_metrics[:average_emails_per_user],
       icon: "fas fa-chart-line"
     ) %>
   </div>
-
   <!-- Top Users by Email Disposal Table -->
   <div>
     <%= render Admin::PaginatedTableComponent.new(
@@ -44,7 +39,6 @@
       pagination_params: { date_range: params[:date_range], tab: "usage" }
     ) %>
   </div>
-
   <!-- Additional Usage Insights -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
     <div class="bg-white rounded-lg shadow p-6 border border-gray-200">
@@ -69,13 +63,12 @@
         </div>
       </div>
     </div>
-
     <div class="bg-white rounded-lg shadow p-6 border border-gray-200">
       <h3 class="text-lg font-semibold text-gray-900 mb-4">Usage Insights</h3>
       <div class="space-y-3">
         <div class="flex justify-between">
-          <span class="text-sm text-gray-600">Total Unsubscribes</span>
-          <span class="text-sm font-medium text-gray-900"><%= usage_metrics[:unsubscribe_count] %></span>
+          <span class="text-sm text-gray-600">Successful Unsubscribes</span>
+          <span class="text-sm font-medium text-gray-900"><%= usage_metrics[:successful_unsubscribe_count] %></span>
         </div>
         <div class="flex justify-between">
           <span class="text-sm text-gray-600">Active Users in Period</span>

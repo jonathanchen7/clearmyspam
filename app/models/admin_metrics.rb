@@ -163,7 +163,8 @@ class AdminMetrics
       archived_emails: emails_disposed[:archived],
       trashed_emails: emails_disposed[:trashed],
       average_emails_per_user: average_emails_per_user,
-      unsubscribe_count: Metrics.sum(:unsubscribe_count)
+      successful_unsubscribe_count: Metrics.sum(:successful_unsubscribe_count),
+      failed_unsubscribe_count: Metrics.sum(:failed_unsubscribe_count)
     }
   end
 
