@@ -1,0 +1,18 @@
+<div class="flex items-center gap-3 mb-6">
+  <label for="sort-select" class="text-sm font-medium text-gray-700">
+    Sort by:
+  </label>
+  <select 
+    id="sort-select" 
+    data-admin-target="sortSelect"
+    data-action="change->admin#updateSort"
+    class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
+  >
+    <% metrics.sort_options.each do |option| %>
+      <option value="<%= option[:value] %>" <%= 'selected' if current_sort == option[:value] %>>
+        <%= option[:label] %>
+      </option>
+    <% end %>
+  </select>
+</div>
+

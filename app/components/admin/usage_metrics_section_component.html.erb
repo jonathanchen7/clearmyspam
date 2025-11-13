@@ -1,0 +1,33 @@
+<div class="bg-white rounded-lg shadow p-6 border border-gray-200 mb-6">
+  <h2 class="text-lg font-semibold text-gray-900 mb-4">Usage</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <%= render Admin::MetricCardComponent.new(
+      title: "Disposed Emails",
+      value: metrics.total_disposed_emails
+    ) %>
+    <%= render Admin::MetricCardComponent.new(
+      title: "Archived Emails",
+      value: metrics.total_archived_emails
+    ) %>
+    <%= render Admin::MetricCardComponent.new(
+      title: "Trashed Emails",
+      value: metrics.total_trashed_emails
+    ) %>
+    <%= render Admin::MetricCardComponent.new(
+      title: "Avg Emails Disposed per User",
+      value: metrics.average_emails_disposed_per_user
+    ) %>
+    <%= render Admin::MetricCardComponent.new(
+      title: "Emails Moved",
+      value: metrics.total_emails_moved
+    ) %>
+    <%= render Admin::MetricCardComponent.new(
+      title: "Successful Unsubscribes",
+      value: metrics.total_successful_unsubscribes
+    ) %>
+    <%= render Admin::MetricCardComponent.new(
+      title: "Failed Unsubscribes",
+      value: metrics.total_failed_unsubscribes
+    ) %>
+  </div>
+</div>

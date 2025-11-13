@@ -1,0 +1,21 @@
+<div class="bg-white rounded-lg shadow p-6 border border-gray-200 mb-6">
+  <h2 class="text-lg font-semibold text-gray-900 mb-4">Users</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <%= render Admin::MetricCardComponent.new(
+      title: "Signed Up Users",
+      value: metrics.signed_up_users_count
+    ) %>
+    <%= render Admin::MetricCardComponent.new(
+      title: "Logged in Users",
+      value: metrics.logged_in_users_count
+    ) %>
+    <%= render Admin::MetricCardComponent.new(
+      title: "Users Converted",
+      value: metrics.users_converted_count
+    ) %>
+    <%= render Admin::MetricCardComponent.new(
+      title: "Conversion Rate",
+      value: "#{metrics.conversion_rate}%"
+    ) %>
+  </div>
+</div>

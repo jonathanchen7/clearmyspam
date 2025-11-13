@@ -1,0 +1,27 @@
+<div class="bg-white rounded-lg shadow p-4 border border-gray-200 mb-4">
+  <div class="flex items-center justify-between">
+    <div>
+      <label for="date-range-select" class="block text-sm font-medium text-gray-700 mb-1">
+        Date Range
+      </label>
+      <p class="text-xs text-gray-500">
+        <%= metrics.start_date.strftime("%b %d, %Y") %> - <%= metrics.end_date.strftime("%b %d, %Y") %>
+      </p>
+    </div>
+    <div class="flex items-center gap-3">
+      <select 
+        id="date-range-select" 
+        data-admin-target="dateRangeSelect"
+        data-action="change->admin#updateDateRange"
+        class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
+        data-action="change->admin#updateDateRange"
+        >
+        <% metrics.date_range_options.each do |option| %>
+          <option value="<%= option[:value] %>" <%= 'selected' if current_date_range == option[:value] %>>
+            <%= option[:label] %>
+          </option>
+          <% end %>
+        </select>
+      </div>
+    </div>
+  </div>

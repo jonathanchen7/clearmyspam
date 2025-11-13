@@ -1,50 +1,123 @@
-<div class="bg-white rounded-lg shadow border border-gray-200">
-  <div class="px-6 py-4 border-b border-gray-200">
-    <h3 class="text-lg font-semibold text-gray-900"><%= title %></h3>
-  </div>
+<div class="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
   <div class="overflow-x-auto">
     <table class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-50">
         <tr>
-          <% columns.each do |column| %>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              <%= column[:header] %>
-            </th>
-          <% end %>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+            User
+          </th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+            Plan Type
+          </th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+            Last Sign In / Sign Up
+          </th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+            Total Disposed Emails
+          </th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+            Disposed in Range
+          </th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+            Moved Emails
+          </th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+            Unsubscribed Emails
+          </th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+            Total Threads
+          </th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+            Unread Threads
+          </th>
         </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
-        <% users.each do |user| %>
-          <tr>
-            <% columns.each do |column| %>
+        <% if users.any? %>
+          <% users.each do |user| %>
+            <tr class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap">
-                <% case column[:type] %>
-                <% when :user_info %>
-                  <div class="flex items-center">
-                    <div class="flex-shrink-0 h-10 w-10">
-                      <%= user_avatar(user) %>
-                    </div>
-                    <div class="ml-4">
-                      <div class="text-sm font-medium text-gray-900"><%= user.name %></div>
-                      <div class="text-sm text-gray-500"><%= user.email %></div>
-                    </div>
+                <div class="flex items-center">
+                  <%= image_tag user.image || "https://ui-avatars.com/api/?name=#{CGI.escape(user.name)}",
+                                alt: user.name,
+                                class: "h-10 w-10 rounded-full" %>
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900"><%= user.name %></div>
+                    <div class="text-sm text-gray-500"><%= user.email %></div>
                   </div>
-                <% when :text %>
-                  <div class="text-sm text-gray-900"><%= user.send(column[:field]) %></div>
-                <% when :date %>
-                  <div class="text-sm text-gray-900"><%= user.send(column[:field]).strftime("%b %d, %Y") %></div>
-                <% when :plan_badge %>
-                  <%= user_plan_badge(user) %>
-                <% when :onboarding_badge %>
-                  <%= onboarding_status_badge(user) %>
-                <% when :custom %>
-                  <%= column[:render].call(user) %>
-                <% end %>
+                </div>
               </td>
-            <% end %>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= plan_type_color_class(user) %>">
+                  <%= plan_type_display(user) %>
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <div>
+                  <div class="font-medium text-gray-900"><%= user.last_login_at.strftime("%b %d, %Y") %></div>
+                  <div class="text-xs text-gray-400">Signed up: <%= user.created_at.strftime("%b %d, %Y") %></div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <%= total_disposed_count(user) %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <%= disposed_in_range_count(user) %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <%= move_count(user) %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <%= unsubscribe_count(user) %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <div>
+                  <div class="font-medium text-gray-900"><%= user.metrics&.total_threads || 0 %></div>
+                  <div class="text-xs text-gray-400">Initial: <%= user.metrics&.initial_total_threads || 0 %></div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <div>
+                  <div class="font-medium text-gray-900"><%= user.metrics&.unread_threads || 0 %></div>
+                  <div class="text-xs text-gray-400">Initial: <%= user.metrics&.initial_unread_threads || 0 %></div>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="9" class="px-6 py-4 text-center text-sm text-gray-500">
+              No users found
+            </td>
           </tr>
         <% end %>
       </tbody>
     </table>
   </div>
+  <% if users.respond_to?(:current_page) && users.total_pages > 1 %>
+    <div class="bg-gray-50 px-6 py-3 border-t border-gray-200">
+      <div class="flex items-center justify-between">
+        <div class="text-sm text-gray-700">
+          Showing <%= users.offset_value + 1 %> to <%= [users.offset_value + users.limit_value, users.total_count].min %>
+          of <%= users.total_count %> users
+        </div>
+        <div class="flex gap-2">
+          <% if users.prev_page %>
+            <%= link_to "Previous", 
+                        admin_path(pagination_params.merge(page: users.prev_page)), 
+                        class: "px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100" %>
+          <% else %>
+            <span class="px-3 py-1 text-sm border border-gray-300 rounded-md text-gray-400 cursor-not-allowed">Previous</span>
+          <% end %>
+          <% if users.next_page %>
+            <%= link_to "Next", 
+                        admin_path(pagination_params.merge(page: users.next_page)), 
+                        class: "px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-100" %>
+          <% else %>
+            <span class="px-3 py-1 text-sm border border-gray-300 rounded-md text-gray-400 cursor-not-allowed">Next</span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
 </div>

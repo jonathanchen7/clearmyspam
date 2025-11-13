@@ -1,72 +1,26 @@
-<div class="min-h-screen">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="min-h-screen bg-gray-50" data-controller="admin">
+  <div class="max-w-[98%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Header -->
-    <div class="mb-8">
+    <div class="mb-6">
       <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-      <p class="mt-2 text-sm text-gray-600">
-        Comprehensive analytics for user activity, sign-ups, and engagement
-      </p>
     </div>
-
-    <!-- Global Metrics Overview -->
-    <div class="bg-white rounded-lg shadow p-6 mb-8 border border-gray-200">
-      <h2 class="text-lg font-semibold text-gray-900 mb-4">Global Overview (All Time)</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <%= render Admin::MetricCardComponent.new(
-          title: "Total Users",
-          value: @metrics.global_metrics[:total_users],
-          icon: '<i class="fas fa-users"></i>'
-        ) %>
-        <%= render Admin::MetricCardComponent.new(
-          title: "Total Emails Disposed",
-          value: @metrics.global_metrics[:total_emails_disposed],
-          icon: '<i class="fas fa-trash"></i>'
-        ) %>
-        <%= render Admin::MetricCardComponent.new(
-          title: "Onboarding Rate",
-          value: "#{@metrics.global_metrics[:onboarding_completion_rate]}%",
-          icon: '<i class="fas fa-check-circle"></i>'
-        ) %>
-        <%= render Admin::MetricCardComponent.new(
-          title: "Conversion Rate",
-          value: "#{@metrics.global_metrics[:conversion_rate]}%",
-          icon: '<i class="fas fa-chart-line"></i>'
-        ) %>
-      </div>
-    </div>
-
-    <!-- Date Range Selector -->
-    <div class="bg-white rounded-lg shadow p-6 mb-8 border border-gray-200">
-      <div class="flex items-center justify-between">
-        <div>
-          <h2 class="text-lg font-semibold text-gray-900">Date Range</h2>
-          <p class="text-sm text-gray-600">
-            <%= @start_date.strftime("%b %d, %Y") %> - <%= @end_date.strftime("%b %d, %Y") %>
-          </p>
-        </div>
-        <div class="flex items-center space-x-4">
-          <select id="date-range-select" class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-            <% @metrics.date_range_options.each do |option| %>
-              <option value="<%= option[:value] %>" <%= 'selected' if params[:date_range] == option[:value] || (params[:date_range].blank? && option[:value] == 'past_week') %>>
-                <%= option[:label] %>
-              </option>
-            <% end %>
-          </select>
-          <button onclick="updateDateRange()" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            Update
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <%= render Admin::TabsComponent.new(active_tab: @active_tab, metrics: @metrics) %>
+    <!-- Date Range Filter -->
+    <%= render Admin::DateRangeFilterComponent.new(
+      metrics: @metrics,
+      current_date_range: @current_date_range
+    ) %>
+    <!-- Metrics Sections -->
+    <%= render Admin::UsersMetricsSectionComponent.new(metrics: @metrics) %>
+    <%= render Admin::UsageMetricsSectionComponent.new(metrics: @metrics) %>
+    <!-- Sort Dropdown -->
+    <%= render Admin::SortDropdownComponent.new(
+      metrics: @metrics,
+      current_sort: @sort_by
+    ) %>
+    <!-- Users Table -->
+    <%= render Admin::UsersTableComponent.new(
+      users: @metrics.users,
+      metrics: @metrics
+    ) %>
   </div>
-
-  <script>
-    function updateDateRange() {
-      const select = document.getElementById('date-range-select');
-      const selectedValue = select.value;
-      const currentTab = new URLSearchParams(window.location.search).get('tab') || 'usage';
-      window.location.href = `/admin?date_range=${selectedValue}&tab=${currentTab}`;
-    }
-  </script>
+</div>

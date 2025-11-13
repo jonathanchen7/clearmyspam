@@ -1,16 +1,9 @@
-<div class="bg-white rounded-lg shadow p-6 border border-gray-200">
-  <div class="flex items-center">
-    <div class="flex-shrink-0">
-      <div class="w-8 h-8 bg-gray-100 text-gray-600 rounded-md flex items-center justify-center">
-        <%= icon.html_safe %>
-      </div>
-    </div>
-    <div class="ml-4">
-      <p class="text-sm font-medium text-gray-500"><%= title %></p>
-      <p class="text-2xl font-semibold text-gray-900"><%= value %></p>
-      <% if subtitle.present? %>
-        <p class="text-xs text-gray-500"><%= subtitle %></p>
-      <% end %>
-    </div>
+<div class="bg-white rounded-lg shadow p-4 border border-gray-200">
+  <div>
+    <p class="text-sm font-medium text-gray-500"><%= title %></p>
+    <p class="text-2xl font-semibold text-gray-900"><%= value %></p>
+    <% if subtitle.present? %>
+      <p class="text-xs text-gray-500"><%= subtitle %></p>
+    <% end %>
   </div>
 </div>

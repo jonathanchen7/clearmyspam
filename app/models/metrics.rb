@@ -23,7 +23,35 @@
 class Metrics < ApplicationRecord
   belongs_to :user
 
-  def disposed_count
-    archived_count + trashed_count
+  def disposed_count(range: nil)
+    range.present? ? archived_count(range: range) + trashed_count(range: range) : archived_count + trashed_count
+  end
+
+  def archived_count(range: nil)
+    range.present? ? sum_in_range(range, :archived_count) : read_attribute(:archived_count)
+  end
+
+  def trashed_count(range: nil)
+    range.present? ? sum_in_range(range, :trashed_count) : read_attribute(:trashed_count)
+  end
+
+  def moved_count(range: nil)
+    range.present? ? sum_in_range(range, :moved_count) : read_attribute(:moved_count)
+  end
+
+  def successful_unsubscribe_count(range: nil)
+    range.present? ? sum_in_range(range, :successful_unsubscribe_count) : read_attribute(:successful_unsubscribe_count)
+  end
+
+  def failed_unsubscribe_count(range: nil)
+    range.present? ? sum_in_range(range, :failed_unsubscribe_count) : read_attribute(:failed_unsubscribe_count)
+  end
+
+  private
+
+  def sum_in_range(range, field)
+    user.daily_metrics
+        .where(date: range.begin..range.end)
+        .sum(field)
   end
 end

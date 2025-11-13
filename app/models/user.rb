@@ -134,7 +134,7 @@ class User < ApplicationRecord
 
   def daily_metric
     @daily_metric ||= daily_metrics.find_or_create_by(
-      date: Date.today,
+      date: Date.current,
       total_threads: metrics.total_threads,
       unread_threads: metrics.unread_threads
     )

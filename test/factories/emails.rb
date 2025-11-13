@@ -4,7 +4,7 @@ FactoryBot.define do
   factory :email do
     transient do
       sender { build(:sender) }
-      date { Date.today }
+      date { Date.current }
     end
 
     vendor_id { SecureRandom.hex(16) }
