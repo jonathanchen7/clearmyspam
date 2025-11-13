@@ -28,10 +28,13 @@ class User < ApplicationRecord
   has_one :active_account_plan, -> { order(created_at: :desc) }, class_name: "AccountPlan"
   has_one :option, autosave: true
   has_one :metrics
+  has_many :daily_metrics, class_name: "DailyMetrics"
+
   has_many :email_tasks
   has_many :pending_email_disposals
   has_many :protected_emails
   has_many :protected_senders
+
   attribute :google_access_token, :string
   attribute :google_access_token_expires_at, :datetime
 
@@ -127,6 +130,14 @@ class User < ApplicationRecord
 
   def gmail_client
     @gmail_client ||= Gmail::Client.new(self)
+  end
+
+  def daily_metric
+    @daily_metric ||= daily_metrics.find_or_create_by(
+      date: Date.today,
+      total_threads: metrics.total_threads,
+      unread_threads: metrics.unread_threads
+    )
   end
 
   def brand_new?

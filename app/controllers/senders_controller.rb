@@ -43,13 +43,25 @@ class SendersController < AuthenticatedController
     sender_emails, _page_token = client.get_emails!(query: sender.query_string, max_results: 3)
 
     url = nil
+    successful_unsubscribe = false
     sender_emails.each do |email|
-      url = UnsubscribeLinkFinder.find_link!(current_user, email)
+      begin
+        puts "Finding unsubscribe link for email: #{email.vendor_id}"
+        url = UnsubscribeLinkFinder.find_link!(current_user, email)
+      rescue => e
+        Honeybadger.notify(e)
+      end
+
       if url.present?
-        current_user.metrics.unsubscribe_count += 1
-        current_user.metrics.save!
+        successful_unsubscribe = true
         break
       end
+    end
+
+    if successful_unsubscribe
+      current_user.daily_metric.increment_successful_unsubscribe_count!
+    else
+      current_user.daily_metric.increment_failed_unsubscribe_count!
     end
 
     render json: { success: true, url: url }

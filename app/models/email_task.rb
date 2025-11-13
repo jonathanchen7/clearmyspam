@@ -35,8 +35,7 @@ class EmailTask < ApplicationRecord
 
       vendor_ids = tasks.map(&:vendor_id)
       user.gmail_client.archive_threads!(vendor_ids)
-      user.metrics.archived_count += vendor_ids.count
-      user.metrics.save!
+      user.daily_metric.increment_archived_count!(by: vendor_ids.count)
     end
 
     def process_trash_tasks!(user, tasks)
@@ -44,8 +43,7 @@ class EmailTask < ApplicationRecord
 
       vendor_ids = tasks.map(&:vendor_id)
       user.gmail_client.trash_threads!(vendor_ids)
-      user.metrics.trashed_count += vendor_ids.count
-      user.metrics.save!
+      user.daily_metric.increment_trashed_count!(by: vendor_ids.count)
     end
 
     def process_move_tasks!(user, tasks)
@@ -56,8 +54,7 @@ class EmailTask < ApplicationRecord
         user.gmail_client.move_threads!(thread_ids: vendor_ids, label_id: label_id)
       end
 
-      user.metrics.moved_count += tasks.count
-      user.metrics.save!
+      user.daily_metric.increment_moved_count!(by: tasks.count)
     end
   end
 
@@ -65,10 +62,13 @@ class EmailTask < ApplicationRecord
     case task_type
     when "archive"
       user.gmail_client.archive_threads!([vendor_id])
+      user.daily_metric.increment_archived_count!
     when "trash"
       user.gmail_client.trash_threads!([vendor_id])
+      user.daily_metric.increment_trashed_count!
     when "move"
       user.gmail_client.move_threads!(thread_ids: [vendor_id], label_id: payload["label_id"])
+      user.daily_metric.increment_moved_count!
     end
   end
 
