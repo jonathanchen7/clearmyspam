@@ -46,7 +46,6 @@ class SendersController < AuthenticatedController
     successful_unsubscribe = false
     sender_emails.each do |email|
       begin
-        puts "Finding unsubscribe link for email: #{email.vendor_id}"
         url = UnsubscribeLinkFinder.find_link!(current_user, email)
       rescue => e
         Honeybadger.notify(e)
