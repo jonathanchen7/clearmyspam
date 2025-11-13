@@ -84,8 +84,6 @@ class User < ApplicationRecord
   def refresh_google_auth!(force: false, session: nil)
     return unless force || google_auth_expired?
 
-    Rails.logger.info("Refreshing Google access token for user: #{id}".on_blue)
-
     response = oauth_client.fetch_access_token!
     update(
       google_access_token: response["access_token"],

@@ -31,7 +31,11 @@ class ProcessEmailTasksJob < ApplicationJob
 
   def acquire_advisory_lock
     lock_key = "process_email_tasks:#{user.id}"
-    ApplicationRecord.sanitize_sql_for_conditions(["pg_try_advisory_xact_lock(?)", Zlib.crc32(lock_key)])
+    lock_id = Zlib.crc32(lock_key)
+    ApplicationRecord.connection.select_value(
+      "SELECT pg_try_advisory_xact_lock(#{lock_id})",
+      "Advisory Lock Check"
+    )
   end
 
   def email_tasks
