@@ -93,24 +93,37 @@ class SendersController < AuthenticatedController
   end
 
   def dispose_all
-    raise "User #{current_user.id} attempted to dispose emails but is disabled." if current_user.disable_dispose?
+    if current_user.disable_dispose?
+      toast.error(
+        I18n.t("toasts.dispose.free_trial_limit.title", dispose: dispose_verb),
+        text: I18n.t("toasts.dispose.free_trial_limit.text", dispose: dispose_verb),
+      ).with_confirm_cta(
+        I18n.t("toasts.dispose.free_trial_limit.cta"),
+        stimulus_data: Views::StimulusData.new(
+          controllers: "pricing",
+          actions: { "click" => "pricing#checkout" },
+          values: { "pricing" => { "plan-type" => "monthly" } },
+          include_controller: true
+        )
+      )
+    else
+      actionable_sender_ids = ProtectedSender.actionable_sender_ids(current_user, senders.map(&:id))
+      actionable_senders = inbox.senders_lookup(actionable_sender_ids)
+      return if actionable_senders.blank?
 
-    actionable_sender_ids = ProtectedSender.actionable_sender_ids(current_user, senders.map(&:id))
-    actionable_senders = inbox.senders_lookup(actionable_sender_ids)
-    return if actionable_senders.blank?
+      result = Gmail::SenderDisposer.new(current_user, actionable_senders).dispose_all!
 
-    result = Gmail::SenderDisposer.new(current_user, actionable_senders).dispose_all!
+      disposed_senders = inbox.remove_senders(result.fully_disposed_sender_ids)
+      result.partially_disposed_senders.each { |sender, count| inbox.decrease_sender_email_count(sender.id, count) }
 
-    disposed_senders = inbox.remove_senders(result.fully_disposed_sender_ids)
-    result.partially_disposed_senders.each { |sender, count| inbox.decrease_sender_email_count(sender.id, count) }
-
-    toast_title = I18n.t("toasts.dispose_all_from_senders.success.title", disposing: disposing_verb.capitalize, disposed_count: result.disposed_email_ids.count)
-    toast_text = I18n.t("toasts.dispose_all_from_senders.success.text",
-                        disposing: disposing_verb.capitalize,
-                        disposed_count: result.disposed_email_ids.count,
-                        sender: (disposed_senders.first || result.partially_disposed_senders.first&.first)&.email,
-                        count: disposed_senders.size + result.partially_disposed_senders.size).html_safe
-    toast.success(toast_title, text: toast_text)
+      toast_title = I18n.t("toasts.dispose_all_from_senders.success.title", disposing: disposing_verb.capitalize, disposed_count: result.disposed_email_ids.count)
+      toast_text = I18n.t("toasts.dispose_all_from_senders.success.text",
+                          disposing: disposing_verb.capitalize,
+                          disposed_count: result.disposed_email_ids.count,
+                          sender: (disposed_senders.first || result.partially_disposed_senders.first&.first)&.email,
+                          count: disposed_senders.size + result.partially_disposed_senders.size).html_safe
+      toast.success(toast_title, text: toast_text)
+    end
 
     render turbo_stream: build_turbo_stream(toast: toast)
   end

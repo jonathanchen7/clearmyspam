@@ -43,20 +43,33 @@ class EmailsController < AuthenticatedController
   end
 
   def dispose
-    raise "User #{current_user.id} attempted to dispose emails but is disabled." if current_user.disable_dispose?
+    if current_user.disable_dispose?
+      toast.error(
+        I18n.t("toasts.dispose.free_trial_limit.title", dispose: dispose_verb),
+        text: I18n.t("toasts.dispose.free_trial_limit.text", dispose: dispose_verb)
+      ).with_confirm_cta(
+        I18n.t("toasts.dispose.free_trial_limit.cta"),
+        stimulus_data: Views::StimulusData.new(
+          controllers: "pricing",
+          actions: { "click" => "pricing#checkout" },
+          values: { "pricing" => { "plan-type" => "monthly" } },
+          include_controller: true
+        )
+      )
+    else
+      ApplicationRecord.transaction do
+        selected_email_ids = params.require(:email_ids)
+        actionable_email_ids = ProtectedEmail.actionable_email_ids(current_user, selected_email_ids)
+        actionable_email_ids = actionable_email_ids.first(current_user.remaining_disposal_count) if current_user.unpaid?
 
-    ApplicationRecord.transaction do
-      selected_email_ids = params.require(:email_ids)
-      actionable_email_ids = ProtectedEmail.actionable_email_ids(current_user, selected_email_ids)
-      actionable_email_ids = actionable_email_ids.first(current_user.remaining_disposal_count) if current_user.unpaid?
-
-      if actionable_email_ids.blank?
-        toast.info I18n.t("toasts.dispose.no_emails.title", dispose: dispose_verb)
-      else
-        Email.dispose_all!(current_user, vendor_ids: actionable_email_ids)
-        @drawer_emails&.reject! { |email| actionable_email_ids.include?(email.vendor_id) }
-        inbox.decrease_sender_email_count(@drawer_sender.id, actionable_email_ids.count)
-        toast.success I18n.t("toasts.dispose.success.title", count: actionable_email_ids.count, disposed: disposed_verb)
+        if actionable_email_ids.blank?
+          toast.info I18n.t("toasts.dispose.no_emails.title", dispose: dispose_verb)
+        else
+          Email.dispose_all!(current_user, vendor_ids: actionable_email_ids)
+          @drawer_emails&.reject! { |email| actionable_email_ids.include?(email.vendor_id) }
+          inbox.decrease_sender_email_count(@drawer_sender.id, actionable_email_ids.count)
+          toast.success I18n.t("toasts.dispose.success.title", count: actionable_email_ids.count, disposed: disposed_verb)
+        end
       end
     end
 
