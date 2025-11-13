@@ -144,6 +144,10 @@ class User < ApplicationRecord
     created_at == last_login_at
   end
 
+  def granted_permissions?
+    google_refresh_token.present?
+  end
+
   private
 
   def oauth_client
