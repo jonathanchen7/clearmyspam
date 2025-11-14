@@ -32,10 +32,14 @@ class ProcessEmailTasksJob < ApplicationJob
   def acquire_advisory_lock
     lock_key = "process_email_tasks:#{user.id}"
     lock_id = Zlib.crc32(lock_key)
-    ApplicationRecord.connection.select_value(
-      "SELECT pg_try_advisory_xact_lock(#{lock_id})",
-      "Advisory Lock Check"
+    acquired = ActiveRecord::Base.connection.select_value(
+      ActiveRecord::Base.send(
+        :sanitize_sql_array,
+        ["SELECT pg_try_advisory_xact_lock(?)", lock_id]
+      )
     )
+
+    acquired
   end
 
   def email_tasks
