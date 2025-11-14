@@ -9,10 +9,8 @@ class ReEngageUnpaidUsersJob < ApplicationJob
     @date_range = date_range
 
     active_unpaid_users.each do |user|
-      puts "USER: #{user.email}"
       next if user.sent_email?("re_engagement") && user.sent_email?("re_engagement_reminder")
 
-      puts "SENDING AN EMAIL!"
       if !user.sent_email?("re_engagement")
         SentEmail.send_re_engagement_email!(user)
       elsif user.sent_emails.find_by(email_type: "re_engagement").sent_at < 3.days.ago
