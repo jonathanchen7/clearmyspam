@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <style>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <style>
       body {
           margin: 0;
           padding: 0;
@@ -25,7 +25,7 @@
 
       .text-preview {
         display: none;
-        font-size: 1px; 
+        font-size: 1px;
         color: #ffffff;
         line-height: 1px;
         max-height: 0px;
@@ -50,6 +50,7 @@
           background-color: #f8f9fa;
           border-left: 4px solid #1467c6;
           border-radius: 4px;
+          color: #1467c6;
       }
 
       .content-image {
@@ -116,57 +117,53 @@
       img {
           margin: 12px 0;
       }
-  </style>
-</head>
-
-<body>
-  <% if @text_preview %>
-    <div class="text-preview">
-      <%= @text_preview %>
-    </div>
-  <% end %>
-<table>
-  <tr>
-    <td class="main-content">
-      <div class="container">
-        <div class="content-box">
-          <div style="margin-bottom: 12px">
-            <%= image_tag "logo.png", alt: "Clear My Spam logo", style: "margin: 0 0; height: 32px; width: auto; display: inline-block; vertical-align: middle;" %>
-            <span style="font-weight: 600; vertical-align: middle; padding-left: 4px;">clear my spam</span>
+    </style>
+  </head>
+  <body>
+    <% if @text_preview %>
+      <div class="text-preview">
+        <%= @text_preview %>
+      </div>
+    <% end %>
+    <table>
+      <tr>
+        <td class="main-content">
+          <div class="container">
+            <div class="content-box">
+              <div style="margin-bottom: 12px">
+                <%= image_tag "logo.png", alt: "Clear My Spam logo", style: "margin: 0 0; height: 32px; width: auto; display: inline-block; vertical-align: middle;" %>
+                <span style="font-weight: 600; vertical-align: middle; padding-left: 4px;">clear my spam</span>
+              </div>
+              <%= yield %>
+              <table style="width: 100%;">
+                <tr>
+                  <td style="padding-bottom: 6px;">Until next time!</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 600;">Jonathan</td>
+                </tr>
+              </table>
+            </div>
           </div>
-
-          <%= yield %>
-
-          <table style="width: 100%;">
-            <tr>
-              <td style="padding-bottom: 6px;">Until next time!</td>
-            </tr>
-            <tr>
-              <td style="font-weight: 600;">Jonathan</td>
-            </tr>
-          </table>
-        </div>
-      </div>
-    </td>
-  </tr>
-
-  <tr>
-    <td class="footer">
-      <div class="container">
-        <div class="footer-text">
-          <%= Time.current.year %> Clear My Spam. All rights reserved.
-        </div>
-        <div class="footer-links">
-          <a href="https://clearmyspam.com/faq" class="footer-link">FAQ</a>
-          <a href="https://clearmyspam.com/terms" class="footer-link">Terms of Service</a>
-          <a href="https://clearmyspam.com/privacy" class="footer-link">Privacy Policy</a>
-          <% if @is_marketing_email %>
-            <a href="<%= Rails.application.routes.url_helpers.marketing_unsubscribe_url(email: @user.email, host: 'clearmyspam.com') %>" class="footer-link">Unsubscribe</a>
-          <% end %>
-        </div>
-      </div>
-    </td>
-  </tr>
-</table>
-</body>
+        </td>
+      </tr>
+      <tr>
+        <td class="footer">
+          <div class="container">
+            <div class="footer-text">
+              <%= Time.current.year %> Clear My Spam. All rights reserved.
+            </div>
+            <div class="footer-links">
+              <a href="https://clearmyspam.com/faq" class="footer-link">FAQ</a>
+              <a href="https://clearmyspam.com/terms" class="footer-link">Terms of Service</a>
+              <a href="https://clearmyspam.com/privacy" class="footer-link">Privacy Policy</a>
+              <% if @is_marketing_email %>
+                <a href="<%= Rails.application.routes.url_helpers.marketing_unsubscribe_url(email: @user.email, host: 'clearmyspam.com') %>" class="footer-link">Unsubscribe</a>
+              <% end %>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </body>
 </html>

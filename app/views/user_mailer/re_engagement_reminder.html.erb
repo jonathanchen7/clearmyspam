@@ -1,0 +1,27 @@
+<div class="content-section">
+  <h2>
+    Your $<%= SentEmail::RE_ENGAGEMENT_COUPON_DISCOUNT_DOLLARS %> credit is expiring soon
+  </h2>
+  <p>
+    Hi there, just wanted to remind you that your
+    <strong>$<%= SentEmail::RE_ENGAGEMENT_COUPON_DISCOUNT_DOLLARS %> credit</strong>
+    is expiring in a few days. Don't miss out on the opportunity to clear your inbox the easy way!
+  </p>
+</div>
+<div class="callout-section">
+  <p>
+    This credit is good for any Clear My Spam plan.
+  </p>
+  <p style="margin: 8px 0 0 0; font-weight: 600;">
+    <%= @discount_code %>
+  </p>
+</div>
+<div class="content-section">
+  <p>
+    We want to be respectful of your inbox, so this is the last reminder we'll be sending.
+    If you don't want to hear from us in the future, feel free to unsubscribe below.
+  </p>
+</div>
+<div class="content-section" style="text-align: center;">
+  <a href="https://clearmyspam.com/app" class="button">Try Clear My Spam again →</a>
+</div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_13_032436) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_14_062455) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -202,11 +202,23 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_13_032436) do
     t.index ["sender_id", "user_id"], name: "index_protected_senders_on_sender_id_and_user_id", unique: true
   end
 
+  create_table "sent_emails", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email_type", null: false
+    t.jsonb "metadata_json", default: {}, null: false
+    t.datetime "sent_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "updated_at", null: false
+    t.uuid "user_id", null: false
+    t.index ["user_id", "email_type"], name: "index_sent_emails_on_user_id_and_email_type", unique: true
+    t.index ["user_id"], name: "index_sent_emails_on_user_id"
+  end
+
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.boolean "admin", default: false
     t.datetime "created_at", null: false
     t.string "email", null: false
     t.string "google_refresh_token"
+    t.boolean "granted_permissions", default: false
     t.string "image"
     t.datetime "last_login_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.string "name", null: false
@@ -216,4 +228,6 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_13_032436) do
     t.string "vendor_id", null: false
     t.index ["vendor_id"], name: "index_users_on_vendor_id", unique: true
   end
+
+  add_foreign_key "sent_emails", "users", on_delete: :cascade
 end

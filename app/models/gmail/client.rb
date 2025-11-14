@@ -22,6 +22,7 @@ module Gmail
       set_client_authorization
 
       response = client.get_user_label("me", "INBOX")
+      user.update!(granted_permissions: true) unless user.granted_permissions?
 
       [response.threads_total, response.threads_unread]
     end

@@ -6,6 +6,7 @@
 #  admin                   :boolean          default(FALSE)
 #  email                   :string           not null
 #  google_refresh_token    :string
+#  granted_permissions     :boolean          default(FALSE)
 #  image                   :string
 #  last_login_at           :datetime         not null
 #  name                    :string           not null
@@ -34,6 +35,13 @@ class User < ApplicationRecord
   has_many :pending_email_disposals
   has_many :protected_emails
   has_many :protected_senders
+  has_many :sent_emails
+
+  scope :unpaid, -> {
+    where.not(
+      id: AccountPlan.where(plan_type: AccountPlan::PRO_PLAN_TYPES).select(:user_id)
+    )
+  }
 
   attribute :google_access_token, :string
   attribute :google_access_token_expires_at, :datetime
@@ -142,8 +150,8 @@ class User < ApplicationRecord
     created_at == last_login_at
   end
 
-  def granted_permissions?
-    google_refresh_token.present?
+  def sent_email?(email_type)
+    sent_emails.exists?(email_type:)
   end
 
   private
