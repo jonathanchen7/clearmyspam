@@ -103,8 +103,8 @@ class AdminMetrics
 
   def sort_options
     [
-      { label: "Usage (Disposal Count)", value: "disposal_count" },
       { label: "Sign Up Date", value: "signup_date" },
+      { label: "Usage (Disposal Count)", value: "disposal_count" },
       { label: "Login Date", value: "login_date" }
     ]
   end

@@ -37,6 +37,6 @@ class AdminController < ApplicationController
   end
 
   def set_sort_params
-    @sort_by = params[:sort_by] || "disposal_count"
+    @sort_by = params[:sort_by] || "signup_date"
   end
 end
