@@ -9,10 +9,12 @@ development:
   <<: *default
   database: clearmyspam_development
   url: <%= ENV["CLEARMYSPAM_DATABASE_URL_DEVELOPMENT"] %>
+  <% if RUBY_PLATFORM =~ /darwin/ %>gssencmode: disable<% end %>
 test:
   <<: *default
   database: clearmyspam_test
   url: <%= ENV["CLEARMYSPAM_DATABASE_URL_TEST"] %>
+  <% if RUBY_PLATFORM =~ /darwin/ %>gssencmode: disable<% end %>
 
 production:
   <<: *default
