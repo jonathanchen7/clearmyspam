@@ -66,7 +66,7 @@ class User < ApplicationRecord
 
         user.account_plans.build(
           plan_type: "trial",
-          thread_disposal_limit: AccountPlan::DEFAULT_THREAD_DISPOSAL_LIMIT
+          daily_disposal_limit: AccountPlan::TRIAL_DAILY_DISPOSAL_LIMIT
         )
         user.option = Option.new(unread_only: true)
         user.metrics = Metrics.new(
@@ -105,25 +105,11 @@ class User < ApplicationRecord
   end
 
   def disable_dispose?
-    if active_pro?
-      false
-    elsif inactive_pro?
-      true
-    elsif unpaid?
-      metrics.disposed_count >= active_account_plan.thread_disposal_limit
-    else
-      true
-    end
+    active_pro? ? false : daily_metric.disposed_count >= active_account_plan.daily_disposal_limit
   end
 
   def remaining_disposal_count
-    if active_pro?
-      nil
-    elsif unpaid?
-      [active_account_plan.thread_disposal_limit - metrics.disposed_count, 0].max
-    else
-      0
-    end
+    active_pro? ? nil : [active_account_plan.daily_disposal_limit - daily_metric.disposed_count, 0].max
   end
 
   def onboarding_completed?
@@ -139,11 +125,10 @@ class User < ApplicationRecord
   end
 
   def daily_metric
-    @daily_metric ||= daily_metrics.find_or_create_by(
-      date: Date.current,
-      total_threads: metrics.total_threads,
-      unread_threads: metrics.unread_threads
-    )
+    @daily_metric ||= daily_metrics.find_or_create_by(date: Date.current) do |daily_metric|
+      daily_metric.total_threads = metrics.total_threads
+      daily_metric.unread_threads = metrics.unread_threads
+    end
   end
 
   def brand_new?

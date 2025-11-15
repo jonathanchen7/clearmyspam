@@ -3,9 +3,9 @@
 # Table name: account_plans
 #
 #  id                           :uuid             not null, primary key
+#  daily_disposal_limit         :integer
 #  plan_type                    :string           not null
 #  stripe_subscription_ended_at :datetime
-#  thread_disposal_limit        :integer
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
 #  stripe_customer_id           :string
@@ -24,12 +24,12 @@ class AccountPlan < ApplicationRecord
   WEEKLY_PRICE_ID = Rails.application.credentials.dig(:stripe, :weekly_price_id)
   YEARLY_PRICE_ID = Rails.application.credentials.dig(:stripe, :yearly_price_id)
 
-  DEFAULT_THREAD_DISPOSAL_LIMIT = Rails.configuration.trial_thread_disposal_limit
+  TRIAL_DAILY_DISPOSAL_LIMIT = Rails.configuration.trial_daily_disposal_limit
 
   belongs_to :user
 
   validates :plan_type, inclusion: { in: PRO_PLAN_TYPES + FREE_PLAN_TYPES }
-  validates :thread_disposal_limit, presence: true, if: -> { unpaid? }
+  validates :daily_disposal_limit, presence: true, if: -> { unpaid? }
   validates :stripe_subscription_id, :stripe_customer_id, presence: true, if: -> { pro? }
   validate :no_active_pro_plans, on: :create
 

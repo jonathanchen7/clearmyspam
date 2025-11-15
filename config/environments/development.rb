@@ -78,7 +78,7 @@ Rails.application.configure do
   # App settings
   config.sync_fetch_count = 25
   config.sender_dispose_all_max = 500
-  config.trial_thread_disposal_limit = 1000
+  config.trial_daily_disposal_limit = 500
   config.sender_emails_per_page = 20
   config.sandbox_mode = true
   config.enable_facebook_pixel = false

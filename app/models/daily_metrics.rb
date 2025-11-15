@@ -22,6 +22,10 @@
 class DailyMetrics < ApplicationRecord
   belongs_to :user
 
+  def disposed_count
+    archived_count + trashed_count
+  end
+
   def increment_archived_count!(by: 1)
     self.archived_count += by
     user.metrics.archived_count += by

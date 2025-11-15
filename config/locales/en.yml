@@ -71,7 +71,7 @@ en:
       success:
         title: "%{disposing}..."
         text:
-          zero: "No emails to %{disposing}"
+          zero: "No emails to %{dispose}"
           one: '%{disposing} <span class="text-primary">%{disposed_count}</span> emails from <span class="text-primary">%{sender}</span>.'
           other: '%{disposing} <span class="text-primary">%{disposed_count}</span> emails across <span class="text-primary">%{count}</span> senders.'
     dispose:
@@ -80,8 +80,8 @@ en:
       success:
         title: "%{count} email(s) %{disposed}"
       free_trial_limit:
-        title: "Free trial limit reached"
-        text: "You have reached the free trial %{dispose} limit. Upgrade your account to unlock unlimited access!"
+        title: "Daily limit reached"
+        text: "You have reached the daily %{disposing} limit. Upgrade to pro for unlimited access!"
         cta: "Go Pro →"
       delete_all_from_sender:
         text: 'We found <b class="text-primary">%{remaining_count}</b> remaining%{unread} emails in your inbox from <b class="text-primary">%{senders}</b>. Would you like to %{dispose} them? Protected emails will not be %{disposed}.'

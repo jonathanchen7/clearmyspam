@@ -29,24 +29,18 @@
           include_controller: true
         )
       ) do %>
-        <% if current_user.unpaid? %>
-          <% if current_user.remaining_disposal_count.zero? %>
-            You have reached your free trial limit of
-            <b class="text-primary"><%= current_user.active_account_plan.thread_disposal_limit %></b>
-            deleted emails.
-          <% else %>
-            You can <%= Current.options.archive ? "archive" : "delete" %>
-            <b class="text-primary">
-              <%= current_user.remaining_disposal_count %>
-            </b>
-            more emails on the free plan.
-          <% end %>
-          Upgrade to pro to unlock all features!
-        <% elsif current_user.inactive_pro? %>
-          Your Clear My Spam Pro subscription has expired. Please renew to regain access to all features.
+        <% if current_user.remaining_disposal_count.zero? %>
+          You've reached your daily limit of
+          <b class="text-primary"><%= current_user.active_account_plan.daily_disposal_limit %></b>
+          <%= disposed_verb %> emails.
         <% else %>
-          Upgrade to Clear My Spam Pro to unlock all features!
+          You can <%= dispose_verb %>
+          <b class="text-primary">
+            <%= current_user.remaining_disposal_count %>
+          </b>
+          more emails today.
         <% end %>
+        Upgrade to pro for unlimited access!
       <% end %>
     <% end %>
   </div>

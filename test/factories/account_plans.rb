@@ -13,7 +13,7 @@ FactoryBot.define do
 
     trait :free do
       plan_type { "trial" }
-      thread_disposal_limit { 500 }
+      daily_disposal_limit { 500 }
       stripe_customer_id { nil }
       stripe_subscription_id { nil }
     end

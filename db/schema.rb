@@ -10,17 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_14_062455) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_15_022218) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "account_plans", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.integer "daily_disposal_limit"
     t.string "plan_type", null: false
     t.string "stripe_customer_id"
     t.datetime "stripe_subscription_ended_at", precision: nil
     t.string "stripe_subscription_id"
-    t.integer "thread_disposal_limit"
     t.datetime "updated_at", null: false
     t.uuid "user_id", null: false
     t.index ["user_id"], name: "index_account_plans_on_user_id"

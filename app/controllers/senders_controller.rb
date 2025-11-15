@@ -94,8 +94,8 @@ class SendersController < AuthenticatedController
   def dispose_all
     if current_user.disable_dispose?
       toast.error(
-        I18n.t("toasts.dispose.free_trial_limit.title", dispose: dispose_verb),
-        text: I18n.t("toasts.dispose.free_trial_limit.text", dispose: dispose_verb),
+        I18n.t("toasts.dispose.free_trial_limit.title"),
+        text: I18n.t("toasts.dispose.free_trial_limit.text", disposing: disposing_verb),
       ).with_confirm_cta(
         I18n.t("toasts.dispose.free_trial_limit.cta"),
         stimulus_data: Views::StimulusData.new(
@@ -120,7 +120,8 @@ class SendersController < AuthenticatedController
                           disposing: disposing_verb.capitalize,
                           disposed_count: result.disposed_email_ids.count,
                           sender: (disposed_senders.first || result.partially_disposed_senders.first&.first)&.email,
-                          count: disposed_senders.size + result.partially_disposed_senders.size).html_safe
+                          count: disposed_senders.size + result.partially_disposed_senders.size,
+                          dispose: dispose_verb).html_safe
       toast.success(toast_title, text: toast_text)
     end
 

@@ -45,8 +45,8 @@ class EmailsController < AuthenticatedController
   def dispose
     if current_user.disable_dispose?
       toast.error(
-        I18n.t("toasts.dispose.free_trial_limit.title", dispose: dispose_verb),
-        text: I18n.t("toasts.dispose.free_trial_limit.text", dispose: dispose_verb)
+        I18n.t("toasts.dispose.free_trial_limit.title"),
+        text: I18n.t("toasts.dispose.free_trial_limit.text", disposing: disposing_verb)
       ).with_confirm_cta(
         I18n.t("toasts.dispose.free_trial_limit.cta"),
         stimulus_data: Views::StimulusData.new(
