@@ -12,7 +12,7 @@ class AccountPlanTest < ActiveSupport::TestCase
     user = create(:user)
     account_plan = AccountPlan.new(plan_type: "trial", user: user)
     assert_not account_plan.valid?
-    assert_includes account_plan.errors.full_messages, "Thread disposal limit can't be blank"
+    assert_includes account_plan.errors.full_messages, "Daily disposal limit can't be blank"
   end
 
   test "it validates stripe subscription id" do
