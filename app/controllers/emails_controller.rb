@@ -60,7 +60,7 @@ class EmailsController < AuthenticatedController
       ApplicationRecord.transaction do
         selected_email_ids = params.require(:email_ids)
         actionable_email_ids = ProtectedEmail.actionable_email_ids(current_user, selected_email_ids)
-        actionable_email_ids = actionable_email_ids.first(current_user.remaining_disposal_count) if current_user.unpaid?
+        actionable_email_ids = actionable_email_ids.first(current_user.remaining_disposal_count) unless current_user.active_pro?
 
         if actionable_email_ids.blank?
           toast.info I18n.t("toasts.dispose.no_emails.title", dispose: dispose_verb)

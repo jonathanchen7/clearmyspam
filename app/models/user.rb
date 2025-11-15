@@ -46,7 +46,7 @@ class User < ApplicationRecord
   attribute :google_access_token, :string
   attribute :google_access_token_expires_at, :datetime
 
-  delegate :active_pro?, :inactive_pro?, :unpaid?, to: :active_account_plan
+  delegate :active_pro?, to: :active_account_plan
 
   validates :email, uniqueness: true
 

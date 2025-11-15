@@ -94,7 +94,7 @@ class Sender
   def fetch_actionable_email_ids!(user)
     email_ids, _page_token = list_emails!(user)
     actionable_email_ids = ProtectedEmail.actionable_email_ids(user, email_ids)
-    actionable_email_ids = actionable_email_ids.first(user.remaining_disposal_count) if user.unpaid?
+    actionable_email_ids = actionable_email_ids.first(user.remaining_disposal_count) unless user.active_pro?
 
     actionable_email_ids
   rescue => e

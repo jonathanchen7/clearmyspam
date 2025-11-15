@@ -71,10 +71,6 @@ class AccountPlan < ApplicationRecord
     pro? && stripe_subscription_ended_at.nil?
   end
 
-  def inactive_pro?
-    pro? && stripe_subscription_ended_at.present?
-  end
-
   def unpaid?
     FREE_PLAN_TYPES.include?(plan_type)
   end

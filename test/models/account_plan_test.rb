@@ -99,16 +99,6 @@ class AccountPlanTest < ActiveSupport::TestCase
     assert_not pro_account_plan.active_pro?
   end
 
-  test "#inactive_pro? returns true for ended pro plans" do
-    user = create(:user)
-    pro_plan = create(:account_plan, :pro, user: user)
-
-    assert_not pro_plan.inactive_pro?
-
-    pro_plan.end_subscription!
-    assert pro_plan.inactive_pro?
-  end
-
   test "#unpaid? returns true for free plans and false for pro plans" do
     user = create(:user)
     free_plan = create(:account_plan, :free, user: user)
