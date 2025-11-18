@@ -1,8 +1,11 @@
 <div class="min-h-screen bg-gray-50" data-controller="admin">
   <div class="max-w-[98%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Header -->
-    <div class="mb-6">
+    <div class="mb-6 flex items-center justify-between">
       <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+      <%= form_with url: admin_trigger_re_engagement_path, method: :post, local: true, class: "inline-block" do |f| %>
+        <%= f.submit "Send Re-engagement Emails", class: "cursor-pointer px-3 py-2 bg-primary text-xs text-white rounded-full hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors" %>
+      <% end %>
     </div>
     <!-- Date Range Filter -->
     <%= render Admin::DateRangeFilterComponent.new(

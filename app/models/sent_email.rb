@@ -36,6 +36,11 @@ class SentEmail < ApplicationRecord
   RE_ENGAGEMENT_COUPON_EXPIRY_DAYS = 7
 
   class << self
+    def send_welcome_email!(user)
+      UserMailer.with(user: user).welcome.deliver_later
+      user.sent_emails.create!(email_type: "welcome")
+    end
+
     def send_re_engagement_email!(user, discount_code: nil)
       ApplicationRecord.transaction do
         discount_code ||= generate_stripe_coupon!(user)

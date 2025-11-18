@@ -3,9 +3,9 @@
 class AdminController < ApplicationController
   before_action :authenticate_user!
   before_action :ensure_admin!
-  before_action :set_date_range
-  before_action :set_pagination_params
-  before_action :set_sort_params
+  before_action :set_date_range, except: [:trigger_re_engagement]
+  before_action :set_pagination_params, except: [:trigger_re_engagement]
+  before_action :set_sort_params, except: [:trigger_re_engagement]
 
   def index
     @metrics = AdminMetrics.new(
@@ -15,6 +15,11 @@ class AdminController < ApplicationController
       per_page: @per_page,
       sort_by: @sort_by
     )
+  end
+
+  def trigger_re_engagement
+    ReEngageUnpaidUsersJob.perform_later
+    redirect_to admin_path, notice: "Re-engagement email job has been queued successfully."
   end
 
   private

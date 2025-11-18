@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   authenticate :user, ->(user) { user.admin? } do
     mount GoodJob::Engine => "good_job"
     get "admin", to: "admin#index"
+    post "admin/trigger_re_engagement", to: "admin#trigger_re_engagement", as: :admin_trigger_re_engagement
   end
 
   get "home/index"
