@@ -83,4 +83,48 @@ class Admin::UsersTableComponent < ViewComponent::Base
       per_page: params[:per_page]
     }
   end
+
+  def thread_change_data(current, initial)
+    curr = current || 0
+    init = initial || 0
+
+    if init > 0
+      diff = curr - init
+      percent_change = ((curr - init) * 100.0 / init).round
+      arrow = arrow_icon(diff)
+      color = arrow_color(diff)
+    else
+      percent_change = nil
+      arrow = nil
+      color = nil
+    end
+
+    {
+      current: curr,
+      initial: init,
+      percent_change: percent_change,
+      arrow: arrow,
+      color: color
+    }
+  end
+
+  def arrow_icon(diff)
+    if diff < 0
+      "↓"
+    elsif diff > 0
+      "↑"
+    else
+      "-"
+    end
+  end
+
+  def arrow_color(diff)
+    if diff < 0
+      "text-green-600"
+    elsif diff > 0
+      "text-red-600"
+    else
+      "text-gray-400"
+    end
+  end
 end

@@ -87,15 +87,41 @@
                 <%= unsubscribe_count(user) %>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <% thread_data = thread_change_data(user.metrics&.total_threads, user.metrics&.initial_total_threads) %>
                 <div>
-                  <div class="font-medium text-gray-900"><%= user.metrics&.total_threads || 0 %></div>
-                  <div class="text-xs text-gray-400">Initial: <%= user.metrics&.initial_total_threads || 0 %></div>
+                  <div class="font-medium text-gray-900 flex items-center gap-1">
+                    <%= thread_data[:current] %>
+                    <% if thread_data[:percent_change].present? %>
+                      <span class="flex items-center text-xs font-semibold <%= thread_data[:color] %>">
+                        <% if thread_data[:arrow] == "-" %>
+                          <span class="mx-1 text-gray-400">-</span>
+                        <% else %>
+                          <span><%= thread_data[:arrow] %></span>
+                          <span class="ml-0.5"><%= thread_data[:percent_change].abs %>%</span>
+                        <% end %>
+                      </span>
+                    <% end %>
+                  </div>
+                  <div class="text-xs text-gray-400">Initial: <%= thread_data[:initial] %></div>
                 </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <% thread_data = thread_change_data(user.metrics&.unread_threads, user.metrics&.initial_unread_threads) %>
                 <div>
-                  <div class="font-medium text-gray-900"><%= user.metrics&.unread_threads || 0 %></div>
-                  <div class="text-xs text-gray-400">Initial: <%= user.metrics&.initial_unread_threads || 0 %></div>
+                  <div class="font-medium text-gray-900 flex items-center gap-1">
+                    <%= thread_data[:current] %>
+                    <% if thread_data[:percent_change].present? %>
+                      <span class="flex items-center text-xs font-semibold <%= thread_data[:color] %>">
+                        <% if thread_data[:arrow] == "-" %>
+                          <span class="mx-1 text-gray-400">-</span>
+                        <% else %>
+                          <span><%= thread_data[:arrow] %></span>
+                          <span class="ml-0.5"><%= thread_data[:percent_change].abs %>%</span>
+                        <% end %>
+                      </span>
+                    <% end %>
+                  </div>
+                  <div class="text-xs text-gray-400">Initial: <%= thread_data[:initial] %></div>
                 </div>
               </td>
             </tr>

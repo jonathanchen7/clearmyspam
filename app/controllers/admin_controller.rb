@@ -19,7 +19,6 @@ class AdminController < ApplicationController
 
   def trigger_re_engagement
     ReEngageUnpaidUsersJob.perform_later
-    redirect_to admin_path, notice: "Re-engagement email job has been queued successfully."
   end
 
   private
