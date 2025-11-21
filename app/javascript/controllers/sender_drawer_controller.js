@@ -3,293 +3,354 @@ import { makeTurboStreamRequest } from "utils/shared";
 import { unsubscribeFromSender } from "../utils/unsubscribe";
 
 export default class extends Controller {
-  static targets = [
-    "drawerContainer",
-    "drawer",
-    "closeButton",
-    "selectAllCheckbox",
-    "selectAllFromSenderBanner",
-    "selectAllFromSenderBannerText",
-    "selectAllFromSenderButton",
-    "email",
-    "emailCheckbox",
-    "disposeIconButton",
-    "protectIconButton",
-    "unprotectIconButton",
-    "unsubscribeButton",
-    "loadMoreButton",
-    "previousPageButton",
-    "nextPageButton",
-  ];
-  static values = {
-    senderId: String,
-    senderEmail: String,
-    page: Number,
-    emailCount: Number,
-    emailsPerPage: Number,
-  };
+	static targets = [
+		"drawerContainer",
+		"drawer",
+		"closeButton",
+		"selectAllCheckbox",
+		"selectAllFromSenderBanner",
+		"selectAllFromSenderBannerText",
+		"selectAllFromSenderButton",
+		"email",
+		"emailCheckbox",
+		"disposeIconButton",
+		"protectIconButton",
+		"unprotectIconButton",
+		"unsubscribeButton",
+		"previousPageButton",
+		"nextPageButton",
+		"backButton",
+		"selectAllContainer",
+		"paginationContainer",
+	];
+	static values = {
+		senderId: String,
+		senderEmail: String,
+		page: Number,
+		emailCount: Number,
+		emailsPerPage: Number,
+	};
 
-  // ------------------ GETTERS ------------------
+	// ------------------ GETTERS ------------------
 
-  get #selectedEmailIds() {
-    return this.emailCheckboxTargets
-      .filter((checkbox) => checkbox.checked)
-      .map((checkbox) => checkbox.id);
-  }
+	get #selectedEmailIds() {
+		return this.emailCheckboxTargets
+			.filter((checkbox) => checkbox.checked)
+			.map((checkbox) => checkbox.id);
+	}
 
-  // ------------------ CONNECT + DISCONNECT ------------------
+	// ------------------ CONNECT + DISCONNECT ------------------
 
-  connect() {
-    this.boundCheckIfDrawerShouldClose =
-      this.#checkIfDrawerShouldClose.bind(this);
-    this.boundHandleKeydown = this.#handleKeydown.bind(this);
-    this.boundHandleToastCtaClick = this.#handleToastCtaClick.bind(this);
+	connect() {
+		this.boundCheckIfDrawerShouldClose =
+			this.#checkIfDrawerShouldClose.bind(this);
+		this.boundHandleKeydown = this.#handleKeydown.bind(this);
+		this.boundHandleToastCtaClick = this.#handleToastCtaClick.bind(this);
 
-    document.addEventListener("click", this.boundCheckIfDrawerShouldClose);
-    document.addEventListener("keydown", this.boundHandleKeydown);
-    window.addEventListener("toast:ctaClick", this.boundHandleToastCtaClick);
+		document.addEventListener("click", this.boundCheckIfDrawerShouldClose);
+		document.addEventListener("keydown", this.boundHandleKeydown);
+		window.addEventListener("toast:ctaClick", this.boundHandleToastCtaClick);
 
-    document.body.classList.add("overflow-hidden");
+		document.body.classList.add("overflow-hidden");
 
-    if (this.emailTargets.length === 0) {
-      makeTurboStreamRequest(
-        `senders/${this.senderIdValue}/emails?page=${this.pageValue}`,
-        "GET"
-      );
-    }
-  }
+		this.currentPreviewEmail = null;
 
-  disconnect() {
-    document.removeEventListener("click", this.boundCheckIfDrawerShouldClose);
-    document.removeEventListener("keydown", this.boundHandleKeydown);
-    window.removeEventListener("toast:ctaClick", this.boundHandleToastCtaClick);
+		if (this.emailTargets.length === 0) {
+			makeTurboStreamRequest(
+				`senders/${this.senderIdValue}/emails?page=${this.pageValue}`,
+				"GET",
+			);
+		}
+	}
 
-    document.body.classList.remove("overflow-hidden");
-  }
+	backButtonTargetConnected(target) {
+		target.style.display = "none";
+	}
 
-  #checkIfDrawerShouldClose(e) {
-    if (!this.hasCloseButtonTarget || !this.hasDrawerTarget) return;
+	disconnect() {
+		document.removeEventListener("click", this.boundCheckIfDrawerShouldClose);
+		document.removeEventListener("keydown", this.boundHandleKeydown);
+		window.removeEventListener("toast:ctaClick", this.boundHandleToastCtaClick);
 
-    if (
-      this.closeButtonTarget.contains(e.target) ||
-      (!this.drawerTarget.contains(e.target) && !e.target.closest(".toast"))
-    ) {
-      this.#closeDrawer();
-    }
-  }
+		document.body.classList.remove("overflow-hidden");
+	}
 
-  #handleKeydown(e) {
-    if (e.key === "Escape") {
-      this.#closeDrawer();
-    }
-  }
+	#checkIfDrawerShouldClose(e) {
+		if (!this.hasCloseButtonTarget || !this.hasDrawerTarget) return;
 
-  #closeDrawer() {
-    const emptyDrawer = document.createElement("div");
-    emptyDrawer.id = "sender_drawer";
-    this.drawerContainerTarget.replaceWith(emptyDrawer);
-  }
+		if (
+			this.closeButtonTarget.contains(e.target) ||
+			(!this.drawerTarget.contains(e.target) && !e.target.closest(".toast"))
+		) {
+			this.#closeDrawer();
+		}
+	}
 
-  // ------------------ SELECTING ------------------
+	#handleKeydown(e) {
+		if (e.key === "Escape") {
+			this.#closeDrawer();
+		}
+	}
 
-  toggleSelectAll(event) {
-    if (event.target.checked) {
-      this.emailCheckboxTargets.forEach((checkbox) => {
-        checkbox.checked = true;
-      });
+	#closeDrawer() {
+		const emptyDrawer = document.createElement("div");
+		emptyDrawer.id = "sender_drawer";
+		this.drawerContainerTarget.replaceWith(emptyDrawer);
+	}
 
-      this.#showSelectAllBanner();
-    } else {
-      this.emailCheckboxTargets.forEach((checkbox) => {
-        checkbox.checked = false;
-      });
+	// ------------------ SELECTING ------------------
 
-      this.#hideSelectAllBanner();
-    }
+	toggleSelectAll(event) {
+		if (event.target.checked) {
+			this.emailCheckboxTargets.forEach((checkbox) => {
+				checkbox.checked = true;
+			});
 
-    this.updateIconButtonsState();
-  }
+			this.#showSelectAllBanner();
+		} else {
+			this.emailCheckboxTargets.forEach((checkbox) => {
+				checkbox.checked = false;
+			});
 
-  toggleSelectAllFromSender(event) {
-    if (this.selectAllFromSender) {
-      this.selectAllFromSenderBannerTextTarget.innerHTML = `All <b class="text-primary">${event.params.emailsOnPage}</b> email(s) on this page are selected.`;
-      this.selectAllFromSenderButtonTarget.textContent = `Select all ${event.params.senderCount} from ${event.params.senderEmail}`;
-      this.selectAllFromSender = false;
-    } else {
-      this.selectAllFromSenderBannerTextTarget.innerHTML = `All <b class="text-primary">${event.params.senderCount}</b> emails from <span class="text-primary">${event.params.senderEmail}</span> are selected.`;
-      this.selectAllFromSenderButtonTarget.textContent = "Clear selection";
-      this.selectAllFromSender = true;
-    }
-  }
+			this.#hideSelectAllBanner();
+		}
 
-  selectEmail(e) {
-    const emailContainer = e.target.closest(".email");
-    const checkbox = emailContainer.querySelector("input[type=checkbox]");
-    checkbox.click();
+		this.updateIconButtonsState();
+	}
 
-    this.checkboxClicked(e);
-  }
+	toggleSelectAllFromSender(event) {
+		if (this.selectAllFromSender) {
+			this.selectAllFromSenderBannerTextTarget.innerHTML = `All <b class="text-primary">${event.params.emailsOnPage}</b> email(s) on this page are selected.`;
+			this.selectAllFromSenderButtonTarget.textContent = `Select all ${event.params.senderCount} from ${event.params.senderEmail}`;
+			this.selectAllFromSender = false;
+		} else {
+			this.selectAllFromSenderBannerTextTarget.innerHTML = `All <b class="text-primary">${event.params.senderCount}</b> emails from <span class="text-primary">${event.params.senderEmail}</span> are selected.`;
+			this.selectAllFromSenderButtonTarget.textContent = "Clear selection";
+			this.selectAllFromSender = true;
+		}
+	}
 
-  checkboxClicked(event) {
-    event.stopPropagation();
-    this.selectAllCheckboxTarget.checked =
-      this.#selectedEmailIds.length === this.emailCheckboxTargets.length;
+	selectEmail(e) {
+		const emailContainer = e.target.closest(".email");
+		const checkbox = emailContainer.querySelector("input[type=checkbox]");
+		checkbox.click();
 
-    if (this.#selectedEmailIds.length === this.emailCheckboxTargets.length) {
-      this.#showSelectAllBanner();
-    } else {
-      this.#hideSelectAllBanner();
-    }
+		this.checkboxClicked(e);
+	}
 
-    this.updateIconButtonsState();
-  }
+	checkboxClicked(event) {
+		event.stopPropagation();
+		this.selectAllCheckboxTarget.checked =
+			this.#selectedEmailIds.length === this.emailCheckboxTargets.length;
 
-  updateIconButtonsState() {
-    const selectedEmailCount = this.#selectedEmailIds.length;
-    this.protectIconButtonTarget.disabled = selectedEmailCount === 0;
-    this.unprotectIconButtonTarget.disabled = selectedEmailCount === 0;
-    this.disposeIconButtonTarget.disabled = selectedEmailCount === 0;
-  }
+		if (this.#selectedEmailIds.length === this.emailCheckboxTargets.length) {
+			this.#showSelectAllBanner();
+		} else {
+			this.#hideSelectAllBanner();
+		}
 
-  #showSelectAllBanner() {
-    if (this.emailCountValue > this.emailsPerPageValue) {
-      this.selectAllFromSenderBannerTarget.classList.remove("hidden");
-    }
-  }
+		this.updateIconButtonsState();
+	}
 
-  #hideSelectAllBanner() {
-    if (this.emailCountValue > this.emailsPerPageValue) {
-      this.selectAllFromSenderBannerTarget.classList.add("hidden");
-    }
-  }
+	updateIconButtonsState() {
+		const selectedEmailCount = this.#selectedEmailIds.length;
+		this.protectIconButtonTarget.disabled = selectedEmailCount === 0;
+		this.unprotectIconButtonTarget.disabled = selectedEmailCount === 0;
+		this.disposeIconButtonTarget.disabled = selectedEmailCount === 0;
+	}
 
-  // ------------------ ACTIONS ------------------
+	#showSelectAllBanner() {
+		if (this.emailCountValue > this.emailsPerPageValue) {
+			this.selectAllFromSenderBannerTarget.classList.remove("hidden");
+		}
+	}
 
-  previousPage() {
-    makeTurboStreamRequest(
-      `senders/${this.senderIdValue}?page=${this.pageValue - 1}`,
-      "GET",
-      null,
-      this.previousPageButtonTarget
-    );
-  }
+	#hideSelectAllBanner() {
+		if (this.emailCountValue > this.emailsPerPageValue) {
+			this.selectAllFromSenderBannerTarget.classList.add("hidden");
+		}
+	}
 
-  nextPage() {
-    makeTurboStreamRequest(
-      `senders/${this.senderIdValue}?page=${this.pageValue + 1}`,
-      "GET",
-      null,
-      this.nextPageButtonTarget
-    );
-  }
+	// ------------------ ACTIONS ------------------
 
-  unsubscribe() {
-    unsubscribeFromSender(
-      this.senderIdValue,
-      this.senderEmailValue,
-      this.unsubscribeButtonTarget
-    );
-  }
+	previousPage() {
+		makeTurboStreamRequest(
+			`senders/${this.senderIdValue}?page=${this.pageValue - 1}`,
+			"GET",
+			null,
+			this.previousPageButtonTarget,
+		);
+	}
 
-  disableActions(_) {
-    this.selectAllCheckboxTarget.disabled = true;
-    this.protectIconButtonTarget.disabled = true;
-    this.unprotectIconButtonTarget.disabled = true;
-    this.disposeIconButtonTarget.disabled = true;
-    this.unsubscribeButtonTarget.disabled = true;
-    this.loadMoreButtonTarget.disabled = true;
-  }
+	nextPage() {
+		makeTurboStreamRequest(
+			`senders/${this.senderIdValue}?page=${this.pageValue + 1}`,
+			"GET",
+			null,
+			this.nextPageButtonTarget,
+		);
+	}
 
-  toggleProtection(event) {
-    event.stopPropagation();
-    const isProtected = event.params.protected === true;
+	backToSender() {
+		makeTurboStreamRequest(
+			`senders/${this.senderIdValue}?page=${this.pageValue}`,
+			"GET",
+			null,
+			this.backButtonTarget,
+		);
+	}
 
-    makeTurboStreamRequest(
-      isProtected ? `emails/unprotect` : `emails/protect`,
-      "POST",
-      this.#turboRequestBody({ email_ids: [event.params.emailId] }),
-      event.target.closest("button")
-    );
-  }
+	unsubscribe() {
+		unsubscribeFromSender(
+			this.senderIdValue,
+			this.senderEmailValue,
+			this.unsubscribeButtonTarget,
+		);
+	}
 
-  dispose(event) {
-    event.stopPropagation();
-    makeTurboStreamRequest(
-      `emails/dispose`,
-      "POST",
-      this.#turboRequestBody({ email_ids: [event.params.emailId] }),
-      event.target.closest("button")
-    );
-  }
+	disableActions(_) {
+		this.selectAllCheckboxTarget.disabled = true;
+		this.protectIconButtonTarget.disabled = true;
+		this.unprotectIconButtonTarget.disabled = true;
+		this.disposeIconButtonTarget.disabled = true;
+		this.unsubscribeButtonTarget.disabled = true;
+	}
 
-  protectSelected() {
-    if (this.selectAllFromSender) {
-      makeTurboStreamRequest(
-        `senders/protect`,
-        "POST",
-        this.#turboRequestBody({ sender_ids: [this.senderIdValue] }),
-        this.protectIconButtonTarget
-      );
-    } else {
-      makeTurboStreamRequest(
-        `emails/protect`,
-        "POST",
-        this.#turboRequestBody({ email_ids: this.#selectedEmailIds }),
-        this.protectIconButtonTarget
-      );
-    }
-  }
+	toggleProtection(event) {
+		event.stopPropagation();
 
-  unprotectSelected() {
-    if (this.selectAllFromSender) {
-      makeTurboStreamRequest(
-        `senders/unprotect`,
-        "POST",
-        this.#turboRequestBody({ sender_ids: [this.senderIdValue] }),
-        this.unprotectIconButtonTarget
-      );
-    } else {
-      makeTurboStreamRequest(
-        `emails/unprotect`,
-        "POST",
-        this.#turboRequestBody({ email_ids: this.#selectedEmailIds }),
-        this.unprotectIconButtonTarget
-      );
-    }
-  }
+		const isProtected = this.currentPreviewEmail
+			? this.currentPreviewEmail.protected
+			: event.params.protected;
+		const emailId = this.currentPreviewEmail
+			? this.currentPreviewEmail.id
+			: event.params.emailId;
+		makeTurboStreamRequest(
+			isProtected ? `emails/unprotect` : `emails/protect`,
+			"POST",
+			this.#turboRequestBody({ email_ids: [emailId] }),
+			event.target.closest("button"),
+		);
+	}
 
-  disposeSelected() {
-    if (this.selectAllFromSender) {
-      makeTurboStreamRequest(
-        `senders/dispose_all`,
-        "POST",
-        this.#turboRequestBody({ sender_ids: [this.senderIdValue] }),
-        this.disposeIconButtonTarget
-      );
-    } else {
-      makeTurboStreamRequest(
-        `emails/dispose`,
-        "POST",
-        this.#turboRequestBody({ email_ids: this.#selectedEmailIds }),
-        this.disposeIconButtonTarget
-      );
-    }
-  }
+	dispose(event) {
+		event.stopPropagation();
 
-  #handleToastCtaClick(event) {
-    if (event.detail.action === "disposeAll") {
-      this.disableActions();
-    }
-  }
+		if (this.selectAllFromSender) {
+			makeTurboStreamRequest(
+				`senders/dispose_all`,
+				"POST",
+				this.#turboRequestBody({ sender_ids: [this.senderIdValue] }),
+				event.target.closest("button"),
+			);
+		} else {
+			let emailIds;
+			if (this.currentPreviewEmail) {
+				emailIds = [this.currentPreviewEmail.id];
+			} else if (event.params.emailId) {
+				emailIds = [event.params.emailId];
+			} else {
+				emailIds = this.#selectedEmailIds;
+			}
+			makeTurboStreamRequest(
+				`emails/dispose`,
+				"POST",
+				this.#turboRequestBody({ email_ids: emailIds }),
+				event.target.closest("button"),
+			);
+		}
+	}
 
-  #turboRequestBody(body = {}) {
-    return {
-      ...body,
-      drawer_options: {
-        enabled: true,
-        page: this.pageValue,
-        sender_id: this.senderIdValue,
-      },
-    };
-  }
+	protectSelected() {
+		if (this.selectAllFromSender) {
+			makeTurboStreamRequest(
+				`senders/protect`,
+				"POST",
+				this.#turboRequestBody({ sender_ids: [this.senderIdValue] }),
+				this.protectIconButtonTarget,
+			);
+		} else {
+			const emailIds = this.currentPreviewEmail
+				? [this.currentPreviewEmail.id]
+				: this.#selectedEmailIds;
+			makeTurboStreamRequest(
+				`emails/protect`,
+				"POST",
+				this.#turboRequestBody({ email_ids: emailIds }),
+				this.protectIconButtonTarget,
+			);
+		}
+	}
+
+	unprotectSelected() {
+		if (this.selectAllFromSender) {
+			makeTurboStreamRequest(
+				`senders/unprotect`,
+				"POST",
+				this.#turboRequestBody({ sender_ids: [this.senderIdValue] }),
+				this.unprotectIconButtonTarget,
+			);
+		} else {
+			const emailIds = this.currentPreviewEmail
+				? [this.currentPreviewEmail.id]
+				: this.#selectedEmailIds;
+			makeTurboStreamRequest(
+				`emails/unprotect`,
+				"POST",
+				this.#turboRequestBody({ email_ids: emailIds }),
+				this.unprotectIconButtonTarget,
+			);
+		}
+	}
+
+	#handleToastCtaClick(event) {
+		if (event.detail.action === "disposeAll") {
+			this.disableActions();
+		}
+	}
+
+	previewEmail(event) {
+		const threadId = event.params.threadId;
+		const email = this.emailTargets.find(
+			(el) => el.dataset.emailIdValue === threadId,
+		);
+
+		if (!email) return;
+
+		this.currentPreviewEmail = {
+			id: threadId,
+			protected: email.dataset.protectedValue === "true",
+		};
+
+		this.emailCheckboxTargets.forEach((checkbox) => {
+			checkbox.checked = false;
+		});
+
+		this.#hideSelectAllBanner();
+		this.updateIconButtonsState();
+		this.#updateToolbarForEmailPreview();
+	}
+
+	#updateToolbarForEmailPreview() {
+		this.backButtonTarget.style.display = "";
+		this.selectAllContainerTarget.style.display = "none";
+		this.paginationContainerTarget.style.display = "none";
+
+		this.disposeIconButtonTarget.disabled = this.currentPreviewEmail.protected;
+
+		this.protectIconButtonTarget.disabled = this.currentPreviewEmail.protected;
+		this.unprotectIconButtonTarget.disabled =
+			!this.currentPreviewEmail.protected;
+	}
+
+	#turboRequestBody(body = {}) {
+		return {
+			...body,
+			drawer_options: {
+				enabled: true,
+				page: this.pageValue,
+				sender_id: this.senderIdValue,
+			},
+		};
+	}
 }

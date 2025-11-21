@@ -57,9 +57,9 @@
                       </button>
                     </div>
                   </div>
-                  <div class="flex items-center justify-between py-1 sm:py-2 pl-2 sm:pl-4">
-                    <div class="flex items-center gap-x-2">
-                      <div class="flex items-center gap-x-2">
+                  <div class="flex items-center justify-between py-1 sm:py-2 sm:pl-1.5">
+                    <div class="flex items-center">
+                      <div class="flex items-center justify-center w-8 h-8" data-sender-drawer-target="selectAllContainer">
                         <%= check_box_tag(false,
                                           class: "h-3.5 w-3.5 rounded disabled:opacity-50",
                                           data: {
@@ -67,6 +67,15 @@
                                             "sender-drawer-target": "selectAllCheckbox"
                                           }) %>
                       </div>
+                      <%= render IconButtonComponent.new(
+                          icon: "arrow-left",
+                          color: "text-gray-500",
+                          tooltip: "Back to sender",
+                          stimulus_data: Views::StimulusData.new(
+                            targets: { "sender-drawer" => "backButton" },
+                            actions: { "click" => "sender-drawer#backToSender" }
+                          )
+                        ) %>
                       <div class="flex items-center">
                         <%= render IconButtonComponent.new(
                           icon: Current.options.archive ? "box-archive" : "trash-can",
@@ -74,7 +83,7 @@
                           disabled: true,
                           tooltip: "#{Current.options.archive ? "Archive" : "Delete"} Selected",
                           stimulus_data: Views::StimulusData.new(
-                            actions: { "click" => "sender-drawer#disposeSelected" },
+                            actions: { "click" => "sender-drawer#dispose" },
                             targets: { "sender-drawer" => "disposeIconButton" }
                           )
                         ) %>
@@ -100,17 +109,17 @@
                         ) %>
                       </div>
                     </div>
-                    <div class="flex items-center gap-x-1 sm:gap-x-2">
-                      <% total_count = sender.email_count || 0 %>
-                      <% emails_per_page = Rails.configuration.sender_emails_per_page %>
-                      <% start_index = ((page - 1) * emails_per_page) + 1 %>
-                      <% end_index = [start_index + emails_per_page - 1, total_count].min %>
-                      <% emails_on_page = end_index - start_index + 1 %>
+                    <div class="flex items-center gap-x-1 sm:gap-x-2" data-sender-drawer-target="paginationContainer">
                       <p class="text-xs sm:text-sm text-gray-600">
+                        <% total_count = sender.email_count || 0 %>
+                        <% emails_per_page = Rails.configuration.sender_emails_per_page %>
+                        <% start_index = ((page - 1) * emails_per_page) + 1 %>
+                        <% end_index = [start_index + emails_per_page - 1, total_count].min %>
+                        <% emails_on_page = emails&.length || (end_index - start_index + 1) %>
                         <%= "#{start_index}-#{end_index} of #{total_count}" %>
                       </p>
                       <div class="flex items-center">
-                          <%= render IconButtonComponent.new(
+                        <%= render IconButtonComponent.new(
                             icon: "chevron-left",
                             color: "text-gray-400",
                           disabled: page == 1,
@@ -137,10 +146,10 @@
                     <span data-sender-drawer-target="selectAllFromSenderBannerText">All <b class="text-primary"><%= emails_on_page %></b> email(s) on this page are selected.</span>
                     <button class="text-primary bg-white outline outline-1 outline-gray-400 duration-200 rounded-full px-3 py-1 text-xs font-medium hover:enabled:brightness-95 disabled:opacity-50"
                             data-action="click->sender-drawer#toggleSelectAllFromSender"
-                            data-sender-drawer-target="selectAllFromSenderButton"
-                            data-sender-drawer-sender-email-param="<%= sender.email %>"
-                            data-sender-drawer-sender-count-param="<%= sender.email_count %>"
-                            data-sender-drawer-emails-on-page-param="<%= emails_on_page %>">
+                      data-sender-drawer-target="selectAllFromSenderButton"
+                      data-sender-drawer-sender-email-param="<%= sender.email %>"
+                      data-sender-drawer-sender-count-param="<%= sender.email_count %>"
+                      data-sender-drawer-emails-on-page-param="<%= emails_on_page %>">
                       Select all <%= sender.email_count %> from <%= sender.email %>
                     </button>
                   </div>

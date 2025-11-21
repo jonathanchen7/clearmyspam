@@ -9,9 +9,9 @@ class SendersController < AuthenticatedController
   before_action :set_cached_inbox
 
   before_action :set_sender, if: -> { params[:sender_id].present? || drawer_enabled? }
-  before_action :set_drawer_details, only: [:protect, :unprotect, :dispose_all], if: :drawer_enabled?
+  before_action :set_drawer_details, only: [:protect, :unprotect, :dispose_all, :preview], if: :drawer_enabled?
   before_action :set_senders, only: [:protect, :unprotect, :dispose_all]
-  before_action :set_or_refresh_google_auth, only: [:unsubscribe]
+  before_action :set_or_refresh_google_auth, only: [:unsubscribe, :preview]
 
   after_action -> { inbox.cache! }, only: [:show, :emails, :protect, :unprotect, :dispose_all, :move_all]
   after_action -> { Email.write_to_cache(@drawer_sender.id, @drawer_emails) }, only: [:show, :emails]
@@ -30,6 +30,23 @@ class SendersController < AuthenticatedController
     @drawer_sender = sender
     @drawer_emails = sender.fetch_emails!(current_user, inbox, page: @drawer_page)
     render turbo_stream: turbo_stream.update("emails-table", Dashboard::EmailsTableComponent.new(emails: @drawer_emails))
+  end
+
+  def preview
+    email_id = params[:email_id]
+
+    cached_emails = Email.fetch_from_cache(sender.id) || []
+    preview_email = cached_emails.find { |e| e.vendor_id == email_id }
+
+    if preview_email.present?
+      gmail_thread = Gmail::Client.new(current_user).get_thread_details!(thread_id: email_id)
+      email_html = Gmail::EmailHtmlExtractor.extract_html(gmail_thread)
+    end
+
+    render turbo_stream: turbo_stream.replace("emails-table", Dashboard::EmailPreviewComponent.new(
+      email: preview_email,
+      email_html: email_html
+    ))
   end
 
   def unsubscribe

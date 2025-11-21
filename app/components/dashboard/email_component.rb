@@ -34,6 +34,10 @@ module Dashboard
       helpers.icon("fa-solid", Current.options.archive ? "box-archive" : "trash-can", class: "text-danger")
     end
 
+    def email_preview_path
+      helpers.senders_preview_path(email.sender.id, email.vendor_id)
+    end
+
     private
 
     attr_reader :email

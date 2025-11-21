@@ -1,0 +1,26 @@
+<div class="flex flex-col px-2 sm:px-4 mb-3 gap-y-3 h-[calc(100vh-140px)] min-h-[600px]">
+  <div class="flex flex-col gap-y-1">
+    <div class="flex items-center gap-x-2 max-w-full">
+      <%= helpers.icon("fa-solid", "lock", class: "text-success text-xs") if protected? %>
+      <p class="text-sm text-gray-900 font-medium"><%= email_subject %></p>
+    </div>
+    <p class="text-xs text-gray-500"><%= formatted_date %></p>
+  </div>
+  <% if has_content? %>
+    <div class="border border-gray-200 rounded-lg overflow-hidden bg-white flex-1 flex flex-col">
+      <iframe
+        src="<%= wrapped_email_html %>"
+        class="w-full border-0 flex-1"
+        sandbox="allow-same-origin allow-scripts"
+        referrerpolicy="no-referrer-when-downgrade"
+        title="Email HTML preview"
+        loading="lazy"
+        scrolling="auto"
+      ></iframe>
+    </div>
+  <% else %>
+    <div class="flex flex-col items-center justify-center text-gray-500 text-sm py-8">
+      <p>Unable to load email content.</p>
+    </div>
+  <% end %>
+</div>

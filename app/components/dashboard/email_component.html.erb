@@ -4,9 +4,8 @@
   data-sender-drawer-target="email"
   data-email-id-value="<%= email.vendor_id %>"
   data-protected-value="<%= email.protected? %>"
-  data-action="click->sender-drawer#selectEmail"
   >
-  <div class="min-h-4 min-w-4 sm:min-h-3.5 sm:min-w-3.5 rounded text-primary-400 flex flex-row items-center gap-x-3">
+  <div class="min-h-4 min-w-4 sm:min-h-3.5 sm:min-w-3.5 rounded text-primary-400 flex flex-row items-center gap-x-3 w-full">
     <%= check_box_tag(email.vendor_id,
                       false,
                       class: "h-3.5 w-3.5 rounded",
@@ -14,7 +13,13 @@
                         action: "click->sender-drawer#checkboxClicked",
                         "sender-drawer-target": "emailCheckbox"
                       }) %>
-    <div class="flex flex-col overflow-hidden">
+    <%= link_to email_preview_path,
+                data: { 
+                  turbo_stream: true,
+                  action: "click->sender-drawer#previewEmail",
+                  "sender-drawer-thread-id-param": email.vendor_id
+                },
+                class: "flex flex-col overflow-hidden cursor-pointer w-full" do %>
       <div class="sm:flex items-start gap-x-3">
         <div class="flex items-center gap-x-2 max-w-full">
           <%= helpers.icon("fa-solid", "lock", class: "text-success text-xs") if email.protected? %>
@@ -29,7 +34,7 @@
           <p class="truncate">• <%= email.snippet %></p>
         <% end %>
       </div>
-    </div>
+    <% end %>
   </div>
   <div class="hidden sm:flex flex-row absolute right-2 invisible group-hover:visible p-1 rounded-md group-hover:bg-gray-200 group-hover:duration-300">
     <button
