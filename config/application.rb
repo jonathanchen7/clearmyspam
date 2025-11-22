@@ -27,5 +27,9 @@ module ClearMySpam
     config.good_job.execution_mode = :external
 
     ENV["GOOGLE_API_USE_RAILS_LOGGER"] = "false"
+
+    config.exceptions_app = ->(env) {
+      ErrorsController.action(:show).call(env)
+    }
   end
 end
