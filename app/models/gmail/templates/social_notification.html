@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #fdf4ff;
+    }
+    .container {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    .content-box {
+      background-color: #ffffff;
+      border-radius: 10px;
+      padding: 32px;
+      box-shadow: 0 2px 8px rgba(192, 132, 252, 0.15);
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #e9d5ff;
+    }
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #a855f7 0%, #c084fc 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 20px;
+      margin-right: 16px;
+    }
+    .header-text {
+      flex: 1;
+    }
+    h2 {
+      margin: 0 0 4px 0;
+      font-weight: 600;
+      color: #6b21a8;
+      font-size: 18px;
+    }
+    .timestamp {
+      font-size: 12px;
+      color: #9333ea;
+    }
+    .notification-content {
+      background-color: #faf5ff;
+      border-left: 4px solid #a855f7;
+      border-radius: 6px;
+      padding: 16px;
+      margin: 20px 0;
+    }
+    p {
+      margin-top: 0;
+      margin-bottom: 12px;
+      line-height: 1.6;
+      color: #581c87;
+    }
+    .action-buttons {
+      margin-top: 24px;
+      display: flex;
+      gap: 12px;
+    }
+    .button {
+      flex: 1;
+      display: inline-block;
+      text-align: center;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .button-primary {
+      background-color: #a855f7;
+      color: #ffffff !important;
+    }
+    .button-secondary {
+      background-color: #f3e8ff;
+      color: #7e22ce !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="content-box">
+      <div class="header">
+        <div class="avatar">JD</div>
+        <div class="header-text">
+          <h2>John Doe</h2>
+          <div class="timestamp">2 hours ago</div>
+        </div>
+      </div>
+      
+      <p><strong>New Activity:</strong> You have a new notification!</p>
+      
+      <div class="notification-content">
+        <p><strong>@johndoe</strong> mentioned you in a comment:</p>
+        <p>"Great work on the project! Let's discuss this further."</p>
+      </div>
+      
+      <p>Want to see what's happening? Check out the latest updates.</p>
+      
+      <div class="action-buttons">
+        <a href="https://example.com/view" class="button button-primary">View Activity</a>
+        <a href="https://example.com/settings" class="button button-secondary">Settings</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+

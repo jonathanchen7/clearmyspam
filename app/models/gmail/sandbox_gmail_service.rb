@@ -58,8 +58,9 @@ module Gmail
     # Mirrors Google::Apis::GmailV1::GmailService#get_user_thread
     ThreadResponse = Struct.new(:id, :messages, keyword_init: true)
     Message = Struct.new(:id, :payload, :snippet, :label_ids, keyword_init: true)
-    MessagePayload = Struct.new(:headers, keyword_init: true)
+    MessagePayload = Struct.new(:headers, :parts, :mime_type, :body, keyword_init: true)
     PayloadHeader = Struct.new(:name, :value, keyword_init: true)
+    MessagePartBody = Struct.new(:data, :size, keyword_init: true)
     def get_user_thread(user_id, thread_id, format:, metadata_headers: nil, &block)
       Faker::Config.random = Random.new(BASE_SEED + thread_id.hash)
 
@@ -75,9 +76,26 @@ module Gmail
         PayloadHeader.new(name: "List-Unsubscribe", value: "https://example.com/unsubscribe"),
         PayloadHeader.new(name: "From", value: email.sender.raw_sender),
         PayloadHeader.new(name: "Date", value: email.date.to_s),
-        PayloadHeader.new(name: "Subject", value: email.subject)
+        PayloadHeader.new(name: "Subject", value: email.subject),
+        PayloadHeader.new(name: "To", value: "user@example.com"),
+        PayloadHeader.new(name: "Message-ID", value: "<#{Faker::Alphanumeric.alphanumeric(number: 16)}@example.com>"),
+        PayloadHeader.new(name: "MIME-Version", value: "1.0"),
+        PayloadHeader.new(name: "Content-Type", value: "text/html; charset=UTF-8"),
+        PayloadHeader.new(name: "Content-Transfer-Encoding", value: "quoted-printable")
       ]
-      payload = MessagePayload.new(headers:)
+
+      html_content = load_email_template(thread_id)
+
+      payload = MessagePayload.new(
+        headers: headers,
+        mime_type: "text/html",
+        body: MessagePartBody.new(
+          data: html_content,
+          size: html_content.bytesize
+        ),
+        parts: nil
+      )
+
       messages = [Message.new(id: thread_id, payload:, snippet: email.snippet, label_ids: email.label_ids)]
       result = ThreadResponse.new(id: thread_id, messages:)
 
@@ -122,6 +140,19 @@ module Gmail
 
     def specific_sender_thread_id?(thread_id)
       thread_id.include?("-") && Sender::HASHED_DUMMY_BUSINESS_SENDERS.key?(thread_id.split("-").first)
+    end
+
+    def load_email_template(thread_id)
+      templates = %w[promotional newsletter transactional simple welcome password_reset social_notification shipping survey]
+      template_index = Faker::Number.between(from: 0, to: templates.size - 1)
+      template_name = templates[template_index]
+      template_path = Rails.root.join("app", "models", "gmail", "templates", "#{template_name}.html")
+
+      if File.exist?(template_path)
+        File.read(template_path)
+      else
+        "<html><body><p>Email content</p></body></html>"
+      end
     end
   end
 end

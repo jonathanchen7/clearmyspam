@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #ecfdf5;
+    }
+    .container {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    .content-box {
+      background-color: #ffffff;
+      border-radius: 8px;
+      padding: 32px;
+      box-shadow: 0 2px 4px rgba(16, 185, 129, 0.1);
+    }
+    .status-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #d1fae5;
+    }
+    .status-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: #10b981;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-right: 16px;
+    }
+    h1 {
+      margin: 0;
+      font-weight: 600;
+      color: #065f46;
+      font-size: 24px;
+    }
+    .tracking-info {
+      background-color: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 6px;
+      padding: 20px;
+      margin: 24px 0;
+    }
+    .tracking-number {
+      font-family: 'Courier New', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: #047857;
+      margin: 8px 0;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .info-item {
+      padding: 12px;
+      background-color: #f0fdf4;
+      border-radius: 4px;
+    }
+    .info-label {
+      font-size: 12px;
+      color: #047857;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .info-value {
+      font-size: 16px;
+      color: #065f46;
+      font-weight: 500;
+    }
+    p {
+      margin-top: 0;
+      margin-bottom: 16px;
+      line-height: 1.6;
+      color: #064e3b;
+    }
+    .button {
+      display: inline-block;
+      background-color: #10b981;
+      color: #ffffff !important;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-weight: 600;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="content-box">
+      <div class="status-header">
+        <div class="status-icon">📦</div>
+        <h1>Your Order Has Shipped!</h1>
+      </div>
+      
+      <p>Great news! Your order is on its way. You can track its progress using the information below.</p>
+      
+      <div class="tracking-info">
+        <div style="font-weight: 600; color: #047857; margin-bottom: 8px;">Tracking Number:</div>
+        <div class="tracking-number">1Z999AA10123456784</div>
+      </div>
+      
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">Carrier</div>
+          <div class="info-value">FedEx</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Est. Delivery</div>
+          <div class="info-value">Nov 18, 2025</div>
+        </div>
+      </div>
+      
+      <p>You'll receive another email when your package is delivered.</p>
+      
+      <div style="text-align: center;">
+        <a href="https://example.com/track" class="button">Track Package</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
