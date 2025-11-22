@@ -88,7 +88,19 @@ export default class extends Controller {
 
 	#handleKeydown(e) {
 		if (e.key === "Escape") {
-			this.#closeDrawer();
+			if (this.currentPreviewEmail) {
+				this.backToSender();
+			} else {
+				this.#closeDrawer();
+			}
+		}
+
+		if (e.key === "ArrowLeft") {
+			if (this.currentPreviewEmail) {
+				this.backToSender();
+			} else {
+				this.#closeDrawer();
+			}
 		}
 	}
 
@@ -174,6 +186,8 @@ export default class extends Controller {
 	// ------------------ ACTIONS ------------------
 
 	previousPage() {
+		if (this.pageValue <= 1) return;
+
 		makeTurboStreamRequest(
 			`senders/${this.senderIdValue}?page=${this.pageValue - 1}`,
 			"GET",
