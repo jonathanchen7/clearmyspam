@@ -75,8 +75,8 @@ GEM
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
       uri (>= 0.13.1)
-    addressable (2.8.7)
-      public_suffix (>= 2.0.2, < 7.0)
+    addressable (2.8.8)
+      public_suffix (>= 2.0.2, < 8.0)
     amazing_print (2.0.0)
     annotaterb (4.20.0)
       activerecord (>= 6.0.0)
@@ -171,13 +171,13 @@ GEM
       mini_mime (~> 1.1)
       representable (~> 3.0)
       retriable (~> 3.1)
-    google-apis-gmail_v1 (0.46.0)
+    google-apis-gmail_v1 (0.47.0)
       google-apis-core (>= 0.15.0, < 2.a)
     google-cloud-env (2.3.1)
       base64 (~> 0.2)
       faraday (>= 1.0, < 3.a)
     google-logging-utils (0.2.0)
-    googleauth (1.15.1)
+    googleauth (1.16.0)
       faraday (>= 1.0, < 3.a)
       google-cloud-env (~> 2.2)
       google-logging-utils (~> 0.1)
@@ -221,7 +221,7 @@ GEM
     jbuilder (2.14.1)
       actionview (>= 7.0.0)
       activesupport (>= 7.0.0)
-    json (2.16.0)
+    json (2.17.1)
     jwt (2.10.2)
       base64
     kaminari (1.2.2)
@@ -260,7 +260,7 @@ GEM
     mocha (2.8.2)
       ruby2_keywords (>= 0.0.5)
     msgpack (1.8.0)
-    multi_json (1.17.0)
+    multi_json (1.18.0)
     multi_xml (0.7.1)
       bigdecimal (~> 3.1)
     nenv (0.3.0)
@@ -342,7 +342,7 @@ GEM
     psych (5.2.6)
       date
       stringio
-    public_suffix (6.0.2)
+    public_suffix (7.0.0)
     puma (7.1.0)
       nio4r (~> 2.0)
     raabro (1.4.0)
@@ -543,7 +543,7 @@ DEPENDENCIES
   faker
   font-awesome-sass
   good_job
-  google-apis-gmail_v1 (~> 0.46.0)
+  google-apis-gmail_v1 (~> 0.47.0)
   guard-livereload (~> 2.5)
   honeybadger (~> 6.1)
   importmap-rails
