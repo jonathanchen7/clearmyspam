@@ -30,4 +30,16 @@ class UserMailer < ApplicationMailer
 
     mail(to: @user.email, subject: "Your $#{SentEmail::RE_ENGAGEMENT_COUPON_DISCOUNT_DOLLARS} credit is expiring soon 📅")
   end
+
+  def coupon_fix
+    @text_preview = "Sorry! Here's a $5 promo code 🎟️"
+
+    @is_marketing_email = true
+    @user = params[:user]
+
+    @coupon_code = params[:coupon_code] || "SX53DJLV"
+    @expiry_date = Date.current.end_of_month.strftime("%B %d, %Y")
+
+    mail(to: @user.email, subject: "Sorry! Here's a $5 promo code 🎟️")
+  end
 end

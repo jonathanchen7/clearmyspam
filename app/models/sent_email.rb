@@ -27,7 +27,8 @@ class SentEmail < ApplicationRecord
   VALID_EMAIL_TYPES = [
     "welcome",
     "re_engagement",
-    "re_engagement_reminder"
+    "re_engagement_reminder",
+    "coupon_fix"
   ].freeze
 
   validates :email_type, presence: true, uniqueness: { scope: :user_id }, inclusion: { in: VALID_EMAIL_TYPES }
@@ -58,6 +59,13 @@ class SentEmail < ApplicationRecord
 
         UserMailer.with(user: user, discount_code:).re_engagement_reminder.deliver_later
         user.sent_emails.create!(email_type: "re_engagement_reminder", metadata_json: re_engagement_email.metadata_json)
+      end
+    end
+
+    def send_coupon_fix_email!(user, coupon_code: "SX53DJLV")
+      ApplicationRecord.transaction do
+        UserMailer.with(user: user, coupon_code:).coupon_fix.deliver_later
+        user.sent_emails.create!(email_type: "coupon_fix", metadata_json: { coupon_code: })
       end
     end
 
