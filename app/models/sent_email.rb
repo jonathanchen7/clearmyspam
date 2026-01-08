@@ -43,7 +43,7 @@ class SentEmail < ApplicationRecord
 
     def send_re_engagement_email!(user, discount_code: nil)
       ApplicationRecord.transaction do
-        discount_code ||= generate_stripe_coupon!(user)
+        discount_code ||= generate_stripe_promo_code!(user)
 
         UserMailer.with(user: user, discount_code:).re_engagement.deliver_later
         user.sent_emails.create!(email_type: "re_engagement", metadata_json: { discount_code: })
@@ -63,21 +63,28 @@ class SentEmail < ApplicationRecord
 
     private
 
-    def generate_stripe_coupon!(user)
+    def generate_stripe_promo_code!(user)
       Stripe.api_key = Rails.application.credentials.dig(:stripe, :api_key)
-      coupon = Stripe::Coupon.create(
-        currency: "USD",
-        amount_off: RE_ENGAGEMENT_COUPON_DISCOUNT_DOLLARS * 100,
-        duration: "once",
-        name: "thanks for the feedback! :)",
-        redeem_by: RE_ENGAGEMENT_COUPON_EXPIRY_DAYS.days.from_now.to_i,
+      feedback_coupon_id = Rails.application.credentials.dig(:stripe, :feedback_coupon_id)
+
+      promo_code = Stripe::PromotionCode.create(
+        promotion: {
+          type: "coupon",
+          coupon: feedback_coupon_id
+        },
+        active: true,
+        expires_at: RE_ENGAGEMENT_COUPON_EXPIRY_DAYS.days.from_now.to_i,
+        max_redemptions: 1,
+        restrictions: {
+          first_time_transaction: true
+        },
         metadata: {
           user_id: user.id,
           user_email: user.email
         }
       )
 
-      coupon.id
+      promo_code.id
     end
   end
 end
