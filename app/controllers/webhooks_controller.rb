@@ -80,10 +80,10 @@ class WebhooksController < ApplicationController
   def additional_user_data(customer)
     if customer.address.present?
       {
-        ct: hash(customer.address.city.downcase),
-        st: hash(customer.address.state.downcase),
-        country: hash(customer.address.country.downcase),
-        zip: hash(customer.address.postal_code.downcase)
+        ct: hash(customer.address.city&.downcase),
+        st: hash(customer.address.state&.downcase),
+        country: hash(customer.address.country&.downcase),
+        zip: hash(customer.address.postal_code&.downcase)
       }
     else
       {}
