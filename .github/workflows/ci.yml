@@ -62,7 +62,7 @@ jobs:
         run: bin/rails db:test:prepare test test:system
 
       - name: Upload failed test screenshots
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: screenshots
