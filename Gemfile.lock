@@ -204,7 +204,7 @@ GEM
       multi_json (~> 1.8)
     hashie (5.1.0)
       logger
-    honeybadger (6.5.2)
+    honeybadger (6.5.3)
       logger
       ostruct
     http_parser.rb (0.8.0)
