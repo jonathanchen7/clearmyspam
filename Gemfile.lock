@@ -204,7 +204,7 @@ GEM
       multi_json (~> 1.8)
     hashie (5.1.0)
       logger
-    honeybadger (6.6.2)
+    honeybadger (6.7.0)
       logger
       ostruct
     http_parser.rb (0.8.0)
@@ -551,7 +551,7 @@ DEPENDENCIES
   good_job
   google-apis-gmail_v1 (~> 0.51.0)
   guard-livereload (~> 2.5)
-  honeybadger (~> 6.6)
+  honeybadger (~> 6.7)
   importmap-rails
   jbuilder
   kaminari
