@@ -35,7 +35,7 @@ gem "good_job"
 gem "stripe"
 gem "view_component"
 gem "redcarpet"
-gem "honeybadger", "~> 6.7"
+gem "honeybadger", "~> 6.9"
 gem "kaminari"
 
 gem "colorize"
