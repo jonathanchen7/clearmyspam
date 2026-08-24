@@ -4,16 +4,25 @@ class PricingController < ApplicationController
   set_rate_limit to: 5, only: [:checkout, :billing_portal]
 
   before_action :authenticate_user!, only: [:checkout, :billing_portal]
-  before_action :set_stripe_api_key, only: [:checkout, :billing_portal]
+  before_action :set_stripe_api_key, only: [:billing_portal]
 
   def index
     pixel_client.track_event(Facebook::EventType::ViewContent) if pixel_client.present?
   end
 
   def checkout
+    unless upgrades_enabled?
+      render json: {
+        success: false,
+        error: "Upgrades are temporarily unavailable while Clear My Spam is rebuilt from scratch."
+      }, status: :forbidden
+      return
+    end
+
     plan_type = params.require(:type)
 
     raise "User is already on pro plan" if current_user.active_pro?
+    set_stripe_api_key
 
     session = Stripe::Checkout::Session.create(
       {
@@ -61,5 +70,9 @@ class PricingController < ApplicationController
 
   def set_stripe_api_key
     Stripe.api_key = Rails.application.credentials.dig(:stripe, :api_key)
+  end
+
+  def upgrades_enabled?
+    false
   end
 end

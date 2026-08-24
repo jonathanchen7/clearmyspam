@@ -21,13 +21,8 @@
     <% end %>
     <% unless current_user.active_pro? %>
       <%= render FloatingBannerComponent.new(
-        cta_text: "Go Pro",
-        cta_stimulus_data: Views::StimulusData.new(
-          controllers: "pricing",
-          actions: { "click" => "pricing#checkout" },
-          values: { "pricing" => { "plan-type" => "monthly" } },
-          include_controller: true
-        )
+        cta_text: nil,
+        cta_stimulus_data: nil
       ) do %>
         <% if current_user.remaining_disposal_count.zero? %>
           You've reached your daily limit of
@@ -40,7 +35,7 @@
           </b>
           more emails today.
         <% end %>
-        Upgrade to pro for unlimited access!
+        Upgrades are temporarily unavailable while Clear My Spam is rebuilt from scratch.
       <% end %>
     <% end %>
   </div>

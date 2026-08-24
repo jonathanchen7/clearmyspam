@@ -20,11 +20,11 @@
     <% elsif @plan_type == "free" %>
       <%= link_to "Get Started", app_path, class: button_styling, data: { "turbo-prefetch": false } %>
     <% else %>
-      <button data-controller="pricing"
-              data-action="click->pricing#checkout"
-        data-pricing-plan-type-value="<%= @plan_type %>"
-        class="<%= button_styling %>">
-        <%= @cta %>
+      <button
+        class="<%= class_names(button_styling, "opacity-60 cursor-not-allowed hover:bg-inherit") %>"
+        disabled
+      >
+        Upgrades Paused
       </button>
     <% end %>
   <% else %>

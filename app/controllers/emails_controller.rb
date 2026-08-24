@@ -47,14 +47,6 @@ class EmailsController < AuthenticatedController
       toast.error(
         I18n.t("toasts.dispose.free_trial_limit.title"),
         text: I18n.t("toasts.dispose.free_trial_limit.text", disposing: disposing_verb)
-      ).with_confirm_cta(
-        I18n.t("toasts.dispose.free_trial_limit.cta"),
-        stimulus_data: Views::StimulusData.new(
-          controllers: "pricing",
-          actions: { "click" => "pricing#checkout" },
-          values: { "pricing" => { "plan-type" => "monthly" } },
-          include_controller: true
-        )
       )
     else
       ApplicationRecord.transaction do

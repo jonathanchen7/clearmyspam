@@ -1,6 +1,12 @@
 <% content_for :title, "Clear My Spam | Dashboard" %>
 
 <div id="inbox" data-controller="inbox">
+  <div class="px-3 sm:px-4 pt-3 sm:pt-4">
+    <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+      <span class="font-semibold">Heads up:</span>
+      Clear My Spam is being rebuilt from scratch. Upgrades are temporarily unavailable in the app.
+    </div>
+  </div>
   <%= render partial: "toolbar" %>
   <%= render partial: "senders_table" %>
   <div id="sender_drawer"></div>
